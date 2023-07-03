@@ -1,0 +1,139 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- TabBar -->
+    <LinearLayout
+        android:id="@+id/tabBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|end"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/iv_closeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_cancel" />
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Profil Düzenle"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/checkButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_check" />
+    </LinearLayout>
+
+    <!-- Ana ekran -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/tabBar"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Profil resmi -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/iv_profile"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/icon_profile"
+                app:civ_border_color="#000"
+                app:civ_border_overlay="true"
+                app:civ_border_width="2dp" />
+
+            <!-- Fotoğrafı değiştir -->
+            <TextView
+                android:id="@+id/changePhotoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fotoğrafı Değiştir"
+                android:textSize="16sp"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="8dp" />
+
+            <!-- Ad -->
+            <TextView
+                android:id="@+id/nameLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ad"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:paddingTop="16dp" />
+            <!-- Ad TextField -->
+            <EditText
+                android:id="@+id/nameTextField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Adınızı girin" />
+
+
+            <!-- TextField 1 -->
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kullanıcı Adı"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:paddingTop="18dp" />
+            <EditText
+                android:id="@+id/et_userName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Kullanıcı Adı" />
+
+            <!-- TextField 2 -->
+            <TextView
+                android:id="@+id/textView14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Biyografi"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:paddingTop="18dp" />
+            <EditText
+                android:id="@+id/et_biografi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Biyografi" />
+
+
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="İnternet Sitesi"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:paddingTop="18dp" />
+            <EditText
+                android:id="@+id/et_site"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="İnternet Sitesi" />
+
+
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>
