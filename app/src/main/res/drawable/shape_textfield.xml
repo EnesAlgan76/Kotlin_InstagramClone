@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#F5F5F5" /> <!-- Background color of the text field -->
+    <corners android:radius="5dp" /> <!-- Rounded corners with a radius of 8dp -->
+    <stroke
+        android:width="1dp"
+        android:color="#CCCCCC" />
+    <padding
+        android:left="12dp"
+        android:top="18dp"
+        android:right="12dp"
+        android:bottom="18dp" /> <!-- Padding inside the text field -->
+</shape>

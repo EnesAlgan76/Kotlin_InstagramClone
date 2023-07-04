@@ -14,7 +14,7 @@
         android:theme="@style/Theme.KotlinInstagramApp"
         tools:targetApi="31">
         <activity
-            android:name=".RegisterActivity"
+            android:name=".Login.RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".Profile.SettingActivity"

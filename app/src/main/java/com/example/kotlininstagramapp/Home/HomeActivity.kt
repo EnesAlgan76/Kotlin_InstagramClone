@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import com.example.kotlininstagramapp.Login.RegisterActivity
 import com.example.kotlininstagramapp.Profile.ProfileActivity
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.Reels.ReelsActivity
@@ -38,7 +39,7 @@ class HomeActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         print("clicked")
         when(item.itemId){
             R.id.menu_item_add ->{
-                startActivity(Intent(this, ShareActivity::class.java))
+                startActivity(Intent(this, RegisterActivity::class.java))
                 overridePendingTransition(0, 0)
                 return true
             }
