@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -13,9 +14,11 @@
         android:theme="@style/Theme.KotlinInstagramApp"
         tools:targetApi="31">
         <activity
-            android:name=".Profile.SettingActivity"
+            android:name=".RegisterActivity"
             android:exported="false" />
-        <!-- Set the intent-filter of HomeActivity as the launcher -->
+        <activity
+            android:name=".Profile.SettingActivity"
+            android:exported="false" /> <!-- Set the intent-filter of HomeActivity as the launcher -->
         <activity
             android:name=".Home.HomeActivity"
             android:exported="true">
