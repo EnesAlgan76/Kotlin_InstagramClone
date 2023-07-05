@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.view.MenuItem
 import com.example.kotlininstagramapp.Home.HomeActivity
+import com.example.kotlininstagramapp.Login.RegisterActivity
 import com.example.kotlininstagramapp.Profile.ProfileActivity
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.Reels.ReelsActivity
@@ -22,7 +23,7 @@ class BottomNavigationHandler {
                 override fun onNavigationItemSelected(item: MenuItem): Boolean {
                     when (item.itemId) {
                         R.id.menu_item_add -> {
-                            val intent = Intent(context, ShareActivity::class.java)
+                            val intent = Intent(context, RegisterActivity::class.java)
                             context.startActivity(intent)
                             (context as Activity).overridePendingTransition(0, 0)
                             return true

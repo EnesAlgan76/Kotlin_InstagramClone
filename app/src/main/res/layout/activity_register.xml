@@ -12,7 +12,18 @@
         android:layout_height="match_parent"
         tools:context=".Login.RegisterActivity">
 
+        <FrameLayout
+            android:id="@+id/fl_registerpage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="invisible">
+
+        </FrameLayout>
+
         <LinearLayout
+            android:id="@+id/register_root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
