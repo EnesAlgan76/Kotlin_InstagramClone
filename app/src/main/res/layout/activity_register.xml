@@ -108,7 +108,7 @@
                 android:layout_height="70dp"
                 android:layout_margin="24dp"
                 android:backgroundTint="#3b97f1"
-                android:text="Button"
+                android:text="İleri"
                 android:textAllCaps="false" />
         </LinearLayout>
 

@@ -19,32 +19,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="ONAY KODUNU GİR"
+            android:text="AD VE ŞİFRE"
             android:textColor="#000000"
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/textView12"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="18dp"
-            android:text="Şu numaraya gönderdiğimiz 6 haneli kodu gir:"
-            android:textColor="#000000"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/tv_fragment_tel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="+905XXXXXXXXX"
-            android:textColor="#000000"
-            android:textSize="16sp" />
-
         <EditText
-            android:id="@+id/et_frg_onaykodu"
+            android:id="@+id/et_frgregister_adsoyad"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="24dp"
@@ -52,7 +33,31 @@
             android:layout_marginRight="24dp"
             android:background="@drawable/shape_textfield"
             android:ems="10"
-            android:hint="Onay Kodu"
+            android:hint="Ad Soyad"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/et_frgregister_kullaniciAdi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginRight="24dp"
+            android:background="@drawable/shape_textfield"
+            android:ems="10"
+            android:hint="Kullanıcı Adı"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/et_frgregister_sifre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginRight="24dp"
+            android:background="@drawable/shape_textfield"
+            android:ems="10"
+            android:hint="Şifre"
             android:inputType="textPersonName" />
 
         <Button

@@ -5,13 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView6"
+    <Button
+        android:id="@+id/btn_mail_frg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="160dp"
-        android:layout_marginTop="274dp"
-        android:text="MAİL Fragment"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginBottom="254dp"
+        android:text="Regiter activitye geç"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_mail_frg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="71dp"
+        android:layout_marginBottom="66dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/btn_mail_frg"
+        app:layout_constraintStart_toStartOf="@+id/btn_mail_frg" />
 </androidx.constraintlayout.widget.ConstraintLayout>
