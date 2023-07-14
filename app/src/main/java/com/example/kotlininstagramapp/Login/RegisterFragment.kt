@@ -1,7 +1,6 @@
 package com.example.kotlininstagramapp.Login
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,50 +9,89 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import com.example.kotlininstagramapp.Home.HomeActivity
+import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
-import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-import java.util.concurrent.TimeUnit
 
 class RegisterFragment :Fragment(){
     val firebaseAuth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
+    private var adSoyad: EditText? = null
+    private var kullaniciAdi: EditText? = null
+    private var sifre: EditText? = null
+    private var btnIleri: Button? = null
+
+    private var gelenTelNo: String = ""
+    private var gelenMail: String = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = inflater.inflate(R.layout.fragment_register,container,false)
-        var ad_soyad = view.findViewById<EditText>(R.id.et_frgregister_adsoyad)
-        var kullanici_adi = view.findViewById<EditText>(R.id.et_frgregister_kullaniciAdi)
-        var sifre = view.findViewById<EditText>(R.id.et_frgregister_sifre)
-        var btn_ileri =  view.findViewById<Button>(R.id.btn_ileri_frgregister)
-
-
-
-
-       // requestVerificationCode(gelenTelNo)
-       // btn_ileri.setOnClickListener { performOperations(et_onaykod.text.toString())}
-
+        val view = inflater.inflate(R.layout.fragment_register, container, false)
+        adSoyad = view.findViewById(R.id.et_frgregister_adsoyad)
+        kullaniciAdi = view.findViewById(R.id.et_frgregister_kullaniciAdi)
+        sifre = view.findViewById(R.id.et_frgregister_sifre)
+        btnIleri = view.findViewById(R.id.btn_ileri_frgregister)
+        btnIleri?.setOnClickListener { registerNewUser() }
         return view
     }
 
-//    private fun performOperations(gelenKodKullanici: String) {
-//        var credential = PhoneAuthProvider.getCredential(gelenVerificationId,gelenKodKullanici)
-//        firebaseAuth.signInWithCredential(credential).addOnCompleteListener {task->
-//            if (task.isSuccessful) {
-//                Toast.makeText(activity, "Doğrulama Başarılı--> "+gelenKod, Toast.LENGTH_SHORT).show()
-//                val user = task.result?.user
-//            } else {
-//                Toast.makeText(activity, "Hatalı Kod", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
+
+
+    private fun registerNewUser() {
+        if(checkFieldsAreFilled()){
+            if (gelenMail.isEmpty()){gelenMail = gelenTelNo+"@enes.com"}
+            val emailQuery = db.collection("users").whereEqualTo("userName",kullaniciAdi!!.text.trim().toString())
+            emailQuery.get().addOnCompleteListener { task ->
+                if(task.isSuccessful){
+                    val querySnapshot = task.result
+                    if(querySnapshot !=null && !querySnapshot.isEmpty){
+                        showToast("Username already exists")
+                    }else{
+                        createFirebaseUser()
+                    }
+                }
+            }
+        }else{
+            showToast("Tüm Alanları Doldurunuz")
+        }
+    }
+
+
+
+    private fun createFirebaseUser() {
+        firebaseAuth.createUserWithEmailAndPassword(gelenMail,sifre?.text.toString())
+            .addOnCompleteListener {task ->
+                if (task.isSuccessful){
+                var userID = firebaseAuth.currentUser!!.uid
+                var user = User(userID, adSoyad?.text.toString(), kullaniciAdi?.text.toString(), gelenTelNo, gelenMail, sifre?.text.toString())
+
+                val userCollection = db.collection("users")
+                userCollection.document(userID).set(user).addOnCompleteListener { task->
+                    if(task.isSuccessful){
+                        showToast("Yeni Kulanıcı Oluşturuldu")
+                    }else{
+                        showToast("Kullanıcı Veritabanınagmai Kaydedilirken Hata Oluştu")
+                        firebaseAuth.currentUser!!.delete()
+                    }
+                }
+            }else{
+                showToast("Kullanıcı Kaydedilirken Hata Oluştu")
+            }
+
+        }
+    }
+
+    private fun checkFieldsAreFilled(): Boolean {
+        val adSoyadText = adSoyad?.text?.trim().toString()
+        val kullaniciAdiText = kullaniciAdi?.text?.trim().toString()
+        val sifreText = sifre?.text?.trim().toString()
+
+        return !(adSoyadText.isEmpty() || kullaniciAdiText.isEmpty() || sifreText.isEmpty())
+    }
 
 
     override fun onAttach(context: Context) {
@@ -68,12 +106,14 @@ class RegisterFragment :Fragment(){
     }
 
     @Subscribe(sticky = true)
-    fun onTelefonGonderReceived(event : EventBusDataEvents.KayitBilgileriGonder){
-        if (event.telNo!=null){
-            var gelenTelNo = event.telNo!!
-        }
+    fun onTelefonGonderReceived2(event : EventBusDataEvents.KayitBilgileriGonder){
+        gelenTelNo = event.telNo?:""
+        gelenMail = event.mail?:""
 
+    }
 
+    private fun showToast(message: String) {
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }
 
 

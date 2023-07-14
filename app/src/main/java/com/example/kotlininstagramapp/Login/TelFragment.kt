@@ -50,6 +50,7 @@ class TelFragment :Fragment(){
                 if (task.isSuccessful) {
                     Toast.makeText(activity, "Doğrulama Başarılı--> "+gelenKod, Toast.LENGTH_SHORT).show()
                     val user = task.result?.user
+                    user?.delete()
                     navigateRegisterFragment()
                 } else {
                     Toast.makeText(activity, "Hatalı Kod", Toast.LENGTH_SHORT).show()

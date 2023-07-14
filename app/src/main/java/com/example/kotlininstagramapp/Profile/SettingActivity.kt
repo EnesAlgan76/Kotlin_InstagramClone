@@ -33,11 +33,12 @@ class SettingActivity : AppCompatActivity() {
         }
 
         binding.tvLogOut.setOnClickListener {
-            binding.profileSettingsRoot.visibility = View.GONE
-            var transaction = supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.profileSetingsContainer,LogOutFragment())
-            transaction.addToBackStack("logout fragment eklendi")
-            transaction.commit()
+            //binding.profileSettingsRoot.visibility = View.GONE
+          //  var transaction = supportFragmentManager.beginTransaction()
+            LogoutFragment().show(supportFragmentManager, "LogoutDialog")
+//            transaction.replace(R.id.profileSetingsContainer,LogOutFragment())
+//            transaction.addToBackStack("logout fragment eklendi")
+//            transaction.commit()
 
         }
     }

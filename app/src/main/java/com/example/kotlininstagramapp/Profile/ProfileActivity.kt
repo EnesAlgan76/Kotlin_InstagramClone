@@ -1,9 +1,9 @@
 package com.example.kotlininstagramapp.Profile
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.ActivityProfileBinding
@@ -11,6 +11,8 @@ import com.example.kotlininstagramapp.utils.ImageLoader
 
 class ProfileActivity : AppCompatActivity() {
     lateinit var binding: ActivityProfileBinding
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
