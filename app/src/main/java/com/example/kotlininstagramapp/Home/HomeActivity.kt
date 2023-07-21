@@ -20,12 +20,14 @@ class HomeActivity : AppCompatActivity() {
     var auth = FirebaseAuth.getInstance()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         if (auth.currentUser!=null){
+
             Toast.makeText(this, "registered", Toast.LENGTH_SHORT).show()
         }else{
             Toast.makeText(this, "unregistered", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this,LoginActivity()::class.java))
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
         }
 
         binding = ActivityHomeBinding.inflate(layoutInflater)

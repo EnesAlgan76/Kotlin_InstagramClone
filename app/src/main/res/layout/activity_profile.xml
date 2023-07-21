@@ -14,7 +14,7 @@
         tools:context=".Profile.ProfileActivity">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/tv_userName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -57,7 +57,7 @@
             app:civ_border_overlay="true"
             app:civ_border_width="2dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_userName" />
 
         <TextView
             android:id="@+id/tv_posts"
@@ -130,13 +130,13 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_follow" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/tv_biograpy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="4dp"
             android:text="TextView"
-            app:layout_constraintStart_toStartOf="@+id/iv_profile"
-            app:layout_constraintTop_toBottomOf="@+id/iv_profile" />
+            app:layout_constraintStart_toStartOf="@+id/tv_name"
+            app:layout_constraintTop_toBottomOf="@+id/tv_name" />
 
         <Button
             android:id="@+id/btn_editprofile"
@@ -153,7 +153,7 @@
             app:layout_constraintEnd_toStartOf="@+id/button2"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_biograpy" />
 
         <Button
             android:id="@+id/button2"
@@ -192,6 +192,17 @@
             app:layout_constraintEnd_toEndOf="@+id/iv_profile"
             app:layout_constraintStart_toStartOf="@+id/iv_profile"
             app:layout_constraintTop_toTopOf="@+id/iv_profile" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="TextView"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tv_biograpy"
+            app:layout_constraintStart_toStartOf="@+id/iv_profile"
+            app:layout_constraintTop_toBottomOf="@+id/iv_profile" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout

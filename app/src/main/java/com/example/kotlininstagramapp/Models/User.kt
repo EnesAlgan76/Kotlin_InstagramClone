@@ -6,5 +6,6 @@ class User(
     var userName: String,
     var telNo: String,
     var mail: String,
-    var password :String
+    var password :String,
+    var userDetails: UserDetails
 )

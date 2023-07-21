@@ -51,5 +51,7 @@ dependencies {
     implementation("org.greenrobot:eventbus:3.3.1")
     implementation platform('com.google.firebase:firebase-bom:32.1.1')
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2")
 
 }

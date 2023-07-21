@@ -24,6 +24,10 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.tvRegiserlogin.setOnClickListener {
+            startActivity(Intent(this,RegisterActivity::class.java))
+        }
+
         binding.etLoginmail.addTextChangedListener(textWatcher)
         binding.etLoginpassword.addTextChangedListener(textWatcher)
 

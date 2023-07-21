@@ -61,7 +61,7 @@
 
             <!-- Fotoğrafı değiştir -->
             <TextView
-                android:id="@+id/changePhotoText"
+                android:id="@+id/tv_changePhoto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Fotoğrafı Değiştir"
@@ -74,13 +74,13 @@
                 android:id="@+id/nameLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ad"
+                android:paddingTop="16dp"
+                android:text="Tam Ad"
                 android:textColor="@color/black"
-                android:textSize="16sp"
-                android:paddingTop="16dp" />
+                android:textSize="16sp" />
             <!-- Ad TextField -->
             <EditText
-                android:id="@+id/nameTextField"
+                android:id="@+id/fullNameTextField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Adınızı girin" />
@@ -131,7 +131,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="İnternet Sitesi" />
-
 
 
         </LinearLayout>

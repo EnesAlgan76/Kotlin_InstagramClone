@@ -10,21 +10,24 @@ import java.lang.Exception
 
 class ImageLoader {
 
-    companion object{
+    companion object {
 
-        fun setImage(imgUrl :String, imageView: ImageView, mProgressBar: ProgressBar){
+        fun setImage(imgUrl: String, imageView: ImageView, mProgressBar: ProgressBar?) {
             Picasso.get()
                 .load(imgUrl)
                 .error(R.drawable.icon_profile)
-                .into(imageView, object: Callback{
+                .into(imageView, object : Callback {
                     override fun onSuccess() {
-                        mProgressBar.visibility = View.GONE
+                        if (mProgressBar != null) {
+                            mProgressBar.visibility = View.GONE
+                        }
                     }
 
                     override fun onError(e: Exception?) {
-                        mProgressBar.visibility = View.GONE
+                        if (mProgressBar != null) {
+                            mProgressBar.visibility = View.GONE
+                        }
                     }
-
                 })
         }
     }

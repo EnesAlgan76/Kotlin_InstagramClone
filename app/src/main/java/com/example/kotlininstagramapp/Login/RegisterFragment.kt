@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.kotlininstagramapp.Models.User
+import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.auth.FirebaseAuth
@@ -66,8 +67,10 @@ class RegisterFragment :Fragment(){
         firebaseAuth.createUserWithEmailAndPassword(gelenMail,sifre?.text.toString())
             .addOnCompleteListener {task ->
                 if (task.isSuccessful){
-                var userID = firebaseAuth.currentUser!!.uid
-                var user = User(userID, adSoyad?.text.toString(), kullaniciAdi?.text.toString(), gelenTelNo, gelenMail, sifre?.text.toString())
+                val userID = firebaseAuth.currentUser!!.uid
+
+                val userDetails = UserDetails("","","","","")
+                val user = User(userID, adSoyad?.text.toString(), kullaniciAdi?.text.toString(), gelenTelNo, gelenMail, sifre?.text.toString(),userDetails)
 
                 val userCollection = db.collection("users")
                 userCollection.document(userID).set(user).addOnCompleteListener { task->
