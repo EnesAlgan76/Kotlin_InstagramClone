@@ -39,7 +39,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupHomeViewPager() {
-        var myPagerAdapter = MyPagerAdapter(supportFragmentManager)
+        var myPagerAdapter = MyPagerAdapter(this)
         binding.viewPager.adapter = myPagerAdapter
         binding.viewPager.currentItem = 1
     }

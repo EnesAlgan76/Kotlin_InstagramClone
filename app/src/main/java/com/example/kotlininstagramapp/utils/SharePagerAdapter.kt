@@ -7,8 +7,11 @@ import com.example.kotlininstagramapp.Home.MessagesFragment
 
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.kotlininstagramapp.Share.ShareCameraFragment
+import com.example.kotlininstagramapp.Share.ShareGalleryFragment
+import com.example.kotlininstagramapp.Share.ShareVideoFragment
 
-class MyPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
+class SharePagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
 
     override fun getItemCount(): Int {
         return 3
@@ -16,11 +19,12 @@ class MyPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> CameraFragment()
-            1 -> HomeFragment()
-            2 -> MessagesFragment()
+            0 -> ShareCameraFragment()
+            1 -> ShareVideoFragment()
+            2 -> ShareGalleryFragment()
             else -> throw IllegalArgumentException("Invalid position: $position")
         }
     }
+
 }
 

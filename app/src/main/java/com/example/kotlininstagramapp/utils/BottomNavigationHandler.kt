@@ -23,7 +23,7 @@ class BottomNavigationHandler {
                 override fun onNavigationItemSelected(item: MenuItem): Boolean {
                     when (item.itemId) {
                         R.id.menu_item_add -> {
-                            val intent = Intent(context, RegisterActivity::class.java)
+                            val intent = Intent(context, ShareActivity::class.java)
                             context.startActivity(intent)
                             (context as Activity).overridePendingTransition(0, 0)
                             return true
@@ -41,7 +41,7 @@ class BottomNavigationHandler {
                             return true
                         }
                         R.id.menu_item_search -> {
-                            val intent = Intent(context, SearchActivity::class.java)
+                            val intent = Intent(context, RegisterActivity::class.java)
                             context.startActivity(intent)
                             (context as Activity).overridePendingTransition(0, 0)
                             return true

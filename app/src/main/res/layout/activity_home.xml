@@ -85,7 +85,7 @@
             app:layout_constraintTop_toBottomOf="@+id/appbar"
             tools:ignore="NotSibling" />
 
-        <androidx.viewpager.widget.ViewPager
+        <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -93,7 +93,7 @@
             app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view">
-        </androidx.viewpager.widget.ViewPager>
+        </androidx.viewpager2.widget.ViewPager2>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
