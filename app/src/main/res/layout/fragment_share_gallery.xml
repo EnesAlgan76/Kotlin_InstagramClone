@@ -55,21 +55,34 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tabBar">
 
+<!--        <ImageView-->
+<!--            android:id="@+id/imageView7"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHeight_percent="0.6"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            tools:src="@tools:sample/avatars" />-->
+
         <ImageView
-            android:id="@+id/imageView7"
+            android:id="@+id/iv_gallery"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.6"
+            android:layout_height="200dp"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
+            tools:srcCompat="@tools:sample/avatars" />
 
         <GridView
+            android:id="@+id/grid_view_gallery"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="397dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:numColumns="3"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHeight_percent="0.4"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView7" />
+            app:layout_constraintTop_toBottomOf="@+id/iv_gallery" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
