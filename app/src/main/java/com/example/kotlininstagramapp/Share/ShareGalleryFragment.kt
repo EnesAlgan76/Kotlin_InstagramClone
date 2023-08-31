@@ -11,6 +11,8 @@ import android.widget.ArrayAdapter
 import android.widget.GridView
 import android.widget.ImageView
 import android.widget.Spinner
+import android.widget.VideoView
+import androidx.core.net.toUri
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.FileOperations
 import com.squareup.picasso.Picasso
@@ -22,12 +24,14 @@ class ShareGalleryFragment : Fragment() {
     lateinit var spinner :Spinner
     lateinit var gridview :GridView
     lateinit var bigImage:ImageView
+    lateinit var bigVideo:VideoView
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
         var view = inflater.inflate(R.layout.fragment_share_gallery, container, false)
 
         spinner = view.findViewById(R.id.spn_directory_name)
         gridview = view.findViewById(R.id.grid_view_gallery)
-        bigImage = view.findViewById<ImageView>(R.id.iv_gallery);
+        bigImage = view.findViewById(R.id.iv_gallery)
+        bigVideo = view.findViewById(R.id.vv_gallery)
         initializeSpinner()
         //listOf("DCIM","Download","Pictures","WhatsApp/Media/WhatsApp Images")
 //        GlobalScope.launch {
@@ -73,7 +77,19 @@ class ShareGalleryFragment : Fragment() {
 
 
                     gridview.setOnItemClickListener { adapterView, view, position, l ->
-                        Picasso.get().load(fileList.get(position)).into(bigImage)
+                        val file = fileList[position]
+
+                        if(file.extension.equals("mp4",true)){
+                            bigImage.visibility=View.GONE
+                            bigVideo.visibility = View.VISIBLE
+                            bigVideo.setVideoURI(file.toUri())
+                            bigVideo.start()
+                        }else{
+                            bigVideo.stopPlayback()
+                            bigImage.visibility=View.VISIBLE
+                            bigVideo.visibility = View.GONE
+                            Picasso.get().load(fileList.get(position)).into(bigImage)
+                        }
                     }
 
 

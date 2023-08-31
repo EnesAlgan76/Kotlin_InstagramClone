@@ -7,83 +7,77 @@
     android:layout_width="match_parent">
 
     <LinearLayout
-        android:id="@+id/tabBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/iv_closeButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/tabBar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/icon_cancel"
-            android:layout_gravity="start" />
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-        <Spinner
-            android:id="@+id/spn_directory_name"
-            android:layout_width="160dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp" />
+            <ImageView
+                android:id="@+id/iv_closeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:src="@drawable/icon_cancel" />
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            <Spinner
+                android:id="@+id/spn_directory_name"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp" />
 
-        <TextView
-            android:id="@+id/tv_ileri"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:text="İleri"
-            android:textColor="#2196F3"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tv_ileri"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="İleri"
+                android:textColor="#2196F3"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
 
+        </LinearLayout>
 
-    </LinearLayout>
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tabBar">
-
-<!--        <ImageView-->
-<!--            android:id="@+id/imageView7"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="0dp"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHeight_percent="0.6"-->
-<!--            app:layout_constraintTop_toTopOf="parent"-->
-<!--            tools:src="@tools:sample/avatars" />-->
-
-        <ImageView
+        <com.naver.android.helloyako.imagecrop.view.ImageCropView
             android:id="@+id/iv_gallery"
             android:layout_width="match_parent"
+            android:layout_gravity="center"
             android:layout_height="200dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="invisible"
+            app:gridInnerColor="#66ffffff"
+            app:gridInnerStroke="1dp"
+            app:gridOuterColor="#ffffff"
+            app:gridOuterStroke="1dp"
+            app:outsideLayerColor="#99000000"
+            app:setInnerGridMode="on"
+            app:setOuterGridMode="on"
             tools:srcCompat="@tools:sample/avatars" />
+
+        <VideoView
+            android:id="@+id/vv_gallery"
+            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_height="200dp"
+            android:visibility="gone" />
 
         <GridView
             android:id="@+id/grid_view_gallery"
             android:layout_width="match_parent"
-            android:layout_height="397dp"
-            android:layout_marginTop="5dp"
+            android:layout_height="match_parent"
             android:gravity="center"
             android:numColumns="3"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHeight_percent="0.4"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/iv_gallery" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintHeight_percent="0.4" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
