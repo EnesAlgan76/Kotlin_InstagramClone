@@ -29,9 +29,6 @@ class GalleryGridAdapter(context: Context, private val mediaFiles: List<File>) :
         val viewHolder: ViewHolder
         val view: View
 
-
-
-
         if (convertView == null) {
             view = LayoutInflater.from(context).inflate(R.layout.grid_image_view, parent, false)
             val imageView: ImageView = view.findViewById(R.id.image_view)
@@ -56,20 +53,8 @@ class GalleryGridAdapter(context: Context, private val mediaFiles: List<File>) :
             videoDurationText.text = videoDuration
         }else{
             Glide.with(context).load(mediaFiles[position]).into(imageView)
-
+            videoDurationText.text = ""
         }
-
-//        if (file.extension.lowercase() == "mp4") {
-//            println("************** >>>> ${file.absolutePath}")
-//            val videoThumbnail = getVideoThumbnail2(file)
-//            imageView.setImageBitmap(videoThumbnail)
-//            val videoDuration = getVideoDuration(file)
-//            videoDurationText.text = videoDuration
-//           // videoDurationText.visibility = View.VISIBLE
-//        }
-//
-//        Picasso.get().load(mediaFiles[position]).resize(250,250).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).into(imageView)
-
         return view
     }
 
@@ -83,17 +68,8 @@ class GalleryGridAdapter(context: Context, private val mediaFiles: List<File>) :
         val minutes = seconds/60
         val remainingSeconds = seconds%60
         return String.format("%02d:%02d", minutes, remainingSeconds)
-
-
     }
 
-    private fun getVideoThumbnail2(videoFile: File): Bitmap? {
-        val retriever = MediaMetadataRetriever()
-        retriever.setDataSource(videoFile.absolutePath)
-
-        val timeInMicroseconds = 1000000L // 1 second
-        return retriever.getFrameAtTime(timeInMicroseconds, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
-    }
 
     private fun getVideoThumbnail(file: File): Bitmap? {
         val retriever = MediaMetadataRetriever()
