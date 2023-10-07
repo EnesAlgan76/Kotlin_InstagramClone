@@ -35,7 +35,7 @@ class SettingActivity : AppCompatActivity() {
         binding.tvLogOut.setOnClickListener {
             //binding.profileSettingsRoot.visibility = View.GONE
           //  var transaction = supportFragmentManager.beginTransaction()
-            LogoutFragment().show(supportFragmentManager, "LogoutDialog")
+            LogOutFragment().show(supportFragmentManager, "LogoutDialog")
 //            transaction.replace(R.id.profileSetingsContainer,LogOutFragment())
 //            transaction.addToBackStack("logout fragment eklendi")
 //            transaction.commit()

@@ -1,22 +1,29 @@
 package com.example.kotlininstagramapp.Share
 
 import GalleryGridAdapter
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.GridView
-import android.widget.ImageView
-import android.widget.Spinner
-import android.widget.VideoView
+import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import com.bumptech.glide.Glide
+import com.example.kotlininstagramapp.Login.RegisterFragment
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.databinding.ActivityShareBinding
+import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.FileOperations
 import com.squareup.picasso.Picasso
+import id.zelory.compressor.Compressor
+import id.zelory.compressor.constraint.quality
 import kotlinx.coroutines.*
+import org.greenrobot.eventbus.EventBus
 import java.io.File
 
 class ShareGalleryFragment : Fragment() {
@@ -25,33 +32,47 @@ class ShareGalleryFragment : Fragment() {
     lateinit var gridview :GridView
     lateinit var bigImage:ImageView
     lateinit var bigVideo:VideoView
+    lateinit var buttonIleri:TextView
+    private var selectedMedia: File? = null
+
+    val REQUEST_EXTERNAL_STORAGE_PERMISSION = 1
+
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
         var view = inflater.inflate(R.layout.fragment_share_gallery, container, false)
+
 
         spinner = view.findViewById(R.id.spn_directory_name)
         gridview = view.findViewById(R.id.grid_view_gallery)
         bigImage = view.findViewById(R.id.iv_gallery)
         bigVideo = view.findViewById(R.id.vv_gallery)
+        buttonIleri = view.findViewById(R.id.tv_ileri)
+        handleIleriButton()
         initializeSpinner()
-        //listOf("DCIM","Download","Pictures","WhatsApp/Media/WhatsApp Images")
-//        GlobalScope.launch {
-//            var resimYolListesi = async {
-//                FileOperations.listImageFiles("Pictures")
-//            }
-//
-//            val result = resimYolListesi.await()
-//
-//            println(result.toString())
-//        }
-
-
         return view
     }
-    
-    private fun initializeSpinner2 (){
-        var spinerOptions = arrayOf("WhatsAppImages")
 
+
+
+    private fun handleIleriButton() {
+        val flShareNextFrame = requireActivity().findViewById<FrameLayout>(R.id.fl_shareNextFrame)
+        val mainLayout = requireActivity().findViewById<ConstraintLayout>(R.id.mainLayout)
+        buttonIleri.setOnClickListener {
+            println("**********TIKLANDI**************")
+            mainLayout.visibility = View.GONE
+            flShareNextFrame.visibility = View.VISIBLE
+
+            EventBus.getDefault().postSticky(EventBusDataEvents.SendMediaFile(selectedMedia!!))
+
+            val shareNextFragment = ShareNextFragment()
+
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fl_shareNextFrame, shareNextFragment)
+                .addToBackStack("ShareNextFragment")
+                .commit()
+        }
     }
+
 
 
     private fun initializeSpinner() {
@@ -74,12 +95,17 @@ class ShareGalleryFragment : Fragment() {
                     val gridAdapter = GalleryGridAdapter(requireActivity(), fileList)
                     gridview.adapter = gridAdapter
                     println(result.toString())
+                    if (fileList.isNotEmpty()){
+                        selectedMedia =fileList[0]
+                    }
 
 
                     gridview.setOnItemClickListener { adapterView, view, position, l ->
                         val file = fileList[position]
+                        selectedMedia = file
 
                         if(file.extension.equals("mp4",true)){
+
                             bigImage.visibility=View.GONE
                             bigVideo.visibility = View.VISIBLE
                             bigVideo.setVideoURI(file.toUri())
@@ -88,7 +114,13 @@ class ShareGalleryFragment : Fragment() {
                             bigVideo.stopPlayback()
                             bigImage.visibility=View.VISIBLE
                             bigVideo.visibility = View.GONE
-                            Picasso.get().load(fileList.get(position)).into(bigImage)
+
+                            Glide.with(requireActivity())
+                                .load(file)
+                                .override(1080  , 1920) // Set target width and height
+                                .into(bigImage)
+
+
                         }
                     }
 

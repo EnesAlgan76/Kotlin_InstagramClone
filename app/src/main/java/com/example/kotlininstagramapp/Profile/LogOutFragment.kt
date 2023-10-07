@@ -5,16 +5,11 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import com.example.kotlininstagramapp.Login.LoginActivity
-import com.example.kotlininstagramapp.R
 import com.google.firebase.auth.FirebaseAuth
 
-class LogoutFragment : DialogFragment() {
+class LogOutFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(requireContext())
