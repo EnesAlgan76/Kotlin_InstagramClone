@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,6 +38,7 @@ class ProfileEditFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_edit_profile, container, false)
+
         firebaseHelper = FirebaseHelper()
         initViews(view)
         setupGalleryLauncher()
@@ -53,9 +55,11 @@ class ProfileEditFragment : Fragment() {
         val saveButton = view.findViewById<ImageView>(R.id.checkButton)
         val changeProfilePhoto = view.findViewById<TextView>(R.id.tv_changePhoto)
 
-        closeButton.setOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
-        }
+         closeButton.setOnClickListener {
+             parentFragmentManager.popBackStack()
+             (requireActivity() as ProfileActivity).toggleProfileRootVisibility(true);
+         }
+
 
         changeProfilePhoto.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -77,8 +81,6 @@ class ProfileEditFragment : Fragment() {
                  progressDialog.dismiss()
              }
          }
-
-
 
          fullName.setText(eventuserFullName)
         userNameEditText.setText(eventuserName)

@@ -1,6 +1,5 @@
 package com.example.kotlininstagramapp.Share
 
-import android.Manifest
 import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
@@ -12,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Post
@@ -22,7 +20,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
@@ -46,6 +43,7 @@ class ShareNextFragment : Fragment() {
     val postId = UUID.randomUUID().toString()
     var  storageReference = FirebaseStorage.getInstance().reference
     val imageRef = storageReference.child("posts/${mAuth.currentUser?.uid}/${postId}")
+    val shareProgressDialog = ShareProgressDialog()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_share_next, container, false)
@@ -67,26 +65,34 @@ class ShareNextFragment : Fragment() {
 
         tvShare.setOnClickListener {
             var compressedImageUri: Uri
-            GlobalScope.launch(Dispatchers.IO) {
-                val compressedImageFile = Compressor.compress(requireContext(), gelenDosya!!){quality(80)}
-                compressedImageUri = Uri.parse("file://${compressedImageFile.absolutePath}")
+            shareProgressDialog.show(requireActivity().supportFragmentManager, "ShareProgressDialog")
+            shareProgressDialog.isCancelable = false
 
+            GlobalScope.launch(Dispatchers.IO) {
+                val compressedImageFile = Compressor.compress(requireContext(), gelenDosya!!) { quality(80) }
+                compressedImageUri = Uri.parse("file://${compressedImageFile.absolutePath}")
                 withContext(Dispatchers.Main) {
                     uploadImageToStorage(compressedImageUri)
                 }
-
-
             }
-
-
         }
 
 
+        Log.e(".","ShareNextFragment ÇALIŞTI")
         return view
     }
 
+
+
      fun uploadImageToStorage(compressedImageUri: Uri) {
         val uploadTask = imageRef.putFile(compressedImageUri)
+
+         uploadTask.addOnProgressListener { taskSnapshot ->
+             val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
+
+             Log.e("","Progress ____>>> "+progress)
+             shareProgressDialog.tvProgress.text = "Yükleniyor : %${progress}"
+         }
 
         uploadTask.addOnSuccessListener { task->
             imageRef.downloadUrl.addOnSuccessListener { uri ->
@@ -98,6 +104,7 @@ class ShareNextFragment : Fragment() {
         }.addOnFailureListener { exception ->
             // Handle any errors that occurred during the upload
             println("Upload failed: $exception")
+            shareProgressDialog.dismiss()
         }
     }
 
@@ -108,20 +115,20 @@ class ShareNextFragment : Fragment() {
             "explanation" to post.explanation,
             "url" to post.url,
         )
-
-
        // userDocRef.collection("posts").add(hashMapOf(post.postId to postMap))
-
         userDocRef.set(hashMapOf("userId" to post.userId)).addOnSuccessListener {
             userDocRef.collection("posts").document(post.postId).set(postMap)
                 .addOnSuccessListener { documentReference ->
                     println("Post added with ID: ${documentReference}")
+                    shareProgressDialog.dismiss()
                 }
                 .addOnFailureListener { e ->
                     println("Error adding post: $e")
+                    shareProgressDialog.dismiss()
                 }
         } .addOnFailureListener { e ->
             println("Error setting user data: $e")
+            shareProgressDialog.dismiss()
         }
 
 

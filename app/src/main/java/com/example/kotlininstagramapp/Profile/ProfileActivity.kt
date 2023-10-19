@@ -2,6 +2,7 @@ package com.example.kotlininstagramapp.Profile
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kotlininstagramapp.Models.UserDetails
@@ -14,7 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.greenrobot.eventbus.EventBus
 
-class ProfileActivity : AppCompatActivity() {
+class ProfileActivity : AppCompatActivity(){
     lateinit var binding: ActivityProfileBinding
     val db = FirebaseFirestore.getInstance()
     val firebaseAuth = FirebaseAuth.getInstance()
@@ -59,8 +60,18 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         binding.profileActivityroot.visibility=View.VISIBLE
-        super.onBackPressed()
+        println("----- Geri Tuşuna Basıldı ------")
+        onBackPressedDispatcher.onBackPressed()
     }
+
+    fun toggleProfileRootVisibility(isVisible: Boolean) {
+        if (isVisible) {
+            binding.profileActivityroot.visibility = View.VISIBLE
+        } else {
+            binding.profileActivityroot.visibility = View.GONE
+        }
+    }
+
 
     private fun handleButtonClicks() {
         binding.ivMenu.setOnClickListener {
@@ -75,4 +86,7 @@ class ProfileActivity : AppCompatActivity() {
             transaction.commit()
         }
     }
+
+
+
 }

@@ -21,7 +21,6 @@ class FileOperations {
       }
 
       fun listImageFilesRecursive(directory: File): ArrayList<String>? {
-          Log.e("Hata","ÇALIŞTI ${directory}")
           if (!directory.isDirectory) {
               println("Error: The provided path is not a directory.")
               return null
