@@ -26,6 +26,7 @@ import id.zelory.compressor.constraint.quality
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -64,15 +65,21 @@ class ShareNextFragment : Fragment() {
         }
 
         tvShare.setOnClickListener {
-            var compressedImageUri: Uri
             shareProgressDialog.show(requireActivity().supportFragmentManager, "ShareProgressDialog")
             shareProgressDialog.isCancelable = false
 
             GlobalScope.launch(Dispatchers.IO) {
-                val compressedImageFile = Compressor.compress(requireContext(), gelenDosya!!) { quality(80) }
-                compressedImageUri = Uri.parse("file://${compressedImageFile.absolutePath}")
-                withContext(Dispatchers.Main) {
-                    uploadImageToStorage(compressedImageUri)
+                try {
+                    val compressedImageFile = Compressor.compress(requireContext(), gelenDosya!!) { quality(80) }
+                    val compressedImageUri = Uri.fromFile(compressedImageFile)
+                    uploadImageToStorage2(compressedImageUri)
+                } catch (e: Exception) {
+                    // Handle any exceptions
+                    e.printStackTrace()
+                } finally {
+                    withContext(Dispatchers.Main) {
+                        shareProgressDialog.dismiss()
+                    }
                 }
             }
         }
@@ -84,55 +91,91 @@ class ShareNextFragment : Fragment() {
 
 
 
-     fun uploadImageToStorage(compressedImageUri: Uri) {
-        val uploadTask = imageRef.putFile(compressedImageUri)
+//    private fun uploadImageToStorage(compressedImageUri: Uri) {
+//        val uploadTask = imageRef.putFile(compressedImageUri)
+//
+//         uploadTask.addOnProgressListener { taskSnapshot ->
+//             val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
+//
+//             Log.e("","Progress ____>>> "+progress)
+//             shareProgressDialog.tvProgress.text = "Yükleniyor : %${progress}"
+//         }
+//
+//        uploadTask.addOnSuccessListener { task->
+//            imageRef.downloadUrl.addOnSuccessListener { uri ->
+//                val url = uri.toString()
+//                var post = Post(mAuth.currentUser!!.uid,postId,FieldValue.serverTimestamp().toString(),explanation.text.toString(),url)
+//                uploadPosttoFirestore(post)
+//                println(url)
+//            }
+//        }.addOnFailureListener { exception ->
+//            // Handle any errors that occurred during the upload
+//            println("Upload failed: $exception")
+//            //shareProgressDialog.dismiss()
+//        }
+//    }
+//
+//    private fun uploadPosttoFirestore(post: Post) {
+//        var userDocRef = firestore.collection("userPosts").document(post.userId)
+//        val postMap = hashMapOf(
+//            "date" to post.date,
+//            "explanation" to post.explanation,
+//            "url" to post.url,
+//        )
+//       // userDocRef.collection("posts").add(hashMapOf(post.postId to postMap))
+//        userDocRef.set(hashMapOf("userId" to post.userId)).addOnSuccessListener {
+//            userDocRef.collection("posts").document(post.postId).set(postMap)
+//                .addOnSuccessListener { documentReference ->
+//                    println("Post added with ID: ${documentReference}")
+//                    //shareProgressDialog.dismiss()
+//                }
+//                .addOnFailureListener { e ->
+//                    println("Error adding post: $e")
+//                    //shareProgressDialog.dismiss()
+//                }
+//        } .addOnFailureListener { e ->
+//            println("Error setting user data: $e")
+//           // shareProgressDialog.dismiss()
+//        }
+//
+//
+//    }
 
-         uploadTask.addOnProgressListener { taskSnapshot ->
-             val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
 
-             Log.e("","Progress ____>>> "+progress)
-             shareProgressDialog.tvProgress.text = "Yükleniyor : %${progress}"
-         }
+    private suspend fun uploadImageToStorage2(compressedImageUri: Uri) {
+        try {
+            val uploadTask = imageRef.putFile(compressedImageUri).await()
 
-        uploadTask.addOnSuccessListener { task->
-            imageRef.downloadUrl.addOnSuccessListener { uri ->
-                val url = uri.toString()
-                var post = Post(mAuth.currentUser!!.uid,postId,FieldValue.serverTimestamp().toString(),explanation.text.toString(),url)
-                uploadPosttoFirestore(post)
-                println(url)
-            }
-        }.addOnFailureListener { exception ->
-            // Handle any errors that occurred during the upload
-            println("Upload failed: $exception")
-            shareProgressDialog.dismiss()
+            val url = imageRef.downloadUrl.await().toString()
+
+            val post = Post(mAuth.currentUser!!.uid, postId, FieldValue.serverTimestamp().toString(), explanation.text.toString(), url)
+            uploadPostToFirestore2(post)
+        } catch (e: Exception) {
+            // Handle any exceptions
+            e.printStackTrace()
         }
     }
 
-    private fun uploadPosttoFirestore(post: Post) {
-        var userDocRef = firestore.collection("userPosts").document(post.userId)
-        val postMap = hashMapOf(
-            "date" to post.date,
-            "explanation" to post.explanation,
-            "url" to post.url,
-        )
-       // userDocRef.collection("posts").add(hashMapOf(post.postId to postMap))
-        userDocRef.set(hashMapOf("userId" to post.userId)).addOnSuccessListener {
-            userDocRef.collection("posts").document(post.postId).set(postMap)
-                .addOnSuccessListener { documentReference ->
-                    println("Post added with ID: ${documentReference}")
-                    shareProgressDialog.dismiss()
-                }
-                .addOnFailureListener { e ->
-                    println("Error adding post: $e")
-                    shareProgressDialog.dismiss()
-                }
-        } .addOnFailureListener { e ->
-            println("Error setting user data: $e")
-            shareProgressDialog.dismiss()
+    private suspend fun uploadPostToFirestore2(post: Post) {
+        try {
+            val userDocRef = firestore.collection("userPosts").document(post.userId)
+
+            val postMap = hashMapOf(
+                "date" to post.date,
+                "explanation" to post.explanation,
+                "url" to post.url
+            )
+
+            userDocRef.set(hashMapOf("userId" to post.userId)).await()
+            userDocRef.collection("posts").document(post.postId).set(postMap).await()
+        } catch (e: Exception) {
+            // Handle any exceptions
+            e.printStackTrace()
         }
-
-
     }
+
+
+
 
 
     override fun onAttach(context: Context) {

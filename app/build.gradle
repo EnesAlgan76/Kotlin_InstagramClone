@@ -57,5 +57,5 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.16.0'
     implementation "com.naver.android.helloyako:imagecropview:1.2.3"
     implementation 'id.zelory:compressor:3.0.1'
-
+    implementation 'com.iceteck.silicompressorr:silicompressor:2.2.4'
 }
