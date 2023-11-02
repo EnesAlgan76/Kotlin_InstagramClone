@@ -1,60 +1,137 @@
 package com.example.kotlininstagramapp.Share
 
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.utils.EventBusDataEvents
+import com.google.firebase.storage.FirebaseStorage
+import com.otaliastudios.cameraview.CameraListener
+import com.otaliastudios.cameraview.CameraView
+import com.otaliastudios.cameraview.FileCallback
+import com.otaliastudios.cameraview.PictureResult
+import com.otaliastudios.cameraview.controls.Mode
+import com.otaliastudios.cameraview.gesture.Gesture
+import com.otaliastudios.cameraview.gesture.GestureAction
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import org.greenrobot.eventbus.EventBus
+import java.io.File
+import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ShareCameraFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ShareCameraFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    lateinit var cameraView: CameraView
+    lateinit var captureButton : View
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        var view = inflater.inflate(R.layout.fragment_share_camera, container, false)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+        cameraView = view.findViewById(R.id.camraView)
+        captureButton = view.findViewById(R.id.iv_capture)
+        cameraView.setLifecycleOwner(viewLifecycleOwner)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_share_camera, container, false)
-    }
+        cameraView.mapGesture(Gesture.PINCH,GestureAction.ZOOM)
+        cameraView.mapGesture(Gesture.TAP,GestureAction.AUTO_FOCUS)
+        cameraView.mode= Mode.PICTURE
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ShareCameraFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ShareCameraFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+        captureButton.setOnClickListener(object :View.OnClickListener{
+            override fun onClick(p0: View?) {
+                cameraView.takePicture()
             }
+        })
+
+        return view
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        cameraView.addCameraListener(object  : CameraListener(){
+            override fun onPictureTaken(result: PictureResult) {
+                // Convert the image to a byte array
+                val file = File(Environment.getExternalStorageDirectory().absolutePath+"/DCIM/", "filename.jpg")
+                result.toFile(file,object: FileCallback{
+                    override fun onFileReady(file: File?) {
+                        goShareNextFragmet(file)
+                    }
+
+                })
+                super.onPictureTaken(result)
+            }
+
+        })
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun goShareNextFragmet(file: File?) {
+        val flShareNextFrame = requireActivity().findViewById<FrameLayout>(R.id.fl_shareNextFrame)
+        val mainLayout = requireActivity().findViewById<ConstraintLayout>(R.id.mainLayout)
+
+        mainLayout.visibility = View.GONE
+        flShareNextFrame.visibility = View.VISIBLE
+
+        EventBus.getDefault().postSticky(file?.let {
+            EventBusDataEvents.SendMediaFile(it)
+        })
+
+        val shareNextFragment = ShareNextFragment()
+
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fl_shareNextFrame, shareNextFragment)
+            .addToBackStack("ShareNextFragment")
+            .commit()
+    }
+
+    suspend fun uploadFileToStorage(file: File?) {
+        val storage = FirebaseStorage.getInstance()
+
+        // Create a reference to the storage location where you want to save the image
+        val storageRef = storage.getReference("images/${UUID.randomUUID()}.jpg")
+
+        try {
+            storageRef.putFile(Uri.fromFile(file)).await()
+            Log.e("------------","Upload is Succesful")
+        }catch (e: Throwable){
+            Log.e("------------","Error Uploading : ${e.message}")
+        }
+
+
+    }
+
+
+
+
+    override fun onResume() {
+        super.onResume()
+        Log.e("------------","camera view RESUME")
+        cameraView.open()
+    }
+
+    override fun onPause() {
+        Log.e("------------","camera view PAUSE")
+        cameraView.close()
+        super.onPause()
+    }
+
+    override fun onStop() {
+        cameraView.close()
+        Log.e("------------","camera view onStop")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        cameraView.destroy()
+        Log.e("------------","camera view onDestroy")
+        super.onDestroy()
+    }
+
+
 }

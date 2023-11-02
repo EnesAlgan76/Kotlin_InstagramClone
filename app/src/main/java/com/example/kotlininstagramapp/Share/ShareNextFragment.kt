@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.arthenica.ffmpegkit.FFmpegKit
+import com.arthenica.ffmpegkit.ReturnCode
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.R
@@ -34,7 +36,7 @@ import java.io.File
 import java.util.*
 
 class ShareNextFragment : Fragment() {
-    var gelenDosya: File? =null;
+    var gelenDosya: File? =null
     lateinit var image:ImageView
     lateinit var tvShare :TextView
     lateinit var explanation :TextView
@@ -70,16 +72,37 @@ class ShareNextFragment : Fragment() {
 
             GlobalScope.launch(Dispatchers.IO) {
                 try {
-                    val compressedImageFile = Compressor.compress(requireContext(), gelenDosya!!) { quality(80) }
-                    val compressedImageUri = Uri.fromFile(compressedImageFile)
-                    uploadImageToStorage2(compressedImageUri)
+                    if (gelenDosya!!.extension == "mp4") {
+                        val input = gelenDosya!!
+                        val output: File
+                        val outputFileName = System.currentTimeMillis().toString()+".mp4"
+                        val outputDirectory = input.parentFile
+                        output = File(outputDirectory, outputFileName)
+                      //  val command2 =  "-y -i ${input.absolutePath} -preset medium -crf 23 -vf format=yuv420p -c:v h264 ${output.absolutePath}"
+                      //  val command3 = "-i ${input.absolutePath} -c:v h264 -crf 18 -preset slow -c:a aac -b:a 192k -vf scale=1280:-2 ${output.absolutePath}"
+                        val command4 = "-i ${input.absolutePath} -c:v h264 -crf 23 -preset medium ${output.absolutePath}"
+
+                        try {
+                            FFmpegKit.execute(command4)
+                        }catch (e:Throwable){
+                            Log.e("SIKIŞTIRMA hATASI", e.message.toString())
+                        }
+
+                        uploadImageToStorage2(Uri.fromFile(output))
+
+
+                    }
+                    else{
+                        val compressedImageFile = Compressor.compress(requireContext(), gelenDosya!!) { quality(80) }
+                        val compressedImageUri = Uri.fromFile(compressedImageFile)
+                        uploadImageToStorage2(compressedImageUri)
+                    }
+
                 } catch (e: Exception) {
                     // Handle any exceptions
                     e.printStackTrace()
                 } finally {
-                    withContext(Dispatchers.Main) {
-                        shareProgressDialog.dismiss()
-                    }
+
                 }
             }
         }
@@ -144,14 +167,27 @@ class ShareNextFragment : Fragment() {
 
     private suspend fun uploadImageToStorage2(compressedImageUri: Uri) {
         try {
-            val uploadTask = imageRef.putFile(compressedImageUri).await()
+            val uploadTask = imageRef.putFile(compressedImageUri)
 
-            val url = imageRef.downloadUrl.await().toString()
+            uploadTask.addOnProgressListener { taskSnapshot ->
+                val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
 
-            val post = Post(mAuth.currentUser!!.uid, postId, FieldValue.serverTimestamp().toString(), explanation.text.toString(), url)
-            uploadPostToFirestore2(post)
+                Log.e("","Progress ____>>> "+progress)
+                shareProgressDialog.tvProgress.text = "Yükleniyor : %${progress}"
+            }
+
+            uploadTask.addOnSuccessListener {
+                    GlobalScope.launch {
+                        val url = imageRef.downloadUrl.await().toString()
+
+                        val post = Post(mAuth.currentUser!!.uid, postId, FieldValue.serverTimestamp().toString(), explanation.text.toString(), url)
+                        uploadPostToFirestore2(post)
+                    }
+            }
+
+
         } catch (e: Exception) {
-            // Handle any exceptions
+            shareProgressDialog.dismiss()
             e.printStackTrace()
         }
     }
@@ -168,6 +204,7 @@ class ShareNextFragment : Fragment() {
 
             userDocRef.set(hashMapOf("userId" to post.userId)).await()
             userDocRef.collection("posts").document(post.postId).set(postMap).await()
+            shareProgressDialog.dismiss()
         } catch (e: Exception) {
             // Handle any exceptions
             e.printStackTrace()
@@ -192,7 +229,6 @@ class ShareNextFragment : Fragment() {
     @Subscribe(sticky = true)
     fun onMessageEvent(event: EventBusDataEvents.SendMediaFile) {
         gelenDosya = event.mediaFile
-        // Do something with the received message
     }
 
     private fun getVideoThumbnail(file: File): Bitmap? {

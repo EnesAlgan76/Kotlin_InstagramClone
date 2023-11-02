@@ -61,6 +61,7 @@ class ShareGalleryFragment : Fragment() {
     private fun handleIleriButton() {
         val flShareNextFrame = requireActivity().findViewById<FrameLayout>(R.id.fl_shareNextFrame)
         val mainLayout = requireActivity().findViewById<ConstraintLayout>(R.id.mainLayout)
+
         buttonIleri.setOnClickListener {
             println("**********TIKLANDI**************")
             mainLayout.visibility = View.GONE

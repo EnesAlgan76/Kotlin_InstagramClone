@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/teal_200"
     tools:context=".Share.ShareCameraFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <com.otaliastudios.cameraview.CameraView
+        android:id="@+id/camraView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="CAMERA" />
+        android:layout_height="match_parent">
+
+    </com.otaliastudios.cameraview.CameraView>
+
+    <ImageView
+        android:id="@+id/iv_capture"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_margin="20dp"
+        android:layout_gravity="center|bottom"
+        android:src="@drawable/rec" />
 
 </FrameLayout>

@@ -8,6 +8,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.example.kotlininstagramapp.databinding.ActivityShareBinding
 import com.example.kotlininstagramapp.utils.SharePagerAdapter
 import com.google.android.material.tabs.TabLayoutMediator
@@ -36,6 +38,10 @@ class ShareActivity : AppCompatActivity() {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(Manifest.permission.CAMERA)
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.RECORD_AUDIO)
         }
 
         if (permissions.isNotEmpty()){
@@ -74,6 +80,7 @@ class ShareActivity : AppCompatActivity() {
         var myPagerAdapter = SharePagerAdapter(this)
         binding.viewPager.adapter = myPagerAdapter
         binding.viewPager.currentItem = 1
+        binding.viewPager.offscreenPageLimit = 1
 
         TabLayoutMediator(binding.tabLayout,binding.viewPager){ tab, position->
             when(position){
@@ -83,6 +90,16 @@ class ShareActivity : AppCompatActivity() {
                 else -> tab.text = "Tab ${position + 1}"
             }
         }.attach()
+
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+
+            }
+        } )
+
+
+
     }
 
     override fun onBackPressed() {
