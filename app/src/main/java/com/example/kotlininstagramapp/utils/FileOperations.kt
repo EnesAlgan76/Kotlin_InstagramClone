@@ -28,12 +28,12 @@ class FileOperations {
 
           val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "bmp", "mp4") // Add more image extensions if needed
           directory.listFiles()?.forEach { file ->
-              println("++>>"+file)
+              //println("++>>"+file)
               if (file.isFile &&  imageExtensions.contains(file.extension.lowercase())  ) {
 
                   imagedirList.add(file.absolutePath)
 
-                  println("---->  ${directory.absolutePath}: ${file.name}")
+                  //println("---->  ${directory.absolutePath}: ${file.name}")
               } else if (file.isDirectory && directory.name !="WhatsApp Images" ) {
                   println("-----------------------------")
                   listImageFilesRecursive(file)

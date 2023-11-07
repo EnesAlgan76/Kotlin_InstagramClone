@@ -7,7 +7,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +19,7 @@ import androidx.fragment.app.Fragment
 import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
-import com.example.kotlininstagramapp.utils.ImageLoader
+import com.example.kotlininstagramapp.utils.EImageLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -28,9 +27,9 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 
 class ProfileEditFragment : Fragment() {
-    private lateinit var eventuserDetails: UserDetails
-    private lateinit var eventuserName: String
-    private lateinit var eventuserFullName: String
+    private var eventuserDetails: UserDetails =UserDetails()
+    private var eventuserName: String=""
+    private var eventuserFullName: String=""
     private lateinit var galleryLauncher: ActivityResultLauncher<Intent>
     private lateinit var firebaseHelper: FirebaseHelper
     private lateinit var profilePicture: ImageView
@@ -86,7 +85,7 @@ class ProfileEditFragment : Fragment() {
         userNameEditText.setText(eventuserName)
         biography.setText(eventuserDetails.biography)
         site.setText("boş")
-        ImageLoader.setImage(eventuserDetails.profilePicture, profilePicture, null)
+        EImageLoader.setImage(eventuserDetails.profilePicture, profilePicture, null)
     }
 
     private fun setupGalleryLauncher() {

@@ -38,6 +38,7 @@ import java.util.*
 class ShareNextFragment : Fragment() {
     var gelenDosya: File? =null
     lateinit var image:ImageView
+    lateinit var ivBack:ImageView
     lateinit var tvShare :TextView
     lateinit var explanation :TextView
     var mAuth = FirebaseAuth.getInstance()
@@ -53,8 +54,8 @@ class ShareNextFragment : Fragment() {
         image = view.findViewById(R.id.iv_share_next)
         tvShare = view.findViewById(R.id.tv_paylas)
         explanation = view.findViewById(R.id.et_explanation)
+        ivBack = view.findViewById<ImageView>(R.id.iv_back)
         val db = FirebaseFirestore.getInstance()
-        val imageUri = Uri.parse("file://${gelenDosya?.absolutePath}")
 
         gelenDosya?.let {
             if(gelenDosya!!.extension=="mp4"){
@@ -65,6 +66,14 @@ class ShareNextFragment : Fragment() {
             }
 
         }
+
+        ivBack.setOnClickListener {
+
+        }
+
+
+
+
 
         tvShare.setOnClickListener {
             shareProgressDialog.show(requireActivity().supportFragmentManager, "ShareProgressDialog")
@@ -107,62 +116,9 @@ class ShareNextFragment : Fragment() {
             }
         }
 
-
-        Log.e(".","ShareNextFragment ÇALIŞTI")
         return view
     }
 
-
-
-//    private fun uploadImageToStorage(compressedImageUri: Uri) {
-//        val uploadTask = imageRef.putFile(compressedImageUri)
-//
-//         uploadTask.addOnProgressListener { taskSnapshot ->
-//             val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
-//
-//             Log.e("","Progress ____>>> "+progress)
-//             shareProgressDialog.tvProgress.text = "Yükleniyor : %${progress}"
-//         }
-//
-//        uploadTask.addOnSuccessListener { task->
-//            imageRef.downloadUrl.addOnSuccessListener { uri ->
-//                val url = uri.toString()
-//                var post = Post(mAuth.currentUser!!.uid,postId,FieldValue.serverTimestamp().toString(),explanation.text.toString(),url)
-//                uploadPosttoFirestore(post)
-//                println(url)
-//            }
-//        }.addOnFailureListener { exception ->
-//            // Handle any errors that occurred during the upload
-//            println("Upload failed: $exception")
-//            //shareProgressDialog.dismiss()
-//        }
-//    }
-//
-//    private fun uploadPosttoFirestore(post: Post) {
-//        var userDocRef = firestore.collection("userPosts").document(post.userId)
-//        val postMap = hashMapOf(
-//            "date" to post.date,
-//            "explanation" to post.explanation,
-//            "url" to post.url,
-//        )
-//       // userDocRef.collection("posts").add(hashMapOf(post.postId to postMap))
-//        userDocRef.set(hashMapOf("userId" to post.userId)).addOnSuccessListener {
-//            userDocRef.collection("posts").document(post.postId).set(postMap)
-//                .addOnSuccessListener { documentReference ->
-//                    println("Post added with ID: ${documentReference}")
-//                    //shareProgressDialog.dismiss()
-//                }
-//                .addOnFailureListener { e ->
-//                    println("Error adding post: $e")
-//                    //shareProgressDialog.dismiss()
-//                }
-//        } .addOnFailureListener { e ->
-//            println("Error setting user data: $e")
-//           // shareProgressDialog.dismiss()
-//        }
-//
-//
-//    }
 
 
     private suspend fun uploadImageToStorage2(compressedImageUri: Uri) {
@@ -191,6 +147,8 @@ class ShareNextFragment : Fragment() {
             e.printStackTrace()
         }
     }
+
+
 
     private suspend fun uploadPostToFirestore2(post: Post) {
         try {

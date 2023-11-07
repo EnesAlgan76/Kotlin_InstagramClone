@@ -14,6 +14,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Login.RegisterFragment
 import com.example.kotlininstagramapp.R
@@ -30,8 +33,9 @@ import java.io.File
 class ShareGalleryFragment : Fragment() {
 
     lateinit var spinner :Spinner
-    lateinit var gridview :GridView
+    lateinit var recyclerView: RecyclerView
     lateinit var bigImage:ImageView
+    lateinit var closeButton:ImageView
     lateinit var bigVideo:VideoView
     lateinit var buttonIleri:TextView
     private var selectedMedia: File? = null
@@ -42,13 +46,15 @@ class ShareGalleryFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
         var view = inflater.inflate(R.layout.fragment_share_gallery, container, false)
 
-
-
         spinner = view.findViewById(R.id.spn_directory_name)
-        gridview = view.findViewById(R.id.grid_view_gallery)
+        recyclerView = view.findViewById(R.id.recyclerView)
         bigImage = view.findViewById(R.id.iv_gallery)
         bigVideo = view.findViewById(R.id.vv_gallery)
+        closeButton = view.findViewById(R.id.iv_closeButton)
         buttonIleri = view.findViewById(R.id.tv_ileri)
+        closeButton.setOnClickListener {
+            requireActivity().onBackPressed()
+        }
         handleIleriButton()
         initializeSpinner()
 
@@ -90,13 +96,41 @@ class ShareGalleryFragment : Fragment() {
             AdapterView.OnItemClickListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val selectedFolderName = spinnerOptions[position]
-               // var fileList = listOf<File>()
+
                 GlobalScope.launch(Dispatchers.Main) {
                     val resimYolListesi = withContext(Dispatchers.Default) {
                         FileOperations.listImageFiles(selectedFolderName)
                     }
                     val result = resimYolListesi
                     var fileList = result!!.map { File(it) }
+
+                    val adapter = GalleryRecyclerAdapter(requireActivity(),fileList)
+                    val gridLayoutManager = GridLayoutManager(requireContext(), 3)
+                    recyclerView.layoutManager = gridLayoutManager
+                    recyclerView.adapter = adapter
+
+                    adapter.setOnItemClickListener { file ->
+                        selectedMedia = file
+
+                        if (file.extension.equals("mp4", true)) {
+                            bigImage.visibility = View.GONE
+                            bigVideo.visibility = View.VISIBLE
+                            bigVideo.setVideoURI(file.toUri())
+                            bigVideo.start()
+                        } else {
+                            bigVideo.stopPlayback()
+                            bigImage.visibility = View.VISIBLE
+                            bigVideo.visibility = View.GONE
+
+                            Glide.with(requireActivity())
+                                .load(file)
+                                .override(1080, 1920)
+                                .into(bigImage)
+                        }
+                    }
+
+
+                    /*
                     val gridAdapter = GalleryGridAdapter(requireActivity(), fileList)
                     gridview.adapter = gridAdapter
                     println(result.toString())
@@ -127,7 +161,7 @@ class ShareGalleryFragment : Fragment() {
 
 
                         }
-                    }
+                    }*/
 
 
                 }

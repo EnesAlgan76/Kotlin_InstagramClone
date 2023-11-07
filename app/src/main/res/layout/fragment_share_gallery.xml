@@ -71,13 +71,14 @@
             android:layout_height="200dp"
             android:visibility="gone" />
 
-        <GridView
-            android:id="@+id/grid_view_gallery"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:numColumns="3"
-            app:layout_constraintHeight_percent="0.4" />
+            android:clipToPadding="false"
+            android:padding="4dp"
+            android:scrollbars="vertical" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

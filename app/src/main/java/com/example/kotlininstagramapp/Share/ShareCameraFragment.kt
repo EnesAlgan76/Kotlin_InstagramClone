@@ -1,6 +1,7 @@
 package com.example.kotlininstagramapp.Share
 
 import android.graphics.Bitmap
+import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -10,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
@@ -32,8 +34,14 @@ import java.util.*
 class ShareCameraFragment : Fragment() {
     lateinit var cameraView: CameraView
     lateinit var captureButton : View
+    lateinit var closeIcon : ImageView
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_share_camera, container, false)
+
+        closeIcon = view.findViewById(R.id.iv_closeButtonCamera)
+        closeIcon.setOnClickListener {
+            requireActivity().onBackPressed()
+        }
 
         cameraView = view.findViewById(R.id.camraView)
         captureButton = view.findViewById(R.id.iv_capture)

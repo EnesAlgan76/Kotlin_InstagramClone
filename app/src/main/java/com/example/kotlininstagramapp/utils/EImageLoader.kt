@@ -8,7 +8,7 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.lang.Exception
 
-class ImageLoader {
+class EImageLoader {
 
     companion object {
 

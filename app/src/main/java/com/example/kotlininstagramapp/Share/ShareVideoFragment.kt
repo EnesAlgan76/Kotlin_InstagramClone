@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.kotlininstagramapp.R
@@ -21,9 +22,15 @@ import java.io.File
 
 class ShareVideoFragment : Fragment() {
     lateinit var cameraView: CameraView
+    lateinit var closeIcon: ImageView
     lateinit var captureButton : View
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_share_video, container, false)
+
+        closeIcon = view.findViewById(R.id.iv_closeButtonVideo)
+        closeIcon.setOnClickListener {
+            requireActivity().onBackPressed()
+        }
 
         cameraView = view.findViewById(R.id.cameraView )
         captureButton = view.findViewById(R.id.iv_record)

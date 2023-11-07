@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Share.ShareCameraFragment">
-
     <com.otaliastudios.cameraview.CameraView
         android:id="@+id/camraView"
         android:layout_width="match_parent"
@@ -20,5 +19,13 @@
         android:layout_margin="20dp"
         android:layout_gravity="center|bottom"
         android:src="@drawable/rec" />
+
+    <ImageView
+        android:id="@+id/iv_closeButtonCamera"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/iv_close_white"
+        android:padding="12dp"
+        android:layout_gravity="top|left"/>
 
 </FrameLayout>

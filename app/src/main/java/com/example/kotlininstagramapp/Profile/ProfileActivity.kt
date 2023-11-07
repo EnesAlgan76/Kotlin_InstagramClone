@@ -10,7 +10,7 @@ import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.ActivityProfileBinding
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
-import com.example.kotlininstagramapp.utils.ImageLoader
+import com.example.kotlininstagramapp.utils.EImageLoader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.greenrobot.eventbus.EventBus
@@ -45,7 +45,12 @@ class ProfileActivity : AppCompatActivity(){
                     binding.tvPosts.text = userDetails.post
                     binding.tvBiograpy.text = userDetails.biography
                     binding.tvName.text = snapshot.data?.get("userFullName").toString()
-                    ImageLoader.setImage(userDetails.profilePicture,binding.ivProfile,binding.pbActivityProfile)
+                    try {
+                        EImageLoader.setImage(userDetails.profilePicture,binding.ivProfile,binding.pbActivityProfile)
+                    }catch(e : java.lang.Error){
+                        Log.e("------------", "Resim Bulunamadı")
+                    }
+
                     EventBus.getDefault().postSticky(EventBusDataEvents.KullaniciBilgileriGonder(userDetails,binding.tvName.text.toString(),binding.tvUserName.text.toString()))
                 }
             }.addOnFailureListener {e ->

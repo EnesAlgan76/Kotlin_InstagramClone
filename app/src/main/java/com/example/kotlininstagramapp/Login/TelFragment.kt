@@ -36,7 +36,7 @@ class TelFragment :Fragment(){
         var et_onaykod = view.findViewById<EditText>(R.id.et_frg_onaykodu)
         tv_telNo.text = gelenTelNo
 
-        requestVerificationCode(gelenTelNo)
+        requestVerificationCode("+90"+gelenTelNo)
         btn_ileri.setOnClickListener { performOperations(et_onaykod.text.toString())}
 
         return view
