@@ -10,6 +10,6 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         println("SearchActivity sınıfına gidildi")
         setContentView(R.layout.activity_home)
-        BottomNavigationHandler.setupNavigations(this,findViewById(R.id.bottomNavigationView),1)
+        //BottomNavigationHandler.setupNavigations(this,findViewById(R.id.bottomNavigationView),1)
     }
 }

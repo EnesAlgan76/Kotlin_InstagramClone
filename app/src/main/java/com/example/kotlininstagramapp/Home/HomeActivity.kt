@@ -35,7 +35,7 @@ class HomeActivity : AppCompatActivity() {
 
         setupHomeViewPager()
 
-        BottomNavigationHandler.setupNavigations(this,findViewById(R.id.bottomNavigationView),4)
+        //BottomNavigationHandler.setupNavigations(this,findViewById(R.id.bottomNavigationView),4)
     }
 
     private fun setupHomeViewPager() {
