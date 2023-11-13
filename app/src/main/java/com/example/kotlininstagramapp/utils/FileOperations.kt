@@ -2,11 +2,14 @@ package com.example.kotlininstagramapp.utils
 
 import android.os.Environment
 import android.util.Log
+import com.example.kotlininstagramapp.Models.UserPost
 import kotlinx.coroutines.*
 import java.io.File
 
 class FileOperations {
-  companion object{
+
+
+    companion object{
       var imagedirList = ArrayList<String>()
 
       suspend fun listImageFiles(path: String): ArrayList<String>? {
@@ -44,5 +47,7 @@ class FileOperations {
 
           return imagedirList
       }
+
+
   }
 }

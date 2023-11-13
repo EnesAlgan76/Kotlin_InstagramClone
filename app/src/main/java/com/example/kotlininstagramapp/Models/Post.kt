@@ -21,6 +21,18 @@ class Post {
         this.url = url
     }
 
+    companion object {
+        fun fromMap(map: Map<String, Any>): Post {
+            val userId = map["userId"] as String
+            val postId = map["postId"] as String
+            val date = map["date"] as String
+            val explanation = map["explanation"] as String
+            val url = map["url"] as String
+
+            return Post(userId, postId, date, explanation, url)
+        }
+    }
+
 
 
 }

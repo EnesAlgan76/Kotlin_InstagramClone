@@ -12,8 +12,6 @@ class UserDetails(
 
 
     companion object {
-
-
         fun fromMap(data: Map<String, Any>): UserDetails {
             val follower = data["follower"] as? String ?: ""
             val following = data["following"] as? String ?: ""

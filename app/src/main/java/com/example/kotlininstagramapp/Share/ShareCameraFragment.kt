@@ -43,7 +43,7 @@ class ShareCameraFragment : Fragment() {
             requireActivity().onBackPressed()
         }
 
-        cameraView = view.findViewById(R.id.camraView)
+        cameraView = view.findViewById(R.id.cameraViewShareCamera)
         captureButton = view.findViewById(R.id.iv_capture)
         cameraView.setLifecycleOwner(viewLifecycleOwner)
 

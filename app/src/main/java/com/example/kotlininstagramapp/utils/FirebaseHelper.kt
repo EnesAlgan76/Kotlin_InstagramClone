@@ -2,6 +2,9 @@ package com.example.kotlininstagramapp.Profile
 
 import ProgressDialogFragment
 import android.net.Uri
+import com.example.kotlininstagramapp.Models.Post
+import com.example.kotlininstagramapp.Models.User
+import com.example.kotlininstagramapp.Models.UserPost
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,6 +18,46 @@ class FirebaseHelper {
     private val firebaseAuth = FirebaseAuth.getInstance()
 
     val userDocumentRef = db.collection("users").document(firebaseAuth.currentUser?.uid.toString())
+
+
+    fun getUserPosts(uid: String): ArrayList<UserPost> {
+        var list: ArrayList<UserPost> = arrayListOf()
+        userDocumentRef.get().addOnSuccessListener { document ->
+            if (document != null) {
+
+                var user: User =User.fromMap(document.data as Map<String, Any>)
+
+
+                var postDocumentReference = db.collection("userPosts").document(user.userId)
+                var allPostsCollection = postDocumentReference.collection("posts")
+                allPostsCollection.get().addOnSuccessListener { post_documents ->
+                    if (post_documents != null) {
+                        for (i in post_documents){
+                            var userPost:UserPost = UserPost()
+                            var post:Post = Post.fromMap(i.data as Map<String, Any>)
+
+                            userPost.userName=user.userName
+                            userPost.userId = user.userId
+                            userPost.userPostUrl = post.url
+                            userPost.postId = post.postId
+                            userPost.postDescription=post.explanation
+                            userPost.yuklenmeTarihi = post.date
+
+                            list.add(userPost)
+                        }
+
+                    }
+
+                }
+
+            }else{
+
+            }
+
+        }
+        println(list.toString())
+        return list
+    }
 
 
     suspend fun updateUserProfile(

@@ -32,7 +32,7 @@ class ShareVideoFragment : Fragment() {
             requireActivity().onBackPressed()
         }
 
-        cameraView = view.findViewById(R.id.cameraView )
+        cameraView = view.findViewById(R.id.cameraViewShareVideo )
         captureButton = view.findViewById(R.id.iv_record)
         cameraView.setLifecycleOwner(viewLifecycleOwner)
         cameraView.mode = Mode.VIDEO
