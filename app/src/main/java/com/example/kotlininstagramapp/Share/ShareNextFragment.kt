@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firestore.v1.DocumentTransform.FieldTransform.ServerValue
 import com.squareup.picasso.Picasso
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
@@ -135,8 +136,7 @@ class ShareNextFragment : Fragment() {
             uploadTask.addOnSuccessListener {
                     GlobalScope.launch {
                         val url = imageRef.downloadUrl.await().toString()
-
-                        val post = Post(mAuth.currentUser!!.uid, postId, FieldValue.serverTimestamp().toString(), explanation.text.toString(), url)
+                        val post = Post(mAuth.currentUser!!.uid, postId, System.currentTimeMillis().toString(), explanation.text.toString(), url)
                         uploadPostToFirestore2(post)
                     }
             }

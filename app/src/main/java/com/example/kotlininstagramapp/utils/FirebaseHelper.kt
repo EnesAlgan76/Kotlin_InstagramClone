@@ -1,6 +1,5 @@
 package com.example.kotlininstagramapp.Profile
 
-import ProgressDialogFragment
 import android.net.Uri
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.Models.User
@@ -8,8 +7,8 @@ import com.example.kotlininstagramapp.Models.UserPost
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 
 class FirebaseHelper {
@@ -20,13 +19,12 @@ class FirebaseHelper {
     val userDocumentRef = db.collection("users").document(firebaseAuth.currentUser?.uid.toString())
 
 
-    fun getUserPosts(uid: String): ArrayList<UserPost> {
+    fun getUserPosts2(uid: String): ArrayList<UserPost> {
         var list: ArrayList<UserPost> = arrayListOf()
         userDocumentRef.get().addOnSuccessListener { document ->
             if (document != null) {
 
                 var user: User =User.fromMap(document.data as Map<String, Any>)
-
 
                 var postDocumentReference = db.collection("userPosts").document(user.userId)
                 var allPostsCollection = postDocumentReference.collection("posts")
@@ -34,10 +32,14 @@ class FirebaseHelper {
                     if (post_documents != null) {
                         for (i in post_documents){
                             var userPost:UserPost = UserPost()
-                            var post:Post = Post.fromMap(i.data as Map<String, Any>)
+
+                            val dataMap = i.data as MutableMap<String, Any>
+                            dataMap["userId"] =user.userId
+                            dataMap["postId"] = i.id
+
+                            var post:Post = Post.fromMap(dataMap)
 
                             userPost.userName=user.userName
-                            userPost.userId = user.userId
                             userPost.userPostUrl = post.url
                             userPost.postId = post.postId
                             userPost.postDescription=post.explanation
@@ -56,6 +58,45 @@ class FirebaseHelper {
 
         }
         println(list.toString())
+        return list
+    }
+
+    suspend fun getUserPosts(uid: String): ArrayList<UserPost> {
+        val list: ArrayList<UserPost> = arrayListOf()
+
+        try {
+            val document = userDocumentRef.get().await()
+            if (document.exists()) {
+                val user: User = User.fromMap(document.data as Map<String, Any>)
+                val postDocumentReference = db.collection("userPosts").document(user.userId)
+                val allPostsCollection = postDocumentReference.collection("posts")
+
+                val postDocuments: QuerySnapshot = allPostsCollection.get().await()
+                for (i in postDocuments) {
+                    val userPost: UserPost = UserPost()
+
+                    val dataMap = i.data as MutableMap<String, Any>
+                    dataMap["userId"] = user.userId
+                    dataMap["postId"] = i.id
+
+                    val post: Post = Post.fromMap(dataMap)
+
+                    userPost.userName = user.userName
+                    userPost.userPostUrl = post.url
+                    userPost.postId = post.postId
+                    userPost.postDescription = post.explanation
+                    userPost.yuklenmeTarihi = post.date
+                    userPost.profilePicture = user.userDetails.profilePicture
+
+                    list.add(userPost)
+                }
+            }
+        } catch (e: Exception) {
+            // Handle exceptions here
+        }
+
+        println("işlemler bitti")
+
         return list
     }
 

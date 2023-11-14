@@ -2,30 +2,27 @@ package com.example.kotlininstagramapp.Home
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.kotlininstagramapp.Login.LoginActivity
-import com.example.kotlininstagramapp.Models.Post
-import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Models.UserPost
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
-import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.ActivityHomeBinding
-import com.example.kotlininstagramapp.utils.FileOperations
 import com.example.kotlininstagramapp.utils.MyPagerAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
-    private lateinit var binding : ActivityHomeBinding
+    lateinit var binding : ActivityHomeBinding
     val MYCAMERA_PERMISSION_CODE =1001
     var auth = FirebaseAuth.getInstance()
     var firebaseHelper: FirebaseHelper = FirebaseHelper()
@@ -34,14 +31,6 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         if (auth.currentUser!=null){
             Toast.makeText(this, "registered", Toast.LENGTH_SHORT).show()
-
-            try {
-                allPosts = firebaseHelper.getUserPosts(auth.currentUser!!.uid)
-            }catch (e: Error){
-                Log.e("HATA -------------- >> ", e.toString())
-            }
-
-
         }else{
             Toast.makeText(this, "unregistered", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, LoginActivity::class.java)
@@ -81,6 +70,14 @@ class HomeActivity : AppCompatActivity() {
         }else{
             Log.e("-----------","Kamera İzni Verilmemiş")
             binding.viewPager.setCurrentItem(1)
+        }
+    }
+
+    override fun onBackPressed() {
+        if(binding.viewPager.currentItem!=1){
+            binding.viewPager.currentItem =1
+        }else{
+            super.onBackPressed()
         }
     }
 

@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+    android:layout_marginBottom="24dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -17,6 +18,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:scaleType="centerCrop"
+            android:padding="8dp"
             android:src="@drawable/icon_profile"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -108,17 +110,26 @@
 
         <TextView
             android:id="@+id/post_tvusername"
-            android:layout_marginLeft="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ensalgn" />
+            android:layout_marginLeft="8dp"
+            android:text="ensalgn"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/post_tvdescription"
             android:layout_width="wrap_content"
-            android:layout_marginLeft="8dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
             android:layout_weight="1"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textColor="#000000" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/post_tv_dateago"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="TextView" />
 </LinearLayout>

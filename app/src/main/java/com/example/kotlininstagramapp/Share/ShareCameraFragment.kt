@@ -98,22 +98,6 @@ class ShareCameraFragment : Fragment() {
             .commit()
     }
 
-    suspend fun uploadFileToStorage(file: File?) {
-        val storage = FirebaseStorage.getInstance()
-
-        // Create a reference to the storage location where you want to save the image
-        val storageRef = storage.getReference("images/${UUID.randomUUID()}.jpg")
-
-        try {
-            storageRef.putFile(Uri.fromFile(file)).await()
-            Log.e("------------","Upload is Succesful")
-        }catch (e: Throwable){
-            Log.e("------------","Error Uploading : ${e.message}")
-        }
-
-
-    }
-
 
 
 
