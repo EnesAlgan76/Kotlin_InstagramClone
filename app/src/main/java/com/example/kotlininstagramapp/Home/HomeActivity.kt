@@ -38,6 +38,8 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+
+
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setupHomeViewPager()
         setContentView(binding.root)

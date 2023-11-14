@@ -132,4 +132,11 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:text="TextView" />
+
+    <TextView
+        android:id="@+id/tv_showcomments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="Yorumları Gör" />
 </LinearLayout>

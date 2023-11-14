@@ -6,14 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.UserPost
 import com.example.kotlininstagramapp.R
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.concurrent.TimeUnit
 
-class PostsAdapter(private val posts: List<UserPost>, val mContext: Context) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
+class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val framentManager: FragmentManager) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -29,6 +31,15 @@ class PostsAdapter(private val posts: List<UserPost>, val mContext: Context) : R
         holder.post_tvusername.text = userPost.userName
         holder.post_tvdescription.text =userPost.postDescription
         holder.post_tv_dateago.text = getTimeAgo(userPost.yuklenmeTarihi!!.toLong())
+
+        holder.showComment.setOnClickListener {
+            val bottomSheetFragment = BottomSheetDialog(mContext,R.style.BottomSheetTransparent)
+            bottomSheetFragment.apply {
+                setContentView(R.layout.fragment_bottom_sheet_comments)
+                show()
+            }
+            //bottomSheetFragment.show(framentManager, bottomSheetFragment.tag)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -42,6 +53,7 @@ class PostsAdapter(private val posts: List<UserPost>, val mContext: Context) : R
         val post_iv_postimage: ImageView = itemView.findViewById(R.id.post_iv_postimage)
         val post_tvusername: TextView = itemView.findViewById(R.id.post_tvusername)
         val post_tvdescription: TextView = itemView.findViewById(R.id.post_tvdescription)
+        val showComment :TextView = itemView.findViewById(R.id.tv_showcomments)
     }
 
 
