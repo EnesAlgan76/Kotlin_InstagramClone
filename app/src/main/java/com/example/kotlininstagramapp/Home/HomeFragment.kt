@@ -59,7 +59,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView(allPosts: ArrayList<UserPost>) {
-        val adapter=PostsAdapter(allPosts,requireContext(),parentFragmentManager)
+        val adapter=PostsAdapter(allPosts,requireContext(), requireActivity().supportFragmentManager)
         recyclerView.adapter=adapter
     }
 }

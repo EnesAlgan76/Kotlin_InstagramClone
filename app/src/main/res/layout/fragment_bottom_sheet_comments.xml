@@ -3,27 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottom_sheet_root"
     android:orientation="vertical"
-    android:background="@drawable/rounded_bottom_sheet_background"
     android:gravity="center"
+    android:background="@drawable/rounded_bottom_sheet_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
 
-    <Button
-        android:id="@+id/button5"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:text="Button" />
+    <Space
 
-    <Button
-        android:id="@+id/button6"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:text="Button" />
+        android:layout_width="match_parent"
+        android:layout_height="200dp"/>
 
-    <Button
-        android:id="@+id/button7"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:text="Button" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_comments"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </LinearLayout>

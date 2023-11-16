@@ -15,7 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.concurrent.TimeUnit
 
-class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val framentManager: FragmentManager) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
+class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val fragmentManager: FragmentManager) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -33,11 +33,14 @@ class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val
         holder.post_tv_dateago.text = getTimeAgo(userPost.yuklenmeTarihi!!.toLong())
 
         holder.showComment.setOnClickListener {
-            val bottomSheetFragment = BottomSheetDialog(mContext,R.style.BottomSheetTransparent)
-            bottomSheetFragment.apply {
-                setContentView(R.layout.fragment_bottom_sheet_comments)
-                show()
-            }
+            val bottomSheetFragment2 = CommentBottomSheetFragment()
+            bottomSheetFragment2.show(fragmentManager, bottomSheetFragment2.tag)
+
+//            val bottomSheetFragment = BottomSheetDialog(mContext,R.style.BottomSheetTransparent)
+//            bottomSheetFragment.apply {
+//                setContentView(R.layout.fragment_bottom_sheet_comments)
+//                show()
+//            }
             //bottomSheetFragment.show(framentManager, bottomSheetFragment.tag)
         }
     }
