@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginVertical="18dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -36,7 +37,7 @@
         android:text="Bu metin yorum kartını test etmek içindirBu metin yorum kBu metin yorum kartını test etmek içindirartını test etmek içindir"
         android:textColor="#090404"
         android:textSize="12sp"
-        app:layout_constraintEnd_toStartOf="@+id/iv_comment_likebutton"
+        app:layout_constraintEnd_toStartOf="@+id/linearLayout"
         app:layout_constraintStart_toStartOf="@+id/tv_comment_userName"
         app:layout_constraintTop_toBottomOf="@+id/tv_comment_userName" />
 
@@ -51,25 +52,32 @@
         app:layout_constraintStart_toEndOf="@+id/tv_comment_userName"
         app:layout_constraintTop_toTopOf="@+id/tv_comment_userName" />
 
-    <ImageView
-        android:id="@+id/iv_comment_likebutton"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/heart" />
-
-    <TextView
-        android:id="@+id/tv_comment_likecount"
+    <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="15"
-        android:textSize="10sp"
-        app:layout_constraintEnd_toEndOf="@+id/iv_comment_likebutton"
-        app:layout_constraintStart_toStartOf="@+id/iv_comment_likebutton"
-        app:layout_constraintTop_toBottomOf="@+id/iv_comment_likebutton" />
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5">
+
+        <ImageView
+            android:id="@+id/iv_comment_likebutton"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginBottom="8dp"
+            app:srcCompat="@drawable/heart" />
+
+        <TextView
+            android:id="@+id/tv_comment_likecount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="15"
+            android:textColor="#6C6C6C"
+            android:textSize="12sp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

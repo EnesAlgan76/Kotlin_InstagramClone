@@ -8,11 +8,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <Space
-
-        android:layout_width="match_parent"
-        android:layout_height="200dp"/>
+    <androidx.cardview.widget.CardView
+        android:layout_width="70dp"
+        android:layout_height="5dp"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="5dp"
+        app:cardBackgroundColor="#9C9C9C"
+        />
 
 
     <androidx.recyclerview.widget.RecyclerView
