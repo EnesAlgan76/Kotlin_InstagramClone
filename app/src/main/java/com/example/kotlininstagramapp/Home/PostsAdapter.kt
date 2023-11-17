@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.UserPost
 import com.example.kotlininstagramapp.R
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.concurrent.TimeUnit
 
@@ -33,7 +32,7 @@ class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val
         holder.post_tv_dateago.text = getTimeAgo(userPost.yuklenmeTarihi!!.toLong())
 
         holder.showComment.setOnClickListener {
-            val bottomSheetFragment2 = CommentBottomSheetFragment()
+            val bottomSheetFragment2 = CommentBottomSheetFragment(userPost.postId!!)
             bottomSheetFragment2.show(fragmentManager, bottomSheetFragment2.tag)
 
 //            val bottomSheetFragment = BottomSheetDialog(mContext,R.style.BottomSheetTransparent)

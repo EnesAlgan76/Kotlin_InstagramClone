@@ -1,5 +1,6 @@
 package com.example.kotlininstagramapp.Home
 
+import Comment
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -8,10 +9,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.kotlininstagramapp.Models.Comment
 import com.example.kotlininstagramapp.R
 
-class CommentsAdapter(var mContext:Context,var comments: ArrayList<Comment>) :RecyclerView.Adapter<CommentsAdapter.MyViewHolder>() {
+class CommentsAdapter(var mContext:Context,var comments: List<Comment>) :RecyclerView.Adapter<CommentsAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         var tek_satir:View = LayoutInflater.from(parent.context).inflate(R.layout.card_comment,parent,false)
@@ -27,7 +27,7 @@ class CommentsAdapter(var mContext:Context,var comments: ArrayList<Comment>) :Re
 
         holder.comment.text = comment.comment
         holder.userName.text = comment.user_name
-        holder.timeAgo.text = comment.time_ago
+        holder.timeAgo.text = comment.time
         holder.likeCount.text = comment.like_count
         Glide.with(mContext).load(comment.user_profile_picture).into(holder.profileImage)
 

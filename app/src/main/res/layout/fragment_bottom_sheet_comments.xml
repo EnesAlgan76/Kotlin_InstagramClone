@@ -1,24 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet_root"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:background="@drawable/rounded_bottom_sheet_background"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_bottom_sheet_background"
+    android:gravity="top|center"
+    android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="70dp"
         android:layout_height="5dp"
         android:layout_margin="8dp"
-        app:cardCornerRadius="5dp"
+        android:layout_marginTop="16dp"
         app:cardBackgroundColor="#9C9C9C"
-        />
+        app:cardCornerRadius="5dp" />
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_comments"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="50dp"
+            android:layout_margin="8dp"
+            android:layout_height="50dp"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <EditText
+            android:id="@+id/et_comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:ems="10"
+            android:hint="Yorum ekle..."
+            android:inputType="textPersonName"
+            android:padding="12dp"
+            android:textColor="#202020"
+            android:textColorHint="#000000" />
+
+        <TextView
+            android:id="@+id/tv_sharecomment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Paylaş"
+
+            android:textColor="#2196F3" />
+    </LinearLayout>
+
 </LinearLayout>

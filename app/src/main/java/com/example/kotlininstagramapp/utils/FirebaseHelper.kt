@@ -1,5 +1,6 @@
 package com.example.kotlininstagramapp.Profile
 
+import Comment
 import android.net.Uri
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.Models.User
@@ -146,5 +147,38 @@ class FirebaseHelper {
                 // Handle error
             }
         }
+    }
+
+    suspend fun publishComment(text: String, postId: String) {
+        if(firebaseAuth.currentUser!=null){
+           val userDoc = userDocumentRef.get().await()
+            val userProfilePicture = userDoc.getString("userDetails.profilePicture")?:""
+            val userName= userDoc.getString("userName")?:"Unknown User"
+
+            var comment:Comment = Comment(
+                commentId = "",
+                comment = text,
+                like_count = "0",
+                user_id = firebaseAuth.currentUser!!.uid,
+                user_profile_picture = userProfilePicture,
+                time = System.currentTimeMillis().toString(),
+                user_name = userName,
+                post_id = postId
+            )
+
+            val commentCollection =db.collection("comments")
+            val commentDocument = commentCollection.add(comment).await() // addOnSuccessListener
+            commentDocument.update("commentId", commentDocument.id).await()
+        }
+
+    }
+
+    suspend fun getComments(postId: String): List<Comment> {
+        val commentCollection =db.collection("comments")
+        val comments = commentCollection.whereEqualTo("post_id",postId).get().await()
+
+        val commentsList = comments.documents.mapNotNull{ it.toObject(Comment::class.java) }
+        return commentsList
+
     }
 }
