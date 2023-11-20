@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.UserPost
+import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.concurrent.TimeUnit
@@ -32,15 +33,12 @@ class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val
         holder.post_tv_dateago.text = getTimeAgo(userPost.yuklenmeTarihi!!.toLong())
 
         holder.showComment.setOnClickListener {
-            val bottomSheetFragment2 = CommentBottomSheetFragment(userPost.postId!!)
-            bottomSheetFragment2.show(fragmentManager, bottomSheetFragment2.tag)
+            val bottomSheetFragment = CommentBottomSheetFragment(userPost.postId!!)
+            bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
+        }
 
-//            val bottomSheetFragment = BottomSheetDialog(mContext,R.style.BottomSheetTransparent)
-//            bottomSheetFragment.apply {
-//                setContentView(R.layout.fragment_bottom_sheet_comments)
-//                show()
-//            }
-            //bottomSheetFragment.show(framentManager, bottomSheetFragment.tag)
+        holder.post_ivlike.setOnClickListener {
+            FirebaseHelper().saveUserLike(userPost.postId)
         }
     }
 
@@ -56,6 +54,7 @@ class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val
         val post_tvusername: TextView = itemView.findViewById(R.id.post_tvusername)
         val post_tvdescription: TextView = itemView.findViewById(R.id.post_tvdescription)
         val showComment :TextView = itemView.findViewById(R.id.tv_showcomments)
+        val post_ivlike :ImageView = itemView.findViewById(R.id.post_ivlike)
     }
 
 
