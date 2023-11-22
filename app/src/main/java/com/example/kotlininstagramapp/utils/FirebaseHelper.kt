@@ -164,7 +164,7 @@ class FirebaseHelper {
             val documentSnapshot = withContext(Dispatchers.IO) {
                 userLikesRef.get().await()
             }
-            val likedComments = documentSnapshot.get("likedComments") as? List<String> ?: listOf()   // Kullanıcının daha önceden yorumu beğenip
+            val likedComments = documentSnapshot.get("liked_comments") as? List<String> ?: listOf()   // Kullanıcının daha önceden yorumu beğenip
             liked = likedComments.contains(commentId)                                                // beğenmediğini kontrol et
             val newLikeCount = if (liked) currentLikeCount - 1 else currentLikeCount + 1
 
@@ -174,9 +174,9 @@ class FirebaseHelper {
 
 
             val updateTask = if (!liked) {
-                userLikesRef.update("likedComments", FieldValue.arrayUnion(commentId))  // duruma göre kullanıcı füğümünden de likedComments güncelle
+                userLikesRef.update("liked_comments", FieldValue.arrayUnion(commentId))  // duruma göre kullanıcı füğümünden de likedComments güncelle
             } else {
-                userLikesRef.update("likedComments", FieldValue.arrayRemove(commentId))
+                userLikesRef.update("liked_comments", FieldValue.arrayRemove(commentId))
             }
             updateTask.await()
 
@@ -199,7 +199,31 @@ class FirebaseHelper {
     fun saveUserLike(postId: String?) {
         if (postId != null) {
             val data = mapOf("post_id" to postId)
-            userDocumentRef.collection("liked_posts").document(postId).set(data)
+            val likedPostDocRef = userDocumentRef.collection("liked_posts").document(postId)
+            likedPostDocRef.get().addOnCompleteListener { task->
+                if(task.isSuccessful){
+                    val document = task.result
+                    if (document != null && document.exists()){
+                        likedPostDocRef.delete()
+                        println("Existing document deleted for postId: $postId")
+                    }else{
+                        likedPostDocRef.set(data)
+                        println("Existing document added for postId: $postId")
+                    }
+                }else{
+                    println("--------->> network error")
+                }
+            }
+        }
+    }
+
+    suspend fun isPostLiked(postId: String): Boolean {
+        val likedPostDocRef = userDocumentRef.collection("liked_posts").document(postId)
+        return try {
+            val documentSnapshot = likedPostDocRef.get().await()
+            documentSnapshot.exists()
+        } catch (e: Exception) {
+            throw e
         }
     }
 

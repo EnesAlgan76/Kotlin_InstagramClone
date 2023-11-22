@@ -29,7 +29,7 @@ class CommentsAdapter(var mContext:Context,var commentMapList: ArrayList<Pair<Co
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val (comment, isLiked) = commentMapList[position]
+        var (comment, isLiked) = commentMapList[position]
 
         Log.e("COMMENTS",comment.toString())
         holder.comment.text = comment.comment
@@ -52,6 +52,7 @@ class CommentsAdapter(var mContext:Context,var commentMapList: ArrayList<Pair<Co
             }
             comment.like_count =if (isLiked){(comment.like_count.toInt()-1).toString()}else{(comment.like_count.toInt()+1).toString()}
             commentMapList[position]= (comment to !isLiked)
+            isLiked = !isLiked
             notifyItemChanged(position)
         }
 

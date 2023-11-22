@@ -13,9 +13,14 @@ import com.example.kotlininstagramapp.Models.UserPost
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val fragmentManager: FragmentManager) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -25,6 +30,9 @@ class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val userPost = posts[position]
+        var isLiked =false
+
+
         holder.fullNameTextView.text = userPost.userName
         Glide.with(mContext).load(userPost.userPostUrl).into(holder.post_iv_postimage)
         Glide.with(mContext).load(userPost.profilePicture).into(holder.post_profileimage)
@@ -37,8 +45,28 @@ class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val
             bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
         }
 
+        CoroutineScope(Dispatchers.Main).launch{
+            withContext(Dispatchers.IO){
+                isLiked = FirebaseHelper().isPostLiked(userPost.postId!!)
+            }
+            holder.post_ivlike.setImageResource(
+                if(isLiked){R.drawable.heart_red}else{R.drawable.heart}
+            )
+        }
+
+        var sonTiklama:Long = 0
         holder.post_ivlike.setOnClickListener {
-            FirebaseHelper().saveUserLike(userPost.postId)
+            var ilkTiklamaZamani = System.currentTimeMillis()
+            if (ilkTiklamaZamani-sonTiklama>1000){
+                FirebaseHelper().saveUserLike(userPost.postId)
+                println(isLiked.toString())
+                //isLiked=!isLiked
+                notifyItemChanged(position)
+
+            }else{
+                println("----- >> Çift Tıklandı")
+            }
+            sonTiklama = ilkTiklamaZamani
         }
     }
 
