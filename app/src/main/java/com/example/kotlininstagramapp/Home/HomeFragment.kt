@@ -1,6 +1,7 @@
 package com.example.kotlininstagramapp.Home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,14 +48,10 @@ class HomeFragment : Fragment() {
                 println("All Posts: $allPosts")
                 setupRecyclerView(allPosts)
 
-
             } catch (e: Exception) {
                 println("Error fetching posts: ${e.message}")
             }
         }
-
-
-
         return view
     }
 

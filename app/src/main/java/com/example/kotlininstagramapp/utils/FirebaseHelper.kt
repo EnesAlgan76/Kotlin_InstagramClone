@@ -26,6 +26,7 @@ class FirebaseHelper {
     val commentCollection =db.collection("comments")
 
 
+
     suspend fun getUserPosts(uid: String): ArrayList<UserPost> {
         val list: ArrayList<UserPost> = arrayListOf()
 
@@ -38,9 +39,11 @@ class FirebaseHelper {
 
                 val postDocuments: QuerySnapshot = allPostsCollection.get().await()
                 for (i in postDocuments) {
-                    val userPost: UserPost = UserPost()
+                    val userPost = UserPost()
+                    val dataMap = i.data as MutableMap<String, String>
+                    var likeCount:String = dataMap.get("likeCount")?:"null"
 
-                    val dataMap = i.data as MutableMap<String, Any>
+
                     dataMap["userId"] = user.userId
                     dataMap["postId"] = i.id
 
@@ -52,6 +55,7 @@ class FirebaseHelper {
                     userPost.postDescription = post.explanation
                     userPost.yuklenmeTarihi = post.date
                     userPost.profilePicture = user.userDetails.profilePicture
+                    userPost.likeCount = likeCount
 
                     list.add(userPost)
                 }
@@ -66,12 +70,7 @@ class FirebaseHelper {
     }
 
 
-    suspend fun updateUserProfile(
-        fullName: String?,
-        userName: String?,
-        biography: String?,
-        selectedImageUri: Uri?,
-    ){
+    suspend fun updateUserProfile(fullName: String?, userName: String?, biography: String?, selectedImageUri: Uri?, ){
         if (fullName != null) {
             userDocumentRef.update("userFullName", fullName).await()
             println("Tam Ad Güncellendi")
@@ -97,7 +96,6 @@ class FirebaseHelper {
     }
 
 
-
     private suspend fun updateProfileImage(selectedImageUri: Uri?, userName: String?) {
         if (selectedImageUri != null) {
             val imageRef = storageReference.getReference("profileImages/$userName")
@@ -112,6 +110,7 @@ class FirebaseHelper {
             }
         }
     }
+
 
     suspend fun publishComment(text: String, postId: String, adapter: CommentsAdapter) {
         if(firebaseAuth.currentUser!=null){
@@ -142,6 +141,7 @@ class FirebaseHelper {
 
     }
 
+
     suspend fun getComments(postId: String): ArrayList<Pair<Comment,Boolean>> {
         val comments = commentCollection.whereEqualTo("post_id",postId).get().await()
         val likedComments = userDocumentRef.get().await().get("likedComments") as? List<String>?: listOf()
@@ -156,13 +156,14 @@ class FirebaseHelper {
 
     }
 
+
     suspend fun updateCommentLikeState(commentId: String, currentLikeCount: Int) {
-        val userId = firebaseAuth.currentUser!!.uid
-        val userLikesRef = db.collection("users").document(userId)
+//        val userId = firebaseAuth.currentUser!!.uid
+//        val userLikesRef = db.collection("users").document(userId)
         var liked :Boolean? =null
         try {
             val documentSnapshot = withContext(Dispatchers.IO) {
-                userLikesRef.get().await()
+                userDocumentRef.get().await()
             }
             val likedComments = documentSnapshot.get("liked_comments") as? List<String> ?: listOf()   // Kullanıcının daha önceden yorumu beğenip
             liked = likedComments.contains(commentId)                                                // beğenmediğini kontrol et
@@ -174,9 +175,9 @@ class FirebaseHelper {
 
 
             val updateTask = if (!liked) {
-                userLikesRef.update("liked_comments", FieldValue.arrayUnion(commentId))  // duruma göre kullanıcı füğümünden de likedComments güncelle
+                userDocumentRef.update("liked_comments", FieldValue.arrayUnion(commentId))  // duruma göre kullanıcı füğümünden de likedComments güncelle
             } else {
-                userLikesRef.update("liked_comments", FieldValue.arrayRemove(commentId))
+                userDocumentRef.update("liked_comments", FieldValue.arrayRemove(commentId))
             }
             updateTask.await()
 
@@ -196,26 +197,48 @@ class FirebaseHelper {
         }
     }
 
-    fun saveUserLike(postId: String?) {
+
+    suspend fun saveUserLike(postId: String?) {
         if (postId != null) {
             val data = mapOf("post_id" to postId)
             val likedPostDocRef = userDocumentRef.collection("liked_posts").document(postId)
-            likedPostDocRef.get().addOnCompleteListener { task->
-                if(task.isSuccessful){
-                    val document = task.result
-                    if (document != null && document.exists()){
-                        likedPostDocRef.delete()
-                        println("Existing document deleted for postId: $postId")
-                    }else{
-                        likedPostDocRef.set(data)
-                        println("Existing document added for postId: $postId")
+
+            try {
+                val document = likedPostDocRef.get().await()
+
+                if (document.exists()) {
+                    likedPostDocRef.delete().await()
+                    withContext(Dispatchers.IO){
+                        updateLikeCount(postId, increase = false)
                     }
-                }else{
-                    println("--------->> network error")
+
+                    println("Existing document deleted for postId: $postId")
+                } else {
+                    likedPostDocRef.set(data).await()
+                    withContext(Dispatchers.IO){
+                        updateLikeCount(postId, increase = false)
+                    }
+                    println("Existing document added for postId: $postId")
                 }
+            } catch (e: Exception) {
+                println("--------->> network error: ${e.message}")
             }
         }
     }
+
+
+    suspend fun updateLikeCount(postId: String, increase: Boolean) {
+        val postDocumentReference = db.collection("userPosts").document(firebaseAuth.currentUser!!.uid).collection("posts")
+        val document= postDocumentReference.document(postId).get().await()
+        val  currentlikeCount : String = (document.get("likeCount")?:"0").toString()
+        val newValue = if(increase){(currentlikeCount.toInt()+1)}else{(currentlikeCount.toInt()-1)}
+
+        postDocumentReference.document(postId).update("likeCount",newValue.toString())
+
+        println("beğenilme sayısı güncellendi")
+
+    }
+
 
     suspend fun isPostLiked(postId: String): Boolean {
         val likedPostDocRef = userDocumentRef.collection("liked_posts").document(postId)

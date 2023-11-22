@@ -1,6 +1,8 @@
 package com.example.kotlininstagramapp.Home
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,14 +14,17 @@ import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.UserPost
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
-class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val fragmentManager: FragmentManager) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
+class PostsAdapter( var posts: ArrayList<UserPost>, val mContext: Context, val fragmentManager: FragmentManager) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -39,7 +44,7 @@ class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val
         holder.post_tvusername.text = userPost.userName
         holder.post_tvdescription.text =userPost.postDescription
         holder.post_tv_dateago.text = getTimeAgo(userPost.yuklenmeTarihi!!.toLong())
-
+        holder.post_tv_likecount.text =("${userPost.likeCount} beğenme")
         holder.showComment.setOnClickListener {
             val bottomSheetFragment = CommentBottomSheetFragment(userPost.postId!!)
             bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
@@ -58,10 +63,34 @@ class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val
         holder.post_ivlike.setOnClickListener {
             var ilkTiklamaZamani = System.currentTimeMillis()
             if (ilkTiklamaZamani-sonTiklama>1000){
-                FirebaseHelper().saveUserLike(userPost.postId)
-                println(isLiked.toString())
-                //isLiked=!isLiked
-                notifyItemChanged(position)
+                CoroutineScope(Dispatchers.IO).launch {
+                        val userDocumentRef = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().currentUser?.uid.toString())
+                        val likedPostDocRef = userDocumentRef.collection("liked_posts").document(userPost.postId!!)
+                        val document = likedPostDocRef.get().await()
+                        var tempPost = posts[position]
+                        if (document.exists()) {
+                            withContext(Dispatchers.Main){
+                                tempPost.likeCount= (tempPost.likeCount!!.toInt()-1).toString()
+                                posts[position] = tempPost
+                                notifyItemChanged(position)
+                            }
+                            likedPostDocRef.delete().await()
+                            FirebaseHelper().updateLikeCount(userPost.postId!!, increase = false)
+
+                        } else {
+                            withContext(Dispatchers.Main){
+                                tempPost.likeCount= (tempPost.likeCount!!.toInt()+1).toString()
+                                posts[position] = tempPost
+                                notifyItemChanged(position)
+                            }
+                            val data = mapOf("post_id" to userPost.postId!!)
+                            likedPostDocRef.set(data).await()
+                            FirebaseHelper().updateLikeCount(userPost.postId!!, increase = true)
+
+
+                        }
+
+                }
 
             }else{
                 println("----- >> Çift Tıklandı")
@@ -83,6 +112,7 @@ class PostsAdapter(private val posts: List<UserPost>, val mContext: Context, val
         val post_tvdescription: TextView = itemView.findViewById(R.id.post_tvdescription)
         val showComment :TextView = itemView.findViewById(R.id.tv_showcomments)
         val post_ivlike :ImageView = itemView.findViewById(R.id.post_ivlike)
+        val post_tv_likecount :TextView = itemView.findViewById(R.id.post_tv_likecount)
     }
 
 

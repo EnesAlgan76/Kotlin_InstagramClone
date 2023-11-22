@@ -157,7 +157,8 @@ class ShareNextFragment : Fragment() {
             val postMap = hashMapOf(
                 "date" to post.date,
                 "explanation" to post.explanation,
-                "url" to post.url
+                "url" to post.url,
+                "likeCount" to "0"
             )
 
             userDocRef.set(hashMapOf("userId" to post.userId)).await()

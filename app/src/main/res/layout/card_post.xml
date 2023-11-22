@@ -102,6 +102,14 @@
     </LinearLayout>
 
 
+    <TextView
+        android:id="@+id/post_tv_likecount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:textColor="@color/black"
+        android:text="beğenme" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -127,16 +135,16 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/post_tv_dateago"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:text="TextView" />
-
-    <TextView
         android:id="@+id/tv_showcomments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:text="Yorumları Gör" />
+
+    <TextView
+        android:id="@+id/post_tv_dateago"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="TextView" />
 </LinearLayout>

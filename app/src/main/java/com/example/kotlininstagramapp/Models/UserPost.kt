@@ -7,4 +7,5 @@ class UserPost(){
     var userPostUrl :String ?=null
     var yuklenmeTarihi :  String ?=null
     var profilePicture : String?=null
+    var likeCount : String?=null
 }

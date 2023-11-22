@@ -62,4 +62,6 @@ dependencies {
     implementation 'com.otaliastudios:cameraview:2.7.2'
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
 
+
+
 }
