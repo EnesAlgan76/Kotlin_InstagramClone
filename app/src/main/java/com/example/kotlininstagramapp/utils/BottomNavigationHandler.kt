@@ -51,7 +51,7 @@ class BottomNavigationHandler {
                             return true
                         }
                         R.id.menu_item_search -> {
-                            val intent = Intent(context, RegisterActivity::class.java)
+                            val intent = Intent(context, SearchActivity::class.java)
                             context.startActivity(intent)
                             (context as Activity).overridePendingTransition(0, 0)
                             currentMenuNo =0

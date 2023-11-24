@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.kotlininstagramapp.Models.UserDetails
+import com.example.kotlininstagramapp.Models.UserPost
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.ActivityProfileBinding
@@ -13,13 +15,17 @@ import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.EImageLoader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 
 class ProfileActivity : AppCompatActivity(){
     lateinit var binding: ActivityProfileBinding
     val db = FirebaseFirestore.getInstance()
     val firebaseAuth = FirebaseAuth.getInstance()
-
+    val userId = firebaseAuth.currentUser!!.uid
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +34,26 @@ class ProfileActivity : AppCompatActivity(){
         BottomNavigationHandler.setupNavigations(this,findViewById(R.id.bottomNavigationView_profile),4)
         handleButtonClicks()
         setInfos()
+        CoroutineScope(Dispatchers.Main).launch {
+            setRecycleView()
+        }
+
+    }
+
+    private suspend fun setRecycleView() {
+        var userPosts = arrayListOf<UserPost>()
+        withContext(Dispatchers.IO){
+            userPosts = FirebaseHelper().getUserPosts(userId)
+        }
+        var adapter = ProfileUserPostsAdapter(context = this,userPosts)
+        binding.rvProfilePageUserPosts.adapter = adapter
+        binding.rvProfilePageUserPosts.layoutManager = GridLayoutManager(this, 3)
+
 
     }
 
     private fun setInfos() {
         if(firebaseAuth.currentUser!=null){
-            val userId = firebaseAuth.currentUser!!.uid
             val userDocRef = db.collection("users").document(userId)
 
             userDocRef.get().addOnSuccessListener { snapshot ->
