@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_sheet_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_bottom_sheet_background"
+    android:gravity="top|center"
+    android:orientation="vertical">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="50dp"
+        android:layout_height="5dp"
+        android:layout_margin="16dp"
+        app:cardElevation="@null"
+        app:cardBackgroundColor="#CCCCCC"
+        app:cardCornerRadius="5dp" >
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tv_followoptions_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="ensalgn76"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCCCCC"/>
+
+    <TextView
+        android:id="@+id/tv_unfollow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Takibi Bırak"
+        android:textColor="#000000"
+        android:textSize="16sp" />
+
+
+</LinearLayout>

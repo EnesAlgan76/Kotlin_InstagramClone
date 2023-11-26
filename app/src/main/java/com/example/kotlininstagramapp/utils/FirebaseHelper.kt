@@ -158,8 +158,6 @@ class FirebaseHelper {
 
 
     suspend fun updateCommentLikeState(commentId: String, currentLikeCount: Int) {
-//        val userId = firebaseAuth.currentUser!!.uid
-//        val userLikesRef = db.collection("users").document(userId)
         var liked :Boolean? =null
         try {
             val documentSnapshot = withContext(Dispatchers.IO) {
@@ -198,34 +196,6 @@ class FirebaseHelper {
     }
 
 
-    suspend fun saveUserLike(postId: String?) {
-        if (postId != null) {
-            val data = mapOf("post_id" to postId)
-            val likedPostDocRef = userDocumentRef.collection("liked_posts").document(postId)
-
-            try {
-                val document = likedPostDocRef.get().await()
-
-                if (document.exists()) {
-                    likedPostDocRef.delete().await()
-                    withContext(Dispatchers.IO){
-                        updateLikeCount(postId, increase = false)
-                    }
-
-                    println("Existing document deleted for postId: $postId")
-                } else {
-                    likedPostDocRef.set(data).await()
-                    withContext(Dispatchers.IO){
-                        updateLikeCount(postId, increase = false)
-                    }
-                    println("Existing document added for postId: $postId")
-                }
-            } catch (e: Exception) {
-                println("--------->> network error: ${e.message}")
-            }
-        }
-    }
-
 
     suspend fun updateLikeCount(postId: String, increase: Boolean) {
         val postDocumentReference = db.collection("userPosts").document(firebaseAuth.currentUser!!.uid).collection("posts")
@@ -247,6 +217,35 @@ class FirebaseHelper {
             documentSnapshot.exists()
         } catch (e: Exception) {
             throw e
+        }
+    }
+
+    suspend fun followUser(userId: String) {
+        val currentuser = firebaseAuth.currentUser
+        if(currentuser != null){
+            userDocumentRef.collection("follows").document(userId).set((mapOf("userId" to userId))).await()
+            db.collection("users").document(userId).collection("followers").document(currentuser.uid).set(mapOf("userId" to currentuser.uid)).await()
+            Log.e("////","Takip Edildi")
+        }
+    }
+
+    suspend fun unfollowUser(userId: String) {
+        val currentUser = firebaseAuth.currentUser
+        if (currentUser != null) {
+            userDocumentRef.collection("follows").document(userId).delete().await()
+            db.collection("users").document(userId).collection("followers").document(currentUser.uid).delete().await()
+            Log.e("////", "Unfollowed")
+        }
+    }
+
+    fun isUserFollowing(userId :String, callback :(Boolean) ->Unit){
+        val documentRef = userDocumentRef.collection("follows").document(userId).get().addOnSuccessListener {
+                snapshot ->
+            if(snapshot.exists()){
+                callback(true)
+            }else{
+                callback(false)
+            }
         }
     }
 

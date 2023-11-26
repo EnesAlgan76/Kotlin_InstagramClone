@@ -2,6 +2,8 @@ package com.example.kotlininstagramapp.Search
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
@@ -22,31 +24,28 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
         BottomNavigationHandler.setupNavigations(this,findViewById(R.id.bottomNavigationView_search),1)
 
-        // Initialize Firebase Firestore
         firestore = FirebaseFirestore.getInstance()
-
-        // Find views
         val searchBox = findViewById<EditText>(R.id.searchBox)
         val recyclerView = findViewById<RecyclerView>(R.id.rv_search)
 
-        // Set up RecyclerView
+
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = SearchResultsAdapter(this)
         recyclerView.adapter = adapter
 
-        // Listen to changes in the search box
+        val handler = Handler(Looper.getMainLooper())
+
         searchBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // Not used in this example
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Fetch data based on the entered text
+                handler.removeCallbacksAndMessages(null)
                 val searchText = s.toString().trim()
                 if (searchText.isNotEmpty()) {
-                    fetchUsers(searchText)
+                   handler.postDelayed({fetchUsers(searchText)},800)  // Kullanıcının her harf girdiğinde aramak yerine yazmayı bitirince ara.
                 } else {
-                    adapter.clear() // Clear adapter if search box is empty
+                    adapter.clear()
                 }
             }
 
@@ -57,6 +56,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun fetchUsers(searchText: String) {
+        println("---------- Sorgu Yapılıyor ------")
         firestore.collection("users")
             .whereGreaterThanOrEqualTo("userName", searchText)
             .whereLessThan("userName", searchText + "\uf8ff")
@@ -66,6 +66,7 @@ class SearchActivity : AppCompatActivity() {
                     val users = snapshot.documents.mapNotNull { document ->
                         val userFullName = document.getString("userFullName") ?: ""
                         val userName = document.getString("userName") ?: ""
+                        val userId = document.getString("userId") ?: ""
                         val userDetails = document.get("userDetails") as? Map<*, *>
                         val profileImage = userDetails?.get("profilePicture") as? String ?: ""
 
@@ -73,7 +74,8 @@ class SearchActivity : AppCompatActivity() {
                         mapOf(
                             "userFullName" to userFullName,
                             "userName" to userName,
-                            "userProfileImage" to profileImage
+                            "userProfileImage" to profileImage,
+                            "userId" to userId,
                         )
                     }
                     adapter.setUsers(users)

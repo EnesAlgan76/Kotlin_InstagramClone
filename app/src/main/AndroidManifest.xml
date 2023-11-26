@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -18,7 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KotlinInstagramApp"
         tools:targetApi="31">
-
+        <activity
+            android:name=".Generic.UserExplorePage"
+            android:exported="false" />
         <activity
             android:name=".Login.LoginActivity"
             android:exported="false" />
@@ -27,18 +28,17 @@
             android:exported="false" />
         <activity
             android:name=".Profile.SettingActivity"
-            android:exported="false" /> <!-- Set the intent-filter of HomeActivity as the launcher -->
+            android:exported="false" />
         <activity
             android:name=".Home.HomeActivity"
             android:exported="true">
 
-            <!-- Add the intent-filter to HomeActivity -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Other activity declarations -->
+        </activity>
         <activity
             android:name=".Share.ShareActivity"
             android:exported="false" />

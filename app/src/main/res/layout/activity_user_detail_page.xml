@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ScrollView
+        android:id="@+id/userExplore_scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toTopOf="@+id/userExplore_bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/userExplore_fl_activity_profile">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/userExplore_profile_activityroot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:context=".Profile.ProfileActivity">
+
+
+                <TextView
+                    android:id="@+id/userExplore_tv_userName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="16dp"
+                    android:text="enes_algan76"
+                    android:textColor="#000000"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/userExplore_iv_add"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="24dp"
+                    app:layout_constraintEnd_toStartOf="@+id/userExplore_iv_menu"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/icon_add_circle" />
+
+                <ImageView
+                    android:id="@+id/userExplore_iv_menu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="31dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/icon_menu" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/userExplore_iv_profile"
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="36dp"
+                    android:src="@drawable/icon_profile"
+                    app:civ_border_color="#000"
+                    app:civ_border_overlay="true"
+                    app:civ_border_width="2dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/userExplore_tv_userName" />
+
+                <TextView
+                    android:id="@+id/userExplore_tv_posts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="20"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/userExplore_tv_followers"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/userExplore_iv_profile"
+                    app:layout_constraintTop_toTopOf="@+id/userExplore_iv_profile" />
+
+                <TextView
+                    android:id="@+id/userExplore_tv_followers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="373"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/userExplore_tv_follow"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/userExplore_tv_posts"
+                    app:layout_constraintTop_toTopOf="@+id/userExplore_tv_posts" />
+
+                <TextView
+                    android:id="@+id/userExplore_tv_follow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="401"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/userExplore_tv_followers"
+                    app:layout_constraintTop_toTopOf="@+id/userExplore_tv_followers" />
+
+                <TextView
+                    android:id="@+id/userExplore_textView9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Gönderi"
+                    android:textColor="#000000"
+                    app:layout_constraintEnd_toEndOf="@+id/userExplore_tv_posts"
+                    app:layout_constraintStart_toStartOf="@+id/userExplore_tv_posts"
+                    app:layout_constraintTop_toBottomOf="@+id/userExplore_tv_posts" />
+
+                <TextView
+                    android:id="@+id/userExplore_textView10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Takipçi"
+                    android:textColor="#000000"
+                    app:layout_constraintEnd_toEndOf="@+id/userExplore_tv_followers"
+                    app:layout_constraintStart_toStartOf="@+id/userExplore_tv_followers"
+                    app:layout_constraintTop_toBottomOf="@+id/userExplore_tv_followers" />
+
+                <TextView
+                    android:id="@+id/userExplore_textView11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Takip"
+                    android:textColor="#000000"
+                    app:layout_constraintEnd_toEndOf="@+id/userExplore_tv_follow"
+                    app:layout_constraintStart_toStartOf="@+id/userExplore_tv_follow"
+                    app:layout_constraintTop_toBottomOf="@+id/userExplore_tv_follow" />
+
+                <TextView
+                    android:id="@+id/userExplore_tv_biograpy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="TextView"
+                    app:layout_constraintStart_toStartOf="@+id/userExplore_tv_name"
+                    app:layout_constraintTop_toBottomOf="@+id/userExplore_tv_name" />
+
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/userExplore_tv_biograpy">
+                    <Button
+                        android:id="@+id/userExplore_btn_follow"
+                        android:visibility="invisible"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="24dp"
+                        android:backgroundTint="#2196F3"
+                        android:text="Takip Et"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+
+                    <LinearLayout
+                        android:id="@+id/userExplore_layout_followandmessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/userExplore_btn_followOptions"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_margin="8dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="#EEEEEE"
+                            android:drawableEnd="@drawable/iv_arrow_down"
+                            android:text="Takip "
+                            android:textColor="@color/black"
+                            android:textSize="12sp" />
+
+                        <Button
+                            android:id="@+id/userExplore_btn_message"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_margin="8dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="#EEEEEE"
+                            android:text="Mesaj"
+                            android:textColor="@color/black"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+
+                </FrameLayout>
+
+
+
+
+                <ProgressBar
+                    android:id="@+id/userExplore_pb_activityProfile"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/userExplore_iv_profile"
+                    app:layout_constraintEnd_toEndOf="@+id/userExplore_iv_profile"
+                    app:layout_constraintStart_toStartOf="@+id/userExplore_iv_profile"
+                    app:layout_constraintTop_toTopOf="@+id/userExplore_iv_profile" />
+
+                <TextView
+                    android:id="@+id/userExplore_tv_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="TextView"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/userExplore_tv_biograpy"
+                    app:layout_constraintStart_toStartOf="@+id/userExplore_iv_profile"
+                    app:layout_constraintTop_toBottomOf="@+id/userExplore_iv_profile" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/userExplore_rvProfilePageUserPosts"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                app:layout_constraintTop_toBottomOf="@+id/userExplore_btn_editprofile" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/userExplore_bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginBottom="1dp"
+        android:background="#FFFFFF"
+        app:itemIconTint="@drawable/bottom_navigation_selector"
+        app:labelVisibilityMode="unlabeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottomnavigation_menu" />
+
+
+    <FrameLayout
+        android:id="@+id/userExplore_fl_activity_profile"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
