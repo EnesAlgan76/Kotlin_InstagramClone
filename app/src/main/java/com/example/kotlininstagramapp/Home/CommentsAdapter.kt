@@ -49,15 +49,19 @@ class CommentsAdapter(var mContext:Context,var commentMapList: ArrayList<Pair<Co
 
 
         holder.likeButton.setOnClickListener {
+            Log.e("///////","*************${comment.like_count}")
             CoroutineScope(Dispatchers.IO).launch {
                 FirebaseHelper().updateCommentLikeState(comment.commentId, comment.like_count.toInt())
+                withContext(Dispatchers.Main){
+                    comment.like_count =if (isLiked){(comment.like_count.toInt()-1).toString()}else{(comment.like_count.toInt()+1).toString()}
+                    commentMapList[position]= (comment to !isLiked)
+                    isLiked = !isLiked
+                    notifyItemChanged(position)
+                }
 
             }
 
-            comment.like_count =if (isLiked){(comment.like_count.toInt()-1).toString()}else{(comment.like_count.toInt()+1).toString()}
-            commentMapList[position]= (comment to !isLiked)
-            isLiked = !isLiked
-            notifyItemChanged(position)
+
         }
 
 

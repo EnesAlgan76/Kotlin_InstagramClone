@@ -183,8 +183,9 @@ class FirebaseHelper {
             val documentSnapshot = userDocumentRef.get().await()
 
             val likedComments = documentSnapshot.get("liked_comments") as? List<String> ?: listOf()   // Kullanıcının daha önceden yorumu beğenip
-            liked = likedComments.contains(commentId)
-            Log.e("Kullancı önceden Yourumu beğenmiş mi : ", liked.toString())// beğenmediğini kontrol et
+            liked = likedComments.contains(commentId) // beğenmediğini kontrol et
+            Log.e("Kullancı önceden Yourumu beğenmiş mi : ", liked.toString())
+            Log.e("İlk Beğeni Sayısı : ", currentLikeCount.toString())
             val newLikeCount = if (liked) currentLikeCount - 1 else currentLikeCount + 1
             Log.e("yeni sayı : ", newLikeCount.toString())// beğenmediğini kontrol et
 
