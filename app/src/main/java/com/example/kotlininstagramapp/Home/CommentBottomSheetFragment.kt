@@ -24,7 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class CommentBottomSheetFragment(var postId: String) : BottomSheetDialogFragment() {
+class CommentBottomSheetFragment(var postId: String) : BottomSheetDialogFragment()  {
 
     var comments:ArrayList<Pair<Comment,Boolean>> = arrayListOf()
     lateinit var et_comment :EditText
@@ -76,6 +76,11 @@ class CommentBottomSheetFragment(var postId: String) : BottomSheetDialogFragment
             }
         }
         return view;
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.e("sdfs","FRAGMENT DESTROY EDİLDİ")
     }
 
 

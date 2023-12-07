@@ -15,6 +15,7 @@ import com.example.kotlininstagramapp.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 class CommentsAdapter(var mContext:Context,var commentMapList: ArrayList<Pair<Comment,Boolean>>) :RecyclerView.Adapter<CommentsAdapter.MyViewHolder>() {
@@ -46,10 +47,13 @@ class CommentsAdapter(var mContext:Context,var commentMapList: ArrayList<Pair<Co
 
         holder.likeButton.setImageResource(likeImageResource)
 
+
         holder.likeButton.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
                 FirebaseHelper().updateCommentLikeState(comment.commentId, comment.like_count.toInt())
+
             }
+
             comment.like_count =if (isLiked){(comment.like_count.toInt()-1).toString()}else{(comment.like_count.toInt()+1).toString()}
             commentMapList[position]= (comment to !isLiked)
             isLiked = !isLiked

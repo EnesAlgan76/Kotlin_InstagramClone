@@ -43,7 +43,7 @@ class ProfileActivity : AppCompatActivity(){
     private suspend fun setRecycleView() {
         var userPostItems: ArrayList<UserPostItem>
         withContext(Dispatchers.IO){
-            userPostItems = FirebaseHelper().getUserPosts(userId)
+            userPostItems = FirebaseHelper().fetchUserPosts(userId)
         }
         var adapter = ProfileUserPostsAdapter(context = this,userPostItems)
         binding.rvProfilePageUserPosts.adapter = adapter

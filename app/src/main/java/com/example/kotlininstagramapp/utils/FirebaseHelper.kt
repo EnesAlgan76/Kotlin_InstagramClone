@@ -87,54 +87,6 @@ class FirebaseHelper {
 
 
 
-
-
-    suspend fun getUserPosts(uid: String): ArrayList<UserPostItem> {
-        val list: ArrayList<UserPostItem> = arrayListOf()
-        val userDocument = db.collection("users").document(uid)
-
-        try {
-            val document = userDocument.get().await()
-            if (document.exists()) {
-                val user: User = User.fromMap(document.data as Map<String, Any>)
-                val postDocumentReference = db.collection("userPosts").document(user.userId)
-                val allPostsCollection = postDocumentReference.collection("posts")
-
-                val postDocuments: QuerySnapshot = allPostsCollection.get().await()
-                for (i in postDocuments) {
-                    val dataMap = i.data as MutableMap<String, String>
-                    val likeCount:String = dataMap.get("likeCount")?:"null"
-
-
-                    dataMap["userId"] = user.userId
-                    dataMap["postId"] = i.id
-
-                    val post: Post = Post.fromMap(dataMap)
-
-                    val userPostItem = UserPostItem(
-                        post.postId,
-                        user.userId,
-                        post.explanation,
-                        user.userName,
-                        post.url,
-                        post.date,
-                        user.userDetails.profilePicture,
-                        likeCount
-                    )
-
-                    list.add(userPostItem)
-                }
-            }
-        } catch (e: Exception) {
-            // Handle exceptions here
-        }
-
-        println("işlemler bitti")
-
-        return list
-    }
-
-
     suspend fun updateUserProfile(fullName: String?, userName: String?, biography: String?, selectedImageUri: Uri?, ){
         if (fullName != null) {
             userDocumentRef.update("userFullName", fullName).await()
@@ -209,12 +161,15 @@ class FirebaseHelper {
 
     suspend fun getComments(postId: String): ArrayList<Pair<Comment,Boolean>> {
         val comments = commentCollection.whereEqualTo("post_id",postId).get().await()
-        val likedComments = userDocumentRef.get().await().get("likedComments") as? List<String>?: listOf()
+        val userDocument = userDocumentRef.get().await()
+        val likedComments = userDocument.get("liked_comments") as? List<String>?: listOf()
+
 
         val commentsList = comments.documents.mapNotNull{ document ->
             val comment = document.toObject(Comment::class.java)
             val isLiked=  likedComments.contains(comment!!.commentId)
             (comment to isLiked)
+
         }
 
         return ArrayList(commentsList)
@@ -225,12 +180,14 @@ class FirebaseHelper {
     suspend fun updateCommentLikeState(commentId: String, currentLikeCount: Int) {
         var liked :Boolean? =null
         try {
-            val documentSnapshot = withContext(Dispatchers.IO) {
-                userDocumentRef.get().await()
-            }
+            val documentSnapshot = userDocumentRef.get().await()
+
             val likedComments = documentSnapshot.get("liked_comments") as? List<String> ?: listOf()   // Kullanıcının daha önceden yorumu beğenip
-            liked = likedComments.contains(commentId)                                                // beğenmediğini kontrol et
+            liked = likedComments.contains(commentId)
+            Log.e("Kullancı önceden Yourumu beğenmiş mi : ", liked.toString())// beğenmediğini kontrol et
             val newLikeCount = if (liked) currentLikeCount - 1 else currentLikeCount + 1
+            Log.e("yeni sayı : ", newLikeCount.toString())// beğenmediğini kontrol et
+
 
 
             val commentRef = db.collection("comments").document(commentId)   // Beğeni Sayısını Güncelle
