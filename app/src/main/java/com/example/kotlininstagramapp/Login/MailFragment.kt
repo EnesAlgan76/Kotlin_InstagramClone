@@ -31,6 +31,7 @@ class MailFragment : Fragment() {
                 .addToBackStack("RegisterFragmentMail")
                 .commit()
 
+
         }
         return view
     }

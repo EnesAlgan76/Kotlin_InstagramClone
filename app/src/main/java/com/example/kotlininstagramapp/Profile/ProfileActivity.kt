@@ -7,7 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.kotlininstagramapp.Models.UserDetails
-import com.example.kotlininstagramapp.Models.UserPost
+import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.ActivityProfileBinding
@@ -41,11 +41,11 @@ class ProfileActivity : AppCompatActivity(){
     }
 
     private suspend fun setRecycleView() {
-        var userPosts = arrayListOf<UserPost>()
+        var userPostItems: ArrayList<UserPostItem>
         withContext(Dispatchers.IO){
-            userPosts = FirebaseHelper().getUserPosts(userId)
+            userPostItems = FirebaseHelper().getUserPosts(userId)
         }
-        var adapter = ProfileUserPostsAdapter(context = this,userPosts)
+        var adapter = ProfileUserPostsAdapter(context = this,userPostItems)
         binding.rvProfilePageUserPosts.adapter = adapter
         binding.rvProfilePageUserPosts.layoutManager = GridLayoutManager(this, 3)
 

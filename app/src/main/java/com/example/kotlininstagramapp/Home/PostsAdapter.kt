@@ -1,8 +1,6 @@
 package com.example.kotlininstagramapp.Home
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +9,7 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.kotlininstagramapp.Models.UserPost
+import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.google.firebase.auth.FirebaseAuth
@@ -24,9 +22,9 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
-class PostsAdapter( var posts: ArrayList<UserPost>, val mContext: Context, val fragmentManager: FragmentManager) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
+class PostsAdapter(var posts: ArrayList<UserPostItem>, val mContext: Context, val fragmentManager: FragmentManager) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
 
-
+    val defaultImage = R.drawable.icon_profile
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_post, parent, false)
@@ -34,25 +32,25 @@ class PostsAdapter( var posts: ArrayList<UserPost>, val mContext: Context, val f
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val userPost = posts[position]
+        val userPostItem = posts[position]
         var isLiked =false
 
 
-        holder.fullNameTextView.text = userPost.userName
-        Glide.with(mContext).load(userPost.userPostUrl).into(holder.post_iv_postimage)
-        Glide.with(mContext).load(userPost.profilePicture).into(holder.post_profileimage)
-        holder.post_tvusername.text = userPost.userName
-        holder.post_tvdescription.text =userPost.postDescription
-        holder.post_tv_dateago.text = getTimeAgo(userPost.yuklenmeTarihi!!.toLong())
-        holder.post_tv_likecount.text =("${userPost.likeCount} beğenme")
+        holder.fullNameTextView.text = userPostItem.userName
+        Glide.with(mContext).load(userPostItem.userPostUrl).into(holder.post_iv_postimage)
+        Glide.with(mContext).load(userPostItem.profilePicture).error(defaultImage).into(holder.post_profileimage)
+        holder.post_tvusername.text = userPostItem.userName
+        holder.post_tvdescription.text =userPostItem.postDescription
+        holder.post_tv_dateago.text = getTimeAgo(userPostItem.yuklenmeTarihi.toLong())
+        holder.post_tv_likecount.text =("${userPostItem.likeCount} beğenme")
         holder.showComment.setOnClickListener {
-            val bottomSheetFragment = CommentBottomSheetFragment(userPost.postId!!)
+            val bottomSheetFragment = CommentBottomSheetFragment(userPostItem.postId)
             bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
         }
 
         CoroutineScope(Dispatchers.Main).launch{
             withContext(Dispatchers.IO){
-                isLiked = FirebaseHelper().isPostLiked(userPost.postId!!)
+                isLiked = FirebaseHelper().isPostLiked(userPostItem.postId)
             }
             holder.post_ivlike.setImageResource(
                 if(isLiked){R.drawable.heart_red}else{R.drawable.heart}
@@ -64,28 +62,33 @@ class PostsAdapter( var posts: ArrayList<UserPost>, val mContext: Context, val f
             var ilkTiklamaZamani = System.currentTimeMillis()
             if (ilkTiklamaZamani-sonTiklama>1000){
                 CoroutineScope(Dispatchers.IO).launch {
-                        val userDocumentRef = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().currentUser?.uid.toString())
-                        val likedPostDocRef = userDocumentRef.collection("liked_posts").document(userPost.postId!!)
+                    val auth :FirebaseAuth = FirebaseAuth.getInstance()
+                        val userDocumentRef = FirebaseFirestore.getInstance().collection("users").document(auth.currentUser!!.uid)
+                        val likedPostDocRef = userDocumentRef.collection("liked_posts").document(userPostItem.postId)
                         val document = likedPostDocRef.get().await()
                         var tempPost = posts[position]
                         if (document.exists()) {
                             withContext(Dispatchers.Main){
-                                tempPost.likeCount= (tempPost.likeCount!!.toInt()-1).toString()
+                                userPostItem.likeCount= (userPostItem.likeCount.toInt()-1).toString()
                                 posts[position] = tempPost
                                 notifyItemChanged(position)
                             }
                             likedPostDocRef.delete().await()
-                            FirebaseHelper().updateLikeCount(userPost.postId!!, increase = false)
+                            FirebaseHelper().updateLikeCount(userPostItem.postId, userPostItem.userId, increase = false)
 
                         } else {
                             withContext(Dispatchers.Main){
-                                tempPost.likeCount= (tempPost.likeCount!!.toInt()+1).toString()
+                                tempPost.likeCount= (tempPost.likeCount.toInt()+1).toString()
                                 posts[position] = tempPost
                                 notifyItemChanged(position)
                             }
-                            val data = mapOf("post_id" to userPost.postId!!)
+                            val data = mapOf("post_id" to userPostItem.postId)
                             likedPostDocRef.set(data).await()
-                            FirebaseHelper().updateLikeCount(userPost.postId!!, increase = true)
+                            FirebaseHelper().updateLikeCount(
+                                userPostItem.postId,
+                                userPostItem.userId,
+                                increase = true
+                            )
 
 
                         }

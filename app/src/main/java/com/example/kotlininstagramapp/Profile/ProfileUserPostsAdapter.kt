@@ -7,18 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import com.example.kotlininstagramapp.Models.Post
-import com.example.kotlininstagramapp.Models.UserPost
+import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.R
 import java.io.File
-import java.util.concurrent.TimeUnit
 
 
-class ProfileUserPostsAdapter(private val context: Context, private val posts: List<UserPost>) : RecyclerView.Adapter<ProfileUserPostsAdapter.ViewHolder>() {
+class ProfileUserPostsAdapter(private val context: Context, private val posts: List<UserPostItem>) : RecyclerView.Adapter<ProfileUserPostsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.grid_userposts_image_view, parent, false)
@@ -43,12 +39,12 @@ class ProfileUserPostsAdapter(private val context: Context, private val posts: L
         private val iv_userpost: ImageView = itemView.findViewById(R.id.iv_userpost)
         private val iv_reel: ImageView = itemView.findViewById(R.id.iv_reel)
 
-        fun bindData(userPost: UserPost, isVideo: Boolean) {
+        fun bindData(userPostItem: UserPostItem, isVideo: Boolean) {
             if (isVideo) {
-                Glide.with(context).load(userPost.userPostUrl).into(iv_userpost)
+                Glide.with(context).load(userPostItem.userPostUrl).into(iv_userpost)
                 iv_reel.visibility=View.VISIBLE
             } else {
-                Glide.with(context).load(userPost.userPostUrl).into(iv_userpost)
+                Glide.with(context).load(userPostItem.userPostUrl).into(iv_userpost)
             }
         }
     }

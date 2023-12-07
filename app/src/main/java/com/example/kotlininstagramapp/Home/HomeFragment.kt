@@ -1,7 +1,6 @@
 package com.example.kotlininstagramapp.Home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,7 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.kotlininstagramapp.Models.UserPost
+import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
@@ -24,7 +23,7 @@ class HomeFragment : Fragment() {
     lateinit var bottomNavigationView: BottomNavigationView
     lateinit var recyclerView:  RecyclerView
     lateinit var iv_directMessage:  ImageView
-    var allPosts: ArrayList<UserPost> = ArrayList()
+    var allPosts: ArrayList<UserPostItem>  = ArrayList()
     var auth = FirebaseAuth.getInstance()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_home,container,false)
@@ -42,10 +41,8 @@ class HomeFragment : Fragment() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 withContext(Dispatchers.IO) {
-                    allPosts = FirebaseHelper().getUserPosts(auth.currentUser!!.uid)
-                    println("İşlemler Tamam")
+                    allPosts = FirebaseHelper().getAllPosts()
                 }
-                println("All Posts: $allPosts")
                 setupRecyclerView(allPosts)
 
             } catch (e: Exception) {
@@ -55,7 +52,7 @@ class HomeFragment : Fragment() {
         return view
     }
 
-    private fun setupRecyclerView(allPosts: ArrayList<UserPost>) {
+    private fun setupRecyclerView(allPosts: ArrayList<UserPostItem>) {
         val adapter=PostsAdapter(allPosts,requireContext(), requireActivity().supportFragmentManager)
         recyclerView.adapter=adapter
     }

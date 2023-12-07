@@ -1,23 +1,18 @@
 package com.example.kotlininstagramapp.Generic
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.example.kotlininstagramapp.Home.CommentBottomSheetFragment
+import androidx.recyclerview.widget.GridLayoutManager
+import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
-import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.databinding.ActivityHomeBinding
+import com.example.kotlininstagramapp.Profile.ProfileUserPostsAdapter
 import com.example.kotlininstagramapp.databinding.ActivityUserDetailPageBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-interface FollowStateUIHandler {
-    fun handleFollowStateUI()
-}
 
 
 class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
@@ -31,6 +26,10 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
         userId = intent.getStringExtra("USER_ID")
 
         handleFollowStateUI()
+
+        CoroutineScope(Dispatchers.Main).launch {
+            setRecycleView()
+        }
 
         binding.userExploreBtnFollow.setOnClickListener{
             if (userId != null) {
@@ -51,6 +50,16 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
         setContentView(binding.root)
     }
 
+    private suspend fun setRecycleView() {
+        var userPostItems: ArrayList<UserPostItem>
+        withContext(Dispatchers.IO){
+            userPostItems = FirebaseHelper().fetchUserPosts(userId!!)
+        }
+        var adapter = ProfileUserPostsAdapter(context = this,userPostItems)
+        binding.userExploreRvProfilePageUserPosts.adapter = adapter
+        binding.userExploreRvProfilePageUserPosts.layoutManager = GridLayoutManager(this, 3)
+    }
+
     override fun handleFollowStateUI() {
         FirebaseHelper().isUserFollowing(userId!!){
                 isFollowing ->
@@ -66,3 +75,4 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
 
 
 }
+

@@ -92,10 +92,15 @@ class RegisterActivity : AppCompatActivity() {
                         binding.registerRoot.visibility= View.GONE
                         binding.flRegisterpage.visibility = View.VISIBLE
 
+//                        supportFragmentManager.beginTransaction()
+//                            .replace(R.id.fl_registerpage, MailFragment())
+//                            .addToBackStack("MailFragment")
+//                            .commit()
                         supportFragmentManager.beginTransaction()
-                            .replace(R.id.fl_registerpage, MailFragment())
-                            .addToBackStack("MailFragment")
+                            .replace(R.id.fl_registerpage, RegisterFragment())
+                            .addToBackStack("RegisterFragmentMail")
                             .commit()
+
 
                         EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(null,binding.etRegisterpage.text.toString()))
                     }

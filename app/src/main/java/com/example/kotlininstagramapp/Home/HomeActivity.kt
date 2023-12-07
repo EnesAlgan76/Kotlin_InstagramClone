@@ -9,16 +9,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.viewpager2.widget.ViewPager2
 import com.example.kotlininstagramapp.Login.LoginActivity
-import com.example.kotlininstagramapp.Models.UserPost
+import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.databinding.ActivityHomeBinding
 import com.example.kotlininstagramapp.utils.MyPagerAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
@@ -26,7 +22,7 @@ class HomeActivity : AppCompatActivity() {
     val MYCAMERA_PERMISSION_CODE =1001
     var auth = FirebaseAuth.getInstance()
     var firebaseHelper: FirebaseHelper = FirebaseHelper()
-    var allPosts: ArrayList<UserPost> = ArrayList()
+    var allPosts: ArrayList<UserPostItem> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (auth.currentUser!=null){
@@ -37,8 +33,6 @@ class HomeActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
         }
-
-
 
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setupHomeViewPager()

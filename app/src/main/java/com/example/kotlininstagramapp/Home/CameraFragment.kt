@@ -59,14 +59,27 @@ class CameraFragment : Fragment() {
         cameraView.addCameraListener(object  : CameraListener(){
             override fun onPictureTaken(result: PictureResult) {
                 // Convert the image to a byte array
-                val file = File(Environment.getExternalStorageDirectory().absolutePath+"/DCIM/", "filename.jpg")
-                result.toFile(file,object: FileCallback {
-                    override fun onFileReady(file: File?) {
-                        Log.e("*********",file.toString())
-                        //goShareNextFragmet(file)
-                    }
+                //val file = File(Environment.getExternalStorageDirectory().absolutePath+"/DCIM/", "filename.jpg")
 
-                })
+                val file = File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DCIM), "filename.jpg")
+
+
+                try {
+                    file.createNewFile()
+                    result.toFile(file, object : FileCallback {
+                        override fun onFileReady(file: File?) {
+                            file?.let {
+                                Log.e("*********", file.toString())
+                                //goShareNextFragment(file)
+                            } ?: run {
+                                Log.e("*********", "File is null")
+                            }
+                        }
+
+                    })
+                } catch (e: Exception) {
+                    Log.e("*********", "Error creating file: ${e.message}")
+                }
                 super.onPictureTaken(result)
             }
 

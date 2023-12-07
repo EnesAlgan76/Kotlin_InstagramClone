@@ -6,16 +6,15 @@ import android.util.Log
 import com.example.kotlininstagramapp.Home.CommentsAdapter
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.Models.User
-import com.example.kotlininstagramapp.Models.UserPost
+import com.example.kotlininstagramapp.Models.UserPostItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 class FirebaseHelper {
     private val storageReference = FirebaseStorage.getInstance()
@@ -26,12 +25,76 @@ class FirebaseHelper {
     val commentCollection =db.collection("comments")
 
 
+    suspend fun getAllPosts(): ArrayList<UserPostItem> {
+        val userIdList = mutableListOf<String>()
+        val allPostsList = arrayListOf<UserPostItem>()
 
-    suspend fun getUserPosts(uid: String): ArrayList<UserPost> {
-        val list: ArrayList<UserPost> = arrayListOf()
+        val followedUsers = userDocumentRef.collection("follows").get().await()
+        for (doc in followedUsers.documents) {
+            userIdList.add(doc.id)
+        }
+
+        val deferredList = userIdList.map { userId ->
+            CoroutineScope(Dispatchers.IO).async {
+                fetchUserPosts(userId)
+            }
+        }
+
+        val results = deferredList.awaitAll()
+        results.forEach { allPostsList.addAll(it) }
+
+        return allPostsList
+    }
+
+
+
+    suspend fun fetchUserPosts(userId: String): ArrayList<UserPostItem> {
+        val list: ArrayList<UserPostItem> = arrayListOf()
+
+        val userDocument = db.collection("users").document(userId)
+        val document = userDocument.get().await()
+
+        if (document.exists()) {
+            val user: User = User.fromMap(document.data as Map<String, Any>)
+            val postDocumentReference = db.collection("userPosts").document(user.userId)
+            val allPostsCollection = postDocumentReference.collection("posts")
+
+            val postDocuments = allPostsCollection.get().await()
+            for (i in postDocuments) {
+                val dataMap = i.data as MutableMap<String, String>
+                var likeCount: String = dataMap["likeCount"] ?: "null"
+
+                dataMap["userId"] = user.userId
+                dataMap["postId"] = i.id
+                val post: Post = Post.fromMap(dataMap)
+                val userPostItem = UserPostItem(
+                    post.postId,
+                    user.userId,
+                    post.explanation,
+                    user.userName,
+                    post.url,
+                    post.date,
+                    user.userDetails.profilePicture,
+                    likeCount
+                )
+
+                list.add(userPostItem)
+            }
+        }
+
+        return list
+    }
+
+
+
+
+
+    suspend fun getUserPosts(uid: String): ArrayList<UserPostItem> {
+        val list: ArrayList<UserPostItem> = arrayListOf()
+        val userDocument = db.collection("users").document(uid)
 
         try {
-            val document = userDocumentRef.get().await()
+            val document = userDocument.get().await()
             if (document.exists()) {
                 val user: User = User.fromMap(document.data as Map<String, Any>)
                 val postDocumentReference = db.collection("userPosts").document(user.userId)
@@ -39,9 +102,8 @@ class FirebaseHelper {
 
                 val postDocuments: QuerySnapshot = allPostsCollection.get().await()
                 for (i in postDocuments) {
-                    val userPost = UserPost()
                     val dataMap = i.data as MutableMap<String, String>
-                    var likeCount:String = dataMap.get("likeCount")?:"null"
+                    val likeCount:String = dataMap.get("likeCount")?:"null"
 
 
                     dataMap["userId"] = user.userId
@@ -49,15 +111,18 @@ class FirebaseHelper {
 
                     val post: Post = Post.fromMap(dataMap)
 
-                    userPost.userName = user.userName
-                    userPost.userPostUrl = post.url
-                    userPost.postId = post.postId
-                    userPost.postDescription = post.explanation
-                    userPost.yuklenmeTarihi = post.date
-                    userPost.profilePicture = user.userDetails.profilePicture
-                    userPost.likeCount = likeCount
+                    val userPostItem = UserPostItem(
+                        post.postId,
+                        user.userId,
+                        post.explanation,
+                        user.userName,
+                        post.url,
+                        post.date,
+                        user.userDetails.profilePicture,
+                        likeCount
+                    )
 
-                    list.add(userPost)
+                    list.add(userPostItem)
                 }
             }
         } catch (e: Exception) {
@@ -197,10 +262,10 @@ class FirebaseHelper {
 
 
 
-    suspend fun updateLikeCount(postId: String, increase: Boolean) {
-        val postDocumentReference = db.collection("userPosts").document(firebaseAuth.currentUser!!.uid).collection("posts")
+    suspend fun updateLikeCount(postId: String, userId: String, increase: Boolean) {
+        val postDocumentReference = db.collection("userPosts").document(userId).collection("posts")
         val document= postDocumentReference.document(postId).get().await()
-        val  currentlikeCount : String = (document.get("likeCount")?:"0").toString()
+        val currentlikeCount : String = (document["likeCount"]?:"0").toString()
         val newValue = if(increase){(currentlikeCount.toInt()+1)}else{(currentlikeCount.toInt()-1)}
 
         postDocumentReference.document(postId).update("likeCount",newValue.toString())
