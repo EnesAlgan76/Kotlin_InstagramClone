@@ -33,57 +33,104 @@ class FirebaseHelper {
         for (doc in followedUsers.documents) {
             userIdList.add(doc.id)
         }
-
         val deferredList = userIdList.map { userId ->
             CoroutineScope(Dispatchers.IO).async {
-                fetchUserPosts(userId)
+                val user = getUserById(userId)
+                if (user != null) {
+                    fetchUserPosts(user)
+                }else{
+                    emptyList()
+                }
             }
         }
-
         val results = deferredList.awaitAll()
         results.forEach { allPostsList.addAll(it) }
-
         return allPostsList
     }
 
 
+    suspend fun fetchUserPosts(user: User): ArrayList<UserPostItem> {
+        val userPosts: ArrayList<UserPostItem> = arrayListOf()
 
-    suspend fun fetchUserPosts(userId: String): ArrayList<UserPostItem> {
-        val list: ArrayList<UserPostItem> = arrayListOf()
+        val postDocumentReference = db.collection("userPosts").document(user.userId)
+        val allPostsCollection = postDocumentReference.collection("posts")
 
-        val userDocument = db.collection("users").document(userId)
-        val document = userDocument.get().await()
+        val postDocuments = allPostsCollection.get().await()
+        for (i in postDocuments) {
+            val dataMap = i.data as MutableMap<String, String>
+            var likeCount: String = dataMap["likeCount"] ?: "null"
 
-        if (document.exists()) {
-            val user: User = User.fromMap(document.data as Map<String, Any>)
-            val postDocumentReference = db.collection("userPosts").document(user.userId)
-            val allPostsCollection = postDocumentReference.collection("posts")
+            dataMap["userId"] = user.userId
+            dataMap["postId"] = i.id
+            val post: Post = Post.fromMap(dataMap)
+            val userPostItem = UserPostItem(
+                post.postId,
+                user.userId,
+                post.explanation,
+                user.userName,
+                user.userFullName,
+                post.url,
+                post.date,
+                user.userDetails.profilePicture,
+                likeCount
+            )
 
-            val postDocuments = allPostsCollection.get().await()
-            for (i in postDocuments) {
-                val dataMap = i.data as MutableMap<String, String>
-                var likeCount: String = dataMap["likeCount"] ?: "null"
-
-                dataMap["userId"] = user.userId
-                dataMap["postId"] = i.id
-                val post: Post = Post.fromMap(dataMap)
-                val userPostItem = UserPostItem(
-                    post.postId,
-                    user.userId,
-                    post.explanation,
-                    user.userName,
-                    post.url,
-                    post.date,
-                    user.userDetails.profilePicture,
-                    likeCount
-                )
-
-                list.add(userPostItem)
-            }
+            userPosts.add(userPostItem)
         }
 
-        return list
+        return userPosts
     }
+
+
+
+     suspend fun getUserById(userId: String): User? {
+        val userDocument = db.collection("users").document(userId).get().await()
+        return if (userDocument.exists()) {
+            User.fromMap(userDocument.data as Map<String, Any>)
+        } else {
+            null
+        }
+    }
+
+
+
+//    suspend fun fetchUserPosts(userId: String): ArrayList<UserPostItem> {
+//        val list: ArrayList<UserPostItem> = arrayListOf()
+//
+//        val userDocument = db.collection("users").document(userId)
+//        val document = userDocument.get().await()
+//
+//        if (document.exists()) {
+//            val user: User = User.fromMap(document.data as Map<String, Any>)
+//            val postDocumentReference = db.collection("userPosts").document(user.userId)
+//            val allPostsCollection = postDocumentReference.collection("posts")
+//
+//            val postDocuments = allPostsCollection.get().await()
+//            for (i in postDocuments) {
+//                val dataMap = i.data as MutableMap<String, String>
+//                var likeCount: String = dataMap["likeCount"] ?: "null"
+//
+//                dataMap["userId"] = user.userId
+//                dataMap["postId"] = i.id
+//                val post: Post = Post.fromMap(dataMap)
+//                val userPostItem = UserPostItem(
+//                    post.postId,
+//                    user.userId,
+//                    post.explanation,
+//                    user.userName,
+//                    user.userFullName,
+//                    post.url,
+//                    post.date,
+//                    user.userDetails.profilePicture,
+//                    likeCount
+//                )
+//
+//                list.add(userPostItem)
+//            }
+//        }
+//
+//        return list
+//    }
 
 
 

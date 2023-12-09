@@ -208,18 +208,6 @@
                 </FrameLayout>
 
 
-
-
-                <ProgressBar
-                    android:id="@+id/userExplore_pb_activityProfile"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="@+id/userExplore_iv_profile"
-                    app:layout_constraintEnd_toEndOf="@+id/userExplore_iv_profile"
-                    app:layout_constraintStart_toStartOf="@+id/userExplore_iv_profile"
-                    app:layout_constraintTop_toTopOf="@+id/userExplore_iv_profile" />
-
                 <TextView
                     android:id="@+id/userExplore_tv_name"
                     android:layout_width="wrap_content"

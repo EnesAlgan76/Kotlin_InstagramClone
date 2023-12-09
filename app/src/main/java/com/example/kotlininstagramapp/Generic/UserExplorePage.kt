@@ -5,13 +5,17 @@ import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
+import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.Profile.ProfileUserPostsAdapter
+import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.ActivityUserDetailPageBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 
@@ -28,8 +32,16 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
         handleFollowStateUI()
 
         CoroutineScope(Dispatchers.Main).launch {
-            setRecycleView()
+            var userPostItems: ArrayList<UserPostItem>
+            var user: User
+            withContext(Dispatchers.IO){
+                user = FirebaseHelper().getUserById(userId!!)!!
+                userPostItems = FirebaseHelper().fetchUserPosts(user)
+            }
+            setUserInfos(user)
+            setRecycleView(userPostItems)
         }
+
 
         binding.userExploreBtnFollow.setOnClickListener{
             if (userId != null) {
@@ -50,11 +62,19 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
         setContentView(binding.root)
     }
 
-    private suspend fun setRecycleView() {
-        var userPostItems: ArrayList<UserPostItem>
-        withContext(Dispatchers.IO){
-            userPostItems = FirebaseHelper().fetchUserPosts(userId!!)
-        }
+    private fun setUserInfos(user: User) {
+        binding.userExploreTvUserName.setText(user.userName)
+        Glide.with(this).load(user.userDetails.profilePicture).error(R.drawable.icon_profile).placeholder(R.drawable.icon_profile).into(binding.userExploreIvProfile)
+        binding.userExploreTvName.setText(user.userFullName)
+        binding.userExploreTvBiograpy.setText(user.userDetails.biography)
+        binding.userExploreTvFollow.setText(user.userDetails.following)
+        binding.userExploreTvFollowers.setText(user.userDetails.follower)
+        binding.userExploreTvPosts.setText(user.userDetails.post)
+
+
+    }
+
+    private fun setRecycleView(userPostItems: ArrayList<UserPostItem>) {
         var adapter = ProfileUserPostsAdapter(context = this,userPostItems)
         binding.userExploreRvProfilePageUserPosts.adapter = adapter
         binding.userExploreRvProfilePageUserPosts.layoutManager = GridLayoutManager(this, 3)

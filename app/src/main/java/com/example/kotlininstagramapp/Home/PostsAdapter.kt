@@ -1,6 +1,7 @@
 package com.example.kotlininstagramapp.Home
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,8 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.kotlininstagramapp.Generic.UserExplorePage
+import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
@@ -36,7 +39,7 @@ class PostsAdapter(var posts: ArrayList<UserPostItem>, val mContext: Context, va
         var isLiked =false
 
 
-        holder.fullNameTextView.text = userPostItem.userName
+        holder.fullNameTextView.text = userPostItem.userFullName
         Glide.with(mContext).load(userPostItem.userPostUrl).into(holder.post_iv_postimage)
         Glide.with(mContext).load(userPostItem.profilePicture).error(defaultImage).into(holder.post_profileimage)
         holder.post_tvusername.text = userPostItem.userName
@@ -55,6 +58,13 @@ class PostsAdapter(var posts: ArrayList<UserPostItem>, val mContext: Context, va
             holder.post_ivlike.setImageResource(
                 if(isLiked){R.drawable.heart_red}else{R.drawable.heart}
             )
+        }
+
+        holder.fullNameTextView.setOnClickListener {
+            val intent = Intent(mContext,UserExplorePage::class.java)
+            intent.putExtra("USER_ID",userPostItem.userId)
+            intent.getStringExtra("USER_ID")
+            mContext.startActivity(intent)
         }
 
         var sonTiklama:Long = 0
