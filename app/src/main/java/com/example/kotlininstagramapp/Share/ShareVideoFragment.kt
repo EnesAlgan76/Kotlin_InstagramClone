@@ -38,7 +38,7 @@ class ShareVideoFragment : Fragment() {
         cameraView.mode = Mode.VIDEO
 
         var fileName:String = System.currentTimeMillis().toString()+".mp4"
-        var fileToUpload = File(Environment.getExternalStorageDirectory().absolutePath+"/DCIM/",fileName)
+        val fileToUpload = File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DCIM), fileName)
         captureButton.setOnTouchListener(object  :View.OnTouchListener{
             override fun onTouch(p0: View?, motion: MotionEvent?): Boolean {
                 if(motion!!.action ==MotionEvent.ACTION_DOWN){

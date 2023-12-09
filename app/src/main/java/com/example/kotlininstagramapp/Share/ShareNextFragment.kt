@@ -13,16 +13,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.arthenica.ffmpegkit.FFmpegKit
-import com.arthenica.ffmpegkit.ReturnCode
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firestore.v1.DocumentTransform.FieldTransform.ServerValue
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
@@ -30,7 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import java.io.File
@@ -47,7 +45,8 @@ class ShareNextFragment : Fragment() {
     //lateinit var storageReference: StorageReference
     val postId = UUID.randomUUID().toString()
     var  storageReference = FirebaseStorage.getInstance().reference
-    val imageRef = storageReference.child("posts/${mAuth.currentUser?.uid}/${postId}")
+    val imageRef = storageReference.child("posts/${mAuth.currentUser?.uid}/images/${postId}")
+    val videoRef = storageReference.child("posts/${mAuth.currentUser?.uid}/videos/${postId}")
     val shareProgressDialog = ShareProgressDialog()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -98,14 +97,14 @@ class ShareNextFragment : Fragment() {
                             Log.e("SIKIŞTIRMA hATASI", e.message.toString())
                         }
 
-                        uploadImageToStorage2(Uri.fromFile(output))
+                        uploadImageToStorage2(Uri.fromFile(output), image =false)
 
 
                     }
                     else{
                         val compressedImageFile = Compressor.compress(requireContext(), gelenDosya!!) { quality(80) }
                         val compressedImageUri = Uri.fromFile(compressedImageFile)
-                        uploadImageToStorage2(compressedImageUri)
+                        uploadImageToStorage2(compressedImageUri, image =true)
                     }
 
                 } catch (e: Exception) {
@@ -122,9 +121,17 @@ class ShareNextFragment : Fragment() {
 
 
 
-    private suspend fun uploadImageToStorage2(compressedImageUri: Uri) {
+    private suspend fun uploadImageToStorage2(compressedMediaUri: Uri, image: Boolean) {
         try {
-            val uploadTask = imageRef.putFile(compressedImageUri)
+            var mediaRef :StorageReference
+            if (image){
+                mediaRef = imageRef
+            }else{
+                mediaRef = videoRef
+            }
+
+            val uploadTask = mediaRef.putFile(compressedMediaUri)
+
 
             uploadTask.addOnProgressListener { taskSnapshot ->
                 val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
@@ -135,7 +142,7 @@ class ShareNextFragment : Fragment() {
 
             uploadTask.addOnSuccessListener {
                     GlobalScope.launch {
-                        val url = imageRef.downloadUrl.await().toString()
+                        val url = mediaRef.downloadUrl.await().toString()
                         val post = Post(mAuth.currentUser!!.uid, postId, System.currentTimeMillis().toString(), explanation.text.toString(), url)
                         uploadPostToFirestore2(post)
                     }

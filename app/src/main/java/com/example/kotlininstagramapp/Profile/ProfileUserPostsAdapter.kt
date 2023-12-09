@@ -3,6 +3,7 @@ package com.example.kotlininstagramapp.Profile
 import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,8 +28,8 @@ class ProfileUserPostsAdapter(private val context: Context, private val posts: L
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val userPost = posts[position]
-        val isVideo = userPost.userPostUrl?.contains("videos")?:false
-
+        val isVideo = userPost.userPostUrl.contains("videos")
+        Log.e("----------- >>",userPost.userPostUrl)
         holder.bindData(userPost, isVideo)
         holder.itemView.setOnClickListener {
 
