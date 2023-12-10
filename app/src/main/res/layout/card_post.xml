@@ -52,12 +52,35 @@
             app:srcCompat="@drawable/menu_threedot" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageView
-        android:id="@+id/post_iv_postimage"
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
-        android:scaleType="centerCrop"
-        android:layout_height="300dp"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        android:layout_height="300dp">
+
+        <ImageView
+            android:id="@+id/post_iv_postimage"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        <VideoView
+            android:id="@+id/post_vv_postvideo"
+            android:layout_width="wrap_content"
+            android:layout_height="300dp"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
 
     <LinearLayout
         android:layout_width="match_parent"

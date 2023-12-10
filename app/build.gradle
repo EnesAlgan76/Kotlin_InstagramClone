@@ -8,6 +8,10 @@ android {
     namespace 'com.example.kotlininstagramapp'
     compileSdk 33
 
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
         applicationId "com.example.kotlininstagramapp"
         minSdk 24
@@ -62,6 +66,7 @@ dependencies {
     implementation 'com.arthenica:ffmpeg-kit-full:6.0-2'
     implementation 'com.otaliastudios:cameraview:2.7.2'
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
 
 
 

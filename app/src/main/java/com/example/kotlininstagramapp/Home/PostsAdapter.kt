@@ -2,19 +2,24 @@ package com.example.kotlininstagramapp.Home
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
+import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserExplorePage
-import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ui.PlayerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
@@ -25,9 +30,14 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
-class PostsAdapter(var posts: ArrayList<UserPostItem>, val mContext: Context, val fragmentManager: FragmentManager) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
+class PostsAdapter(
+    private var posts: ArrayList<UserPostItem>,
+    private val mContext: Context,
+    private val fragmentManager: FragmentManager,
+   // private val recyclerView: RecyclerView
+) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
+    private val defaultImage = R.drawable.icon_profile
 
-    val defaultImage = R.drawable.icon_profile
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_post, parent, false)
@@ -36,103 +46,142 @@ class PostsAdapter(var posts: ArrayList<UserPostItem>, val mContext: Context, va
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val userPostItem = posts[position]
-        var isLiked =false
 
+        with(holder) {
+            fullNameTextView.text = userPostItem.userFullName
+            post_tvusername.text = userPostItem.userName
+            post_tvdescription.text = userPostItem.postDescription
+            post_tv_dateago.text = getTimeAgo(userPostItem.yuklenmeTarihi.toLong())
+            post_tv_likecount.text = "${userPostItem.likeCount} beğenme"
 
-        holder.fullNameTextView.text = userPostItem.userFullName
-        Glide.with(mContext).load(userPostItem.userPostUrl).into(holder.post_iv_postimage)
-        Glide.with(mContext).load(userPostItem.profilePicture).error(defaultImage).into(holder.post_profileimage)
-        holder.post_tvusername.text = userPostItem.userName
-        holder.post_tvdescription.text =userPostItem.postDescription
-        holder.post_tv_dateago.text = getTimeAgo(userPostItem.yuklenmeTarihi.toLong())
-        holder.post_tv_likecount.text =("${userPostItem.likeCount} beğenme")
-        holder.showComment.setOnClickListener {
-            val bottomSheetFragment = CommentBottomSheetFragment(userPostItem.postId)
-            bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
+            showComment.setOnClickListener {
+                val bottomSheetFragment = CommentBottomSheetFragment(userPostItem.postId)
+                bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
+            }
+
+            fullNameTextView.setOnClickListener {
+                val intent = Intent(mContext, UserExplorePage::class.java).apply {
+                    putExtra("USER_ID", userPostItem.userId)
+                }
+                mContext.startActivity(intent)
+            }
+
+            updateLikeButton(holder, userPostItem)
+            setLikeClickListener(holder, userPostItem, position)
         }
 
-        CoroutineScope(Dispatchers.Main).launch{
-            withContext(Dispatchers.IO){
-                isLiked = FirebaseHelper().isPostLiked(userPostItem.postId)
+        Glide.with(mContext).load(userPostItem.profilePicture).placeholder(defaultImage).error(defaultImage).into(holder.post_profileimage)
+
+        loadMedias(holder, userPostItem)
+    }
+
+
+    private fun loadMedias(holder: PostViewHolder, userPostItem: UserPostItem) {
+        if(userPostItem.userPostUrl.contains("videos")){
+            holder.post_vv_postvideo.visibility = View.VISIBLE
+            holder.post_iv_postimage.visibility = View.GONE
+//            val player: SimpleExoPlayer = SimpleExoPlayer.Builder(mContext).build()
+//
+//            val mediaItem = MediaItem.fromUri(userPostItem.userPostUrl)
+//            player.setMediaItem(mediaItem)
+//            player.prepare()
+//            player.playWhenReady = true
+//            holder.post_vv_postvideo.player = player
+
+
+
+
+           val videoView = holder.post_vv_postvideo
+
+           videoView.setVideoURI(Uri.parse(userPostItem.userPostUrl))
+           videoView.start()
+        }else{
+            holder.post_vv_postvideo.visibility = View.GONE
+            holder.post_iv_postimage.visibility = View.VISIBLE
+            Glide.with(mContext)
+                .load(userPostItem.userPostUrl)
+                .into(holder.post_iv_postimage)
+
+
+        }
+
+    }
+
+    private fun updateLikeButton(holder: PostViewHolder, userPostItem: UserPostItem) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val isLiked = withContext(Dispatchers.IO) {
+                FirebaseHelper().isPostLiked(userPostItem.postId)
             }
             holder.post_ivlike.setImageResource(
-                if(isLiked){R.drawable.heart_red}else{R.drawable.heart}
+                if (isLiked) R.drawable.heart_red else R.drawable.heart
             )
         }
+    }
 
-        holder.fullNameTextView.setOnClickListener {
-            val intent = Intent(mContext,UserExplorePage::class.java)
-            intent.putExtra("USER_ID",userPostItem.userId)
-            intent.getStringExtra("USER_ID")
-            mContext.startActivity(intent)
-        }
-
-        var sonTiklama:Long = 0
+    private fun setLikeClickListener(
+        holder: PostViewHolder,
+        userPostItem: UserPostItem,
+        position: Int
+    ) {
+        var lastClickTime: Long = 0
         holder.post_ivlike.setOnClickListener {
-            var ilkTiklamaZamani = System.currentTimeMillis()
-            if (ilkTiklamaZamani-sonTiklama>1000){
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastClickTime > 1000) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val auth :FirebaseAuth = FirebaseAuth.getInstance()
-                        val userDocumentRef = FirebaseFirestore.getInstance().collection("users").document(auth.currentUser!!.uid)
-                        val likedPostDocRef = userDocumentRef.collection("liked_posts").document(userPostItem.postId)
-                        val document = likedPostDocRef.get().await()
-                        var tempPost = posts[position]
-                        if (document.exists()) {
-                            withContext(Dispatchers.Main){
-                                userPostItem.likeCount= (userPostItem.likeCount.toInt()-1).toString()
-                                posts[position] = tempPost
-                                notifyItemChanged(position)
-                            }
-                            likedPostDocRef.delete().await()
-                            FirebaseHelper().updateLikeCount(userPostItem.postId, userPostItem.userId, increase = false)
-
-                        } else {
-                            withContext(Dispatchers.Main){
-                                tempPost.likeCount= (tempPost.likeCount.toInt()+1).toString()
-                                posts[position] = tempPost
-                                notifyItemChanged(position)
-                            }
-                            val data = mapOf("post_id" to userPostItem.postId)
-                            likedPostDocRef.set(data).await()
-                            FirebaseHelper().updateLikeCount(
-                                userPostItem.postId,
-                                userPostItem.userId,
-                                increase = true
-                            )
-
-
+                    val auth: FirebaseAuth = FirebaseAuth.getInstance()
+                    val userDocumentRef = FirebaseFirestore.getInstance().collection("users")
+                        .document(auth.currentUser!!.uid)
+                    val likedPostDocRef = userDocumentRef.collection("liked_posts")
+                        .document(userPostItem.postId)
+                    val document = likedPostDocRef.get().await()
+                    val tempPost = posts[position]
+                    if (document.exists()) {
+                        withContext(Dispatchers.Main) {
+                            userPostItem.likeCount = (userPostItem.likeCount.toInt() - 1).toString()
+                            posts[position] = tempPost
+                            notifyItemChanged(position)
                         }
-
+                        likedPostDocRef.delete().await()
+                        FirebaseHelper().updateLikeCount(userPostItem.postId, userPostItem.userId, false)
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            tempPost.likeCount = (tempPost.likeCount.toInt() + 1).toString()
+                            posts[position] = tempPost
+                            notifyItemChanged(position)
+                        }
+                        val data = mapOf("post_id" to userPostItem.postId)
+                        likedPostDocRef.set(data).await()
+                        FirebaseHelper().updateLikeCount(userPostItem.postId, userPostItem.userId, true)
+                    }
                 }
-
-            }else{
+            } else {
                 println("----- >> Çift Tıklandı")
             }
-            sonTiklama = ilkTiklamaZamani
+            lastClickTime = currentTime
         }
     }
 
-    override fun getItemCount(): Int {
-        return posts.size
-    }
+
+
+    override fun getItemCount(): Int = posts.size
 
     inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val fullNameTextView: TextView = itemView.findViewById(R.id.post_tv_fullname)
         val post_tv_dateago: TextView = itemView.findViewById(R.id.post_tv_dateago)
         val post_profileimage: CircleImageView = itemView.findViewById(R.id.post_profileimage)
         val post_iv_postimage: ImageView = itemView.findViewById(R.id.post_iv_postimage)
+        val post_vv_postvideo: VideoView = itemView.findViewById(R.id.post_vv_postvideo)
         val post_tvusername: TextView = itemView.findViewById(R.id.post_tvusername)
         val post_tvdescription: TextView = itemView.findViewById(R.id.post_tvdescription)
-        val showComment :TextView = itemView.findViewById(R.id.tv_showcomments)
-        val post_ivlike :ImageView = itemView.findViewById(R.id.post_ivlike)
-        val post_tv_likecount :TextView = itemView.findViewById(R.id.post_tv_likecount)
+        val showComment: TextView = itemView.findViewById(R.id.tv_showcomments)
+        val post_ivlike: ImageView = itemView.findViewById(R.id.post_ivlike)
+        val post_tv_likecount: TextView = itemView.findViewById(R.id.post_tv_likecount)
     }
-
 
     fun getTimeAgo(millis: Long): String {
         val currentTime = System.currentTimeMillis()
         var diffInMillis = currentTime - millis
-        if(diffInMillis<0){diffInMillis =0}
+        if (diffInMillis < 0) diffInMillis = 0
 
         val seconds = TimeUnit.MILLISECONDS.toSeconds(diffInMillis)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis)
@@ -147,4 +196,3 @@ class PostsAdapter(var posts: ArrayList<UserPostItem>, val mContext: Context, va
         }
     }
 }
-

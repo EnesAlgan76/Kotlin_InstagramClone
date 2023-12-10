@@ -231,10 +231,7 @@ class FirebaseHelper {
 
             val likedComments = documentSnapshot.get("liked_comments") as? List<String> ?: listOf()   // Kullanıcının daha önceden yorumu beğenip
             liked = likedComments.contains(commentId) // beğenmediğini kontrol et
-            Log.e("Kullancı önceden Yourumu beğenmiş mi : ", liked.toString())
-            Log.e("İlk Beğeni Sayısı : ", currentLikeCount.toString())
             val newLikeCount = if (liked) currentLikeCount - 1 else currentLikeCount + 1
-            Log.e("yeni sayı : ", newLikeCount.toString())// beğenmediğini kontrol et
 
 
 
@@ -261,7 +258,7 @@ class FirebaseHelper {
             else {
                 "Error removing comment from liked comments: $e"
             }
-            println(errorMessage)
+            println("------------------ "+ errorMessage)
         }
     }
 
