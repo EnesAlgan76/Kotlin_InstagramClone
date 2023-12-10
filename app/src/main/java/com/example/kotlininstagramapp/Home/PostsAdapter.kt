@@ -2,24 +2,22 @@ package com.example.kotlininstagramapp.Home
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Rect
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.net.toUri
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserExplorePage
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.ui.PlayerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
@@ -30,23 +28,74 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
+
 class PostsAdapter(
     private var posts: ArrayList<UserPostItem>,
     private val mContext: Context,
     private val fragmentManager: FragmentManager,
-   // private val recyclerView: RecyclerView
+    private val recyclerView: RecyclerView
 ) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
     private val defaultImage = R.drawable.icon_profile
+    private var playPosition = -2 // Aktif olarak oynatılan öğenin pozisyonunu saklar
+    private val handler = Handler(Looper.getMainLooper())
+
+    init {
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val firstVisibleItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
+                if (firstVisibleItemPosition !=-1 && playPosition!=firstVisibleItemPosition){
+                    playPosition = firstVisibleItemPosition
+                   // Log.e("---------",playPosition.toString())
+                    if(posts[playPosition].userPostUrl.contains("videos")){
+                        handler.removeCallbacksAndMessages(null)
+                        handler.post {
+
+                            val holderTop = recyclerView.findViewHolderForAdapterPosition(playPosition-1) as? PostViewHolder
+                            holderTop?.post_vv_postvideo?.pause()
+
+                            val holderCenter = recyclerView.findViewHolderForAdapterPosition(playPosition) as? PostViewHolder
+                            holderCenter?.post_vv_postvideo?.start()
+
+                            val holderBottom = recyclerView.findViewHolderForAdapterPosition(playPosition+1) as? PostViewHolder
+                            holderBottom?.post_vv_postvideo?.pause()
+
+//                            notifyItemChanged(playPosition)
+//                            notifyItemChanged(playPosition-1)
+//                            notifyItemChanged(playPosition+1)
+                        }
+                    }
+
+                }
+
+            }
+        })
+    }
+
+//    override fun onViewDetachedFromWindow(holder: PostViewHolder) {
+//        if(holder.post_vv_postvideo.visibility == View.VISIBLE){
+//            holder.post_vv_postvideo.stopPlayback()
+//        }
+//        super.onViewDetachedFromWindow(holder)
+//    }
+//
+//    override fun onViewAttachedToWindow(holder: PostViewHolder) {
+//        if(holder.post_vv_postvideo.visibility == View.VISIBLE){
+//            holder.post_vv_postvideo.start()
+//        }
+//        println("${holder.post_tvdescription.text} -------------> ${playPosition}")
+//        super.onViewAttachedToWindow(holder)
+//    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.card_post, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.card_post, parent, false)
         return PostViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val userPostItem = posts[position]
-
         with(holder) {
             fullNameTextView.text = userPostItem.userFullName
             post_tvusername.text = userPostItem.userName
@@ -72,29 +121,29 @@ class PostsAdapter(
 
         Glide.with(mContext).load(userPostItem.profilePicture).placeholder(defaultImage).error(defaultImage).into(holder.post_profileimage)
 
-        loadMedias(holder, userPostItem)
+        loadMedias(holder, userPostItem, position)
     }
 
 
-    private fun loadMedias(holder: PostViewHolder, userPostItem: UserPostItem) {
+    private fun loadMedias(holder: PostViewHolder, userPostItem: UserPostItem, position: Int) {
         if(userPostItem.userPostUrl.contains("videos")){
             holder.post_vv_postvideo.visibility = View.VISIBLE
             holder.post_iv_postimage.visibility = View.GONE
-//            val player: SimpleExoPlayer = SimpleExoPlayer.Builder(mContext).build()
-//
-//            val mediaItem = MediaItem.fromUri(userPostItem.userPostUrl)
-//            player.setMediaItem(mediaItem)
-//            player.prepare()
-//            player.playWhenReady = true
-//            holder.post_vv_postvideo.player = player
-
-
-
-
            val videoView = holder.post_vv_postvideo
 
-           videoView.setVideoURI(Uri.parse(userPostItem.userPostUrl))
-           videoView.start()
+           // Log.e(userPostItem.postDescription,"----> "+playPosition.toString())
+            videoView.setVideoURI(Uri.parse(userPostItem.userPostUrl))
+            //videoView.start()
+
+
+//            if(playPosition == position){
+//                Log.e(userPostItem.postDescription,"----> "+playPosition.toString())
+//                videoView.setVideoURI(Uri.parse(userPostItem.userPostUrl))
+//                videoView.start()
+//            }else{
+//                videoView.stopPlayback()
+//            }
+
         }else{
             holder.post_vv_postvideo.visibility = View.GONE
             holder.post_iv_postimage.visibility = View.VISIBLE
