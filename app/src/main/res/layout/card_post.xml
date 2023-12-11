@@ -59,6 +59,15 @@
         android:layout_width="match_parent"
         android:layout_height="300dp">
 
+        <VideoView
+            android:id="@+id/post_vv_postvideo"
+            android:layout_width="wrap_content"
+            android:layout_height="300dp"
+            android:layout_gravity="center_vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/post_iv_postimage"
             android:layout_width="match_parent"
@@ -69,11 +78,14 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
-        <VideoView
-            android:id="@+id/post_vv_postvideo"
-            android:layout_width="wrap_content"
-            android:layout_height="300dp"
-            android:layout_gravity="center_vertical"
+
+
+        <ProgressBar
+            android:id="@+id/post_progressBar"
+            android:visibility="invisible"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

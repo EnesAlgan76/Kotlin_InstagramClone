@@ -2,6 +2,7 @@ package com.example.kotlininstagramapp.Home
 
 import android.content.Context
 import android.content.Intent
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
@@ -21,19 +22,12 @@ import com.example.kotlininstagramapp.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 
-class PostsAdapter(
-    private var posts: ArrayList<UserPostItem>,
-    private val mContext: Context,
-    private val fragmentManager: FragmentManager,
-    private val recyclerView: RecyclerView
+class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mContext: Context, private val fragmentManager: FragmentManager, private val recyclerView: RecyclerView
 ) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
     private val defaultImage = R.drawable.icon_profile
     private var playPosition = -2 // Aktif olarak oynatılan öğenin pozisyonunu saklar
@@ -48,7 +42,6 @@ class PostsAdapter(
                 val firstVisibleItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
                 if (firstVisibleItemPosition !=-1 && playPosition!=firstVisibleItemPosition){
                     playPosition = firstVisibleItemPosition
-                   // Log.e("---------",playPosition.toString())
                     if(posts[playPosition].userPostUrl.contains("videos")){
                         handler.removeCallbacksAndMessages(null)
                         handler.post {
@@ -61,10 +54,6 @@ class PostsAdapter(
 
                             val holderBottom = recyclerView.findViewHolderForAdapterPosition(playPosition+1) as? PostViewHolder
                             holderBottom?.post_vv_postvideo?.pause()
-
-//                            notifyItemChanged(playPosition)
-//                            notifyItemChanged(playPosition-1)
-//                            notifyItemChanged(playPosition+1)
                         }
                     }
 
@@ -74,20 +63,6 @@ class PostsAdapter(
         })
     }
 
-//    override fun onViewDetachedFromWindow(holder: PostViewHolder) {
-//        if(holder.post_vv_postvideo.visibility == View.VISIBLE){
-//            holder.post_vv_postvideo.stopPlayback()
-//        }
-//        super.onViewDetachedFromWindow(holder)
-//    }
-//
-//    override fun onViewAttachedToWindow(holder: PostViewHolder) {
-//        if(holder.post_vv_postvideo.visibility == View.VISIBLE){
-//            holder.post_vv_postvideo.start()
-//        }
-//        println("${holder.post_tvdescription.text} -------------> ${playPosition}")
-//        super.onViewAttachedToWindow(holder)
-//    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.card_post, parent, false)
@@ -121,28 +96,28 @@ class PostsAdapter(
 
         Glide.with(mContext).load(userPostItem.profilePicture).placeholder(defaultImage).error(defaultImage).into(holder.post_profileimage)
 
-        loadMedias(holder, userPostItem, position)
+        loadMedias(holder, userPostItem)
     }
 
 
-    private fun loadMedias(holder: PostViewHolder, userPostItem: UserPostItem, position: Int) {
+    private fun loadMedias(holder: PostViewHolder, userPostItem: UserPostItem) {
         if(userPostItem.userPostUrl.contains("videos")){
+            Glide.with(mContext)
+                .load(userPostItem.userPostUrl)
+                .into(holder.post_iv_postimage)
+
+            holder.progressDialog.visibility =View.VISIBLE
             holder.post_vv_postvideo.visibility = View.VISIBLE
-            holder.post_iv_postimage.visibility = View.GONE
-           val videoView = holder.post_vv_postvideo
-
-           // Log.e(userPostItem.postDescription,"----> "+playPosition.toString())
+            val videoView = holder.post_vv_postvideo
             videoView.setVideoURI(Uri.parse(userPostItem.userPostUrl))
-            //videoView.start()
 
+            videoView.setOnPreparedListener { mediaPlayer ->
+                holder.post_iv_postimage.visibility = View.GONE
+                holder.progressDialog.visibility =View.GONE
+                Log.e("video Hazır",holder.post_tvdescription.text.toString())
+                mediaPlayer.start()
 
-//            if(playPosition == position){
-//                Log.e(userPostItem.postDescription,"----> "+playPosition.toString())
-//                videoView.setVideoURI(Uri.parse(userPostItem.userPostUrl))
-//                videoView.start()
-//            }else{
-//                videoView.stopPlayback()
-//            }
+            }
 
         }else{
             holder.post_vv_postvideo.visibility = View.GONE
@@ -150,11 +125,15 @@ class PostsAdapter(
             Glide.with(mContext)
                 .load(userPostItem.userPostUrl)
                 .into(holder.post_iv_postimage)
-
-
         }
 
     }
+
+
+
+
+
+
 
     private fun updateLikeButton(holder: PostViewHolder, userPostItem: UserPostItem) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -225,6 +204,7 @@ class PostsAdapter(
         val showComment: TextView = itemView.findViewById(R.id.tv_showcomments)
         val post_ivlike: ImageView = itemView.findViewById(R.id.post_ivlike)
         val post_tv_likecount: TextView = itemView.findViewById(R.id.post_tv_likecount)
+        val progressDialog: ProgressBar = itemView.findViewById(R.id.post_progressBar)
     }
 
     fun getTimeAgo(millis: Long): String {
