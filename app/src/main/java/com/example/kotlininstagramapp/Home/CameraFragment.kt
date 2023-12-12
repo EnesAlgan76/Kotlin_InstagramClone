@@ -12,6 +12,9 @@ import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import com.example.kotlininstagramapp.R
 import com.otaliastudios.cameraview.CameraListener
@@ -27,7 +30,9 @@ class CameraFragment : Fragment() {
     lateinit var capture: ImageView
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_camera,container,false)
-        view.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+
+        Log.e("***********","Kamera tetiklendi")
+
 
         cameraView = view.findViewById(R.id.cameraview)
         switchCameraButton = view.findViewById(R.id.iv_switchfrontcamera)

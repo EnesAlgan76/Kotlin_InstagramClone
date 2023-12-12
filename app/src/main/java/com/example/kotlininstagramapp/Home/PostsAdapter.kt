@@ -19,6 +19,7 @@ import com.example.kotlininstagramapp.Generic.UserExplorePage
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.utils.TextHighlighter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
@@ -75,6 +76,7 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
             fullNameTextView.text = userPostItem.userFullName
             post_tvusername.text = userPostItem.userName
             post_tvdescription.text = userPostItem.postDescription
+            TextHighlighter.highlightWordsTextView(post_tvdescription)
             post_tv_dateago.text = getTimeAgo(userPostItem.yuklenmeTarihi.toLong())
             post_tv_likecount.text = "${userPostItem.likeCount} beğenme"
 
@@ -106,14 +108,12 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
                 .load(userPostItem.userPostUrl)
                 .into(holder.post_iv_postimage)
 
-            holder.progressDialog.visibility =View.VISIBLE
             holder.post_vv_postvideo.visibility = View.VISIBLE
             val videoView = holder.post_vv_postvideo
             videoView.setVideoURI(Uri.parse(userPostItem.userPostUrl))
 
             videoView.setOnPreparedListener { mediaPlayer ->
                 holder.post_iv_postimage.visibility = View.GONE
-                holder.progressDialog.visibility =View.GONE
                 Log.e("video Hazır",holder.post_tvdescription.text.toString())
                 mediaPlayer.start()
 
@@ -204,7 +204,6 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
         val showComment: TextView = itemView.findViewById(R.id.tv_showcomments)
         val post_ivlike: ImageView = itemView.findViewById(R.id.post_ivlike)
         val post_tv_likecount: TextView = itemView.findViewById(R.id.post_tv_likecount)
-        val progressDialog: ProgressBar = itemView.findViewById(R.id.post_progressBar)
     }
 
     fun getTimeAgo(millis: Long): String {

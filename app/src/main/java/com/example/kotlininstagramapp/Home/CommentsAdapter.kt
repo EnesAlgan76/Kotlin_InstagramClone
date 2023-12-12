@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.utils.TextHighlighter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,6 +35,7 @@ class CommentsAdapter(var mContext:Context,var commentMapList: ArrayList<Pair<Co
 
         Log.e("COMMENTS",comment.toString())
         holder.comment.text = comment.comment
+        TextHighlighter.highlightWordsTextView(holder.comment)
         holder.userName.text = comment.user_name
         holder.timeAgo.text = getTimeAgo(comment.time.toLong())
         holder.likeCount.text = comment.like_count

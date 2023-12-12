@@ -7,6 +7,9 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.kotlininstagramapp.Login.LoginActivity
 import com.example.kotlininstagramapp.Models.UserPostItem
@@ -38,9 +41,6 @@ class HomeActivity : AppCompatActivity() {
         setupHomeViewPager()
         setContentView(binding.root)
 
-
-
-        //BottomNavigationHandler.setupNavigations(this,findViewById(R.id.bottomNavigationView),4)
     }
 
     private fun setupHomeViewPager() {
@@ -52,15 +52,24 @@ class HomeActivity : AppCompatActivity() {
             override fun onPageSelected(position: Int) {
                 if (position==0){
                     permissionLauncher.launch(Manifest.permission.CAMERA)
+                    WindowCompat.setDecorFitsSystemWindows(window, false)
+                    WindowInsetsControllerCompat(window, binding.mainContainer).let { controller ->
+                        controller.hide(WindowInsetsCompat.Type.systemBars())
+                        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    }
+                }else{
+                    WindowCompat.setDecorFitsSystemWindows(window, true)
+                    WindowInsetsControllerCompat(window, binding.mainContainer).show(WindowInsetsCompat.Type.systemBars())
+
                 }
                 super.onPageSelected(position)
             }
         })
     }
 
-    val permissionLauncher =registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ){ isGranted->
+
+
+    val permissionLauncher =registerForActivityResult(ActivityResultContracts.RequestPermission()){ isGranted->
         if (isGranted){
             Log.e("-----------","Kamera İzni Verilmiş")
         }else{

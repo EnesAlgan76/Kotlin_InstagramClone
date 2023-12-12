@@ -2,9 +2,11 @@ package com.example.kotlininstagramapp.Home
 
 import Comment
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.opengl.Visibility
 import android.os.Bundle
-import android.text.Layout
+import android.text.*
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.*
 import android.widget.ArrayAdapter
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.utils.TextHighlighter
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -42,6 +45,8 @@ class CommentBottomSheetFragment(var postId: String) : BottomSheetDialogFragment
         val items = Array(5) { "Item $it" }
         val adapter = SchimmerAdapter(requireContext(),  items)
         listViewShimmer.adapter = adapter
+
+        setSpecialWordFormatting(et_comment)
 
 
         CoroutineScope(Dispatchers.Main).launch{
@@ -78,6 +83,9 @@ class CommentBottomSheetFragment(var postId: String) : BottomSheetDialogFragment
         return view;
     }
 
+
+
+
     override fun onDestroy() {
         super.onDestroy()
         Log.e("sdfs","FRAGMENT DESTROY EDİLDİ")
@@ -87,6 +95,30 @@ class CommentBottomSheetFragment(var postId: String) : BottomSheetDialogFragment
     override fun getTheme(): Int {
         return R.style.BottomSheetTransparent
     }
+
+
+    fun setSpecialWordFormatting(editText: EditText) {
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                et_comment.removeTextChangedListener(this) // Remove the TextWatcher temporarily
+
+                val text = et_comment.text.toString()
+                val highlightedText = TextHighlighter.highlightWords(text)
+                val editableText = Editable.Factory.getInstance().newEditable(highlightedText)
+                et_comment.text.replace(0, et_comment.length(), editableText, 0, editableText.length)
+
+                et_comment.addTextChangedListener(this) // Reattach the TextWatcher
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+    }
+
+
+
 
 
 }

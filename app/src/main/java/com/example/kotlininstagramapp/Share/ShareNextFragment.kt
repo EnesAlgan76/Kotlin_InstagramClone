@@ -54,8 +54,7 @@ class ShareNextFragment : Fragment() {
         image = view.findViewById(R.id.iv_share_next)
         tvShare = view.findViewById(R.id.tv_paylas)
         explanation = view.findViewById(R.id.et_explanation)
-        ivBack = view.findViewById<ImageView>(R.id.iv_back)
-        val db = FirebaseFirestore.getInstance()
+        ivBack = view.findViewById(R.id.iv_back)
 
         gelenDosya?.let {
             if(gelenDosya!!.extension=="mp4"){
