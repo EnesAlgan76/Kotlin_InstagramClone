@@ -6,12 +6,12 @@ import android.util.Log
 import com.example.kotlininstagramapp.Home.CommentsAdapter
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.Models.User
+import com.example.kotlininstagramapp.Models.Conversation
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
@@ -314,6 +314,56 @@ class FirebaseHelper {
                 callback(false)
             }
         }
+    }
+
+
+
+
+   suspend fun getConversations(): ArrayList<Conversation> {
+       var conversationList :ArrayList<Conversation> = arrayListOf()
+       val conservationsCollectionRef = userDocumentRef.collection("conservations")
+
+       val conversationDocumnets = conservationsCollectionRef.get().await()
+
+       if(!conversationDocumnets.isEmpty){
+           for (conversationData in conversationDocumnets.documents){
+               var conversation =  Conversation.fromMap(conversationData.data as Map<String, Any>)
+               conversation.conversation_id = conversationData.id
+               conversationList.add(conversation)
+           }
+       }
+
+       return  conversationList
+
+
+//            usersReference.addListenerForSingleValueEvent(object : ValueEventListener {
+//                override fun onDataChange(snapshot: DataSnapshot) {
+//                    val conversationList = mutableListOf<Conversation>()
+//
+//                    for (userSnapshot in snapshot.children) {
+//                        val user = userSnapshot.getValue(User::class.java)
+//                        user?.let {
+//                            val lastMessage = getLastMessageForUser(user.userId) // Replace with your logic to get last message
+//                            val otherUserId = getOtherUserId() // Replace with your logic to get the other user's ID
+//                            val conversation = Conversation(
+//                                userProfileImage = user.userDetails.profilePicture,
+//                                userFullName = user.userFullName,
+//                                lastMessage = lastMessage ?: "", // Set the last message here
+//                                conversationId = "conversation_id", // Replace with conversation ID logic
+//                                otherUserId = otherUserId // Set the other user's ID
+//                            )
+//                            conversationList.add(conversation)
+//                        }
+//                    }
+//                    callback(conversationList)
+//                }
+//
+//                override fun onCancelled(error: DatabaseError) {
+//                    // Handle onCancelled
+//                }
+//            })
+
+
     }
 
 }
