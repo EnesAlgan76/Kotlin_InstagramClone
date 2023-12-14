@@ -9,6 +9,7 @@ import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Models.Conversation
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -335,35 +336,61 @@ class FirebaseHelper {
 
        return  conversationList
 
-
-//            usersReference.addListenerForSingleValueEvent(object : ValueEventListener {
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    val conversationList = mutableListOf<Conversation>()
-//
-//                    for (userSnapshot in snapshot.children) {
-//                        val user = userSnapshot.getValue(User::class.java)
-//                        user?.let {
-//                            val lastMessage = getLastMessageForUser(user.userId) // Replace with your logic to get last message
-//                            val otherUserId = getOtherUserId() // Replace with your logic to get the other user's ID
-//                            val conversation = Conversation(
-//                                userProfileImage = user.userDetails.profilePicture,
-//                                userFullName = user.userFullName,
-//                                lastMessage = lastMessage ?: "", // Set the last message here
-//                                conversationId = "conversation_id", // Replace with conversation ID logic
-//                                otherUserId = otherUserId // Set the other user's ID
-//                            )
-//                            conversationList.add(conversation)
-//                        }
-//                    }
-//                    callback(conversationList)
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                    // Handle onCancelled
-//                }
-//            })
-
-
     }
+
+    suspend fun createNewConversation(userId: String, userName: String, profileImage: String, userFullName: String, message: String) {
+        val conversationRef = db.collection("conversations")
+        val userDocumentRef = db.collection("users").document(firebaseAuth.currentUser!!.uid)
+
+        val currentUserConversations = userDocumentRef.collection("conversations")
+            .whereEqualTo("user_id", userId)
+            .get()
+            .await()
+
+        if (currentUserConversations.isEmpty) {
+            Log.e("//","Conversation does not exist, create a new conversation")
+            val newConversationDocument = conversationRef.document()
+            val firstMessage = mapOf<String, Any>(
+                "message" to message,
+                "timestamp" to FieldValue.serverTimestamp(),
+                "sender_id" to firebaseAuth.currentUser!!.uid,
+                "receiver_id" to userId
+            )
+            newConversationDocument.collection("messages").add(firstMessage).await()
+
+            val newConversation = mapOf<String, Any>(
+                "last_message" to message,
+                "profile_image" to profileImage,
+                "user_full_name" to userFullName,
+                "user_id" to userId,
+                "user_name" to userName
+            )
+            userDocumentRef.collection("conversations").document(newConversationDocument.id).set(newConversation).await()
+
+            val currentUserObject = getUserById(firebaseAuth.currentUser!!.uid)
+
+            val newConversationForOtherUser = mapOf<String, Any>(
+                "last_message" to message,
+                "profile_image" to currentUserObject!!.userDetails.profilePicture,
+                "user_full_name" to currentUserObject.userFullName,
+                "user_id" to currentUserObject.userId,
+                "user_name" to currentUserObject.userName
+            )
+
+            val otherUserDocumentRef = db.collection("users").document(userId)
+            otherUserDocumentRef.collection("conversations").document(newConversationDocument.id).set(newConversationForOtherUser).await()
+        } else {
+            Log.e("//","Conversation already exists, only send the message")
+            val conversationId = currentUserConversations.documents[0].id
+            val messageData = mapOf<String, Any>(
+                "message" to message,
+                "timestamp" to FieldValue.serverTimestamp(),
+                "sender_id" to firebaseAuth.currentUser!!.uid,
+                "receiver_id" to userId
+            )
+            conversationRef.document(conversationId).collection("messages").add(messageData).await()
+        }
+    }
+
 
 }

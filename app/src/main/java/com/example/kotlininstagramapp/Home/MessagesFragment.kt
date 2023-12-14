@@ -31,7 +31,7 @@ class MessagesFragment : Fragment() {
     private lateinit var recyclerViewUsers: RecyclerView
 
     private lateinit var conversationsAdapter: ConversationsAdapter
-    private lateinit var searchResultsAdapter: SearchResultsAdapter
+    private lateinit var searchResultsAdapter: ConversationsSearchResultsAdapter
 
     private lateinit var searchBox: EditText
     private var usersList: MutableList<User> =mutableListOf()
@@ -49,7 +49,7 @@ class MessagesFragment : Fragment() {
         recyclerViewUsers = view.findViewById(R.id.recycler_view_users)
         recyclerViewConversations.layoutManager = LinearLayoutManager(requireContext())
         searchBox = view.findViewById(R.id.searchBox)
-        searchResultsAdapter = SearchResultsAdapter(requireContext())
+        searchResultsAdapter = ConversationsSearchResultsAdapter(requireContext())
 
         recyclerViewUsers.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewUsers.adapter = searchResultsAdapter
