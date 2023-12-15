@@ -16,10 +16,7 @@ import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.Search.SearchResultsAdapter
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.greenrobot.eventbus.EventBus
 
 
@@ -72,14 +69,20 @@ class ConversationsSearchResultsAdapter(context: Context) : RecyclerView.Adapter
                 val userId =  user["userId"]
                 if(userId != currentUser!!.uid){
                     CoroutineScope(Dispatchers.IO).launch {
-                         FirebaseHelper().createNewConversation(userId!!,user["userName"]!!,user["userProfileImage"]!!,user["userFullName"]!!,"example Message")
+                        val conversation_id = FirebaseHelper().createNewConversation(userId!!,user["userName"]!!,user["userProfileImage"]!!,user["userFullName"]!!,"example Message")
+
+                        withContext(Dispatchers.Main){
+                            val intent = Intent(itemView.context, ChatActivity::class.java)
+                            intent.putExtra("USER_ID",userId)
+                            intent.putExtra("FULL_NAME",user["userFullName"])
+                            intent.putExtra("PROFILE_IMAGE",user["userProfileImage"])
+                            intent.putExtra("USER_NAME",user["userName"])
+                            intent.putExtra("USER_NAME",user["userName"])
+                            intent.putExtra("CONVERSATION_ID",conversation_id)
+                            itemView.context.startActivity(intent)
+                        }
                     }
-                    val intent = Intent(itemView.context, ChatActivity::class.java)
-                    intent.putExtra("USER_ID",userId)
-                    intent.putExtra("FULL_NAME",user["userFullName"])
-                    intent.putExtra("PROFILE_IMAGE",user["userProfileImage"])
-                    intent.putExtra("USER_NAME",user["userName"])
-                    itemView.context.startActivity(intent)
+
                 }
 
             }

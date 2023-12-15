@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +18,6 @@ import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.Search.SearchResultsAdapter
-import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CoroutineScope
@@ -31,96 +31,98 @@ class MessagesFragment : Fragment() {
     private lateinit var recyclerViewUsers: RecyclerView
 
     private lateinit var conversationsAdapter: ConversationsAdapter
-    private lateinit var searchResultsAdapter: ConversationsSearchResultsAdapter
+    private lateinit var conversationsSearchResultsAdapter: ConversationsSearchResultsAdapter
 
     private lateinit var searchBox: EditText
-    private var usersList: MutableList<User> =mutableListOf()
-    lateinit var firestore: FirebaseFirestore
-
-
-    var conservations: ArrayList<Conversation>  = ArrayList()
-
+    private val conservations: ArrayList<Conversation> = ArrayList()
+    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = inflater.inflate(R.layout.fragment_messages,container,false)
+        val view = inflater.inflate(R.layout.fragment_messages, container, false)
+        initializeViews(view)
+        setupSearchListener()
+        fetchConversations()
+        return view
+    }
+
+    private fun initializeViews(view: View) {
         firestore = FirebaseFirestore.getInstance()
 
         recyclerViewConversations = view.findViewById(R.id.recycler_view_conversations)
-        recyclerViewUsers = view.findViewById(R.id.recycler_view_users)
         recyclerViewConversations.layoutManager = LinearLayoutManager(requireContext())
-        searchBox = view.findViewById(R.id.searchBox)
-        searchResultsAdapter = ConversationsSearchResultsAdapter(requireContext())
+        conversationsAdapter = ConversationsAdapter(conservations)
+        recyclerViewConversations.adapter = conversationsAdapter
 
+        recyclerViewUsers = view.findViewById(R.id.recycler_view_users)
         recyclerViewUsers.layoutManager = LinearLayoutManager(requireContext())
-        recyclerViewUsers.adapter = searchResultsAdapter
+        conversationsSearchResultsAdapter = ConversationsSearchResultsAdapter(requireContext())
+        recyclerViewUsers.adapter = conversationsSearchResultsAdapter
 
+        searchBox = view.findViewById(R.id.searchBox)
+    }
 
+    private fun setupSearchListener() {
         val handler = Handler(Looper.getMainLooper())
 
         searchBox.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 handler.removeCallbacksAndMessages(null)
                 val searchText = s.toString().trim()
                 if (searchText.isNotEmpty()) {
                     recyclerViewUsers.visibility = View.VISIBLE
-                    handler.postDelayed({fetchUsers(searchText)},800)  // Kullanıcının her harf girdiğinde aramak yerine yazmayı bitirince ara.
+                    recyclerViewConversations.visibility = View.INVISIBLE
+                    handler.postDelayed({ fetchUsers(searchText) }, 800)
                 } else {
-                    searchResultsAdapter.clear()
+                    conversationsSearchResultsAdapter.clear()
                     recyclerViewUsers.visibility = View.GONE
+                    recyclerViewConversations.visibility = View.VISIBLE
                 }
             }
 
-            override fun afterTextChanged(s: Editable?) {
-                // Not used in this example
-            }
+            override fun afterTextChanged(s: Editable?) {}
         })
+    }
 
-
-
+    private fun fetchConversations() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 withContext(Dispatchers.IO) {
-                    conservations = FirebaseHelper().getConversations()
+                    conservations.clear()
+                    conservations.addAll(FirebaseHelper().getConversations())
                 }
-                conversationsAdapter = ConversationsAdapter(conservations)
-                recyclerViewConversations.adapter = conversationsAdapter
-
+                conversationsAdapter.notifyDataSetChanged()
             } catch (e: Exception) {
-                println("Error fetching posts: ${e.message}")
+                Log.e("MessagesFragment", "Error fetching conversations: ${e.message}")
             }
         }
-
-
-        return view
     }
 
     private fun fetchUsers(searchText: String) {
-        println("---------- Sorgu Yapılıyor ------")
+        println("---------- Querying Users ------")
         firestore.collection("users")
             .whereGreaterThanOrEqualTo("userName", searchText)
-            .whereLessThan("userName", searchText + "\uf8ff")
+            .whereLessThan("userName", "$searchText\uf8ff")
             .orderBy("userName", Query.Direction.ASCENDING)
             .addSnapshotListener { querySnapshot, _ ->
                 querySnapshot?.let { snapshot ->
-                    val users = snapshot.documents.mapNotNull { document ->
+                    val users = mutableListOf<Map<String, String>>()
+                    for (document in snapshot.documents) {
                         val userFullName = document.getString("userFullName") ?: ""
                         val userName = document.getString("userName") ?: ""
                         val userId = document.getString("userId") ?: ""
                         val userDetails = document.get("userDetails") as? Map<*, *>
                         val profileImage = userDetails?.get("profilePicture") as? String ?: ""
 
-
-                        mapOf(
+                        val user = mapOf(
                             "userFullName" to userFullName,
                             "userName" to userName,
                             "userProfileImage" to profileImage,
                             "userId" to userId,
                         )
+                        users.add(user)
                     }
-                    searchResultsAdapter.setUsers(users)
+                    conversationsSearchResultsAdapter.setUsers(users)
                 }
             }
     }

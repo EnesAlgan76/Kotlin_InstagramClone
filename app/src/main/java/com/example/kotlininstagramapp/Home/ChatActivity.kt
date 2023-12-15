@@ -1,14 +1,19 @@
 package com.example.kotlininstagramapp.Home
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.databinding.ActivityChatBinding
+import com.google.firebase.auth.FirebaseAuth
 
 class ChatActivity : AppCompatActivity() {
 
     lateinit var binding :ActivityChatBinding
+    val firebaseAuth :FirebaseAuth = FirebaseAuth.getInstance()
+    lateinit var chatAdapter :ChatAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
@@ -17,6 +22,7 @@ class ChatActivity : AppCompatActivity() {
         val  full_name : String = intent.getStringExtra("FULL_NAME") ?: ""
         val  profile_image : String = intent.getStringExtra("PROFILE_IMAGE") ?: ""
         val  user_name : String = intent.getStringExtra("USER_NAME")?: ""
+        val  conversation_id : String = intent.getStringExtra("CONVERSATION_ID")?: ""
 
         binding.editTextMessage.setText(user_id)
         binding.textViewUserFullName.setText(full_name)
@@ -24,10 +30,28 @@ class ChatActivity : AppCompatActivity() {
         Glide.with(this).load(profile_image).into(binding.imageViewUserProfile)
         binding.editTextMessage.setText(user_id)
 
+        binding.buttonSend.setOnClickListener{
+            FirebaseHelper().sendMessage(message = binding.editTextMessage.text.toString(), to =user_id, conversation_id= conversation_id)
+        }
+
+
+
+        FirebaseHelper().getMessages(conversation_id,
+            onMessagesLoaded = { messages ->
+                chatAdapter = ChatAdapter(messages.reversed(), firebaseAuth.currentUser!!.uid)
+                binding.recyclerViewMessages.layoutManager = LinearLayoutManager(this)
+                binding.recyclerViewMessages.adapter = chatAdapter
+                binding.recyclerViewMessages.scrollToPosition(chatAdapter.itemCount-1)
+            },
+            onError = { exception ->
+                Log.e("///////////////","Hata Oluştu "+ exception)
+            }
+        )
 
 
 
 
         setContentView(binding.root)
+
     }
 }

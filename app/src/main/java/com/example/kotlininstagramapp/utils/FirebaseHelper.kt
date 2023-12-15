@@ -4,15 +4,12 @@ import Comment
 import android.net.Uri
 import android.util.Log
 import com.example.kotlininstagramapp.Home.CommentsAdapter
-import com.example.kotlininstagramapp.Models.Post
-import com.example.kotlininstagramapp.Models.User
-import com.example.kotlininstagramapp.Models.Conversation
-import com.example.kotlininstagramapp.Models.UserPostItem
+import com.example.kotlininstagramapp.Models.*
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
@@ -322,7 +319,7 @@ class FirebaseHelper {
 
    suspend fun getConversations(): ArrayList<Conversation> {
        var conversationList :ArrayList<Conversation> = arrayListOf()
-       val conservationsCollectionRef = userDocumentRef.collection("conservations")
+       val conservationsCollectionRef = userDocumentRef.collection("conversations")
 
        val conversationDocumnets = conservationsCollectionRef.get().await()
 
@@ -338,7 +335,7 @@ class FirebaseHelper {
 
     }
 
-    suspend fun createNewConversation(userId: String, userName: String, profileImage: String, userFullName: String, message: String) {
+    suspend fun createNewConversation(userId: String, userName: String, profileImage: String, userFullName: String, message: String): String {
         val conversationRef = db.collection("conversations")
         val userDocumentRef = db.collection("users").document(firebaseAuth.currentUser!!.uid)
 
@@ -347,7 +344,7 @@ class FirebaseHelper {
             .get()
             .await()
 
-        if (currentUserConversations.isEmpty) {
+        return if (currentUserConversations.isEmpty) {
             Log.e("//","Conversation does not exist, create a new conversation")
             val newConversationDocument = conversationRef.document()
             val firstMessage = mapOf<String, Any>(
@@ -379,6 +376,8 @@ class FirebaseHelper {
 
             val otherUserDocumentRef = db.collection("users").document(userId)
             otherUserDocumentRef.collection("conversations").document(newConversationDocument.id).set(newConversationForOtherUser).await()
+
+            newConversationDocument.id // Return the newly created conversation ID
         } else {
             Log.e("//","Conversation already exists, only send the message")
             val conversationId = currentUserConversations.documents[0].id
@@ -389,8 +388,46 @@ class FirebaseHelper {
                 "receiver_id" to userId
             )
             conversationRef.document(conversationId).collection("messages").add(messageData).await()
+
+            conversationId // Return the existing conversation ID
         }
     }
+
+
+    fun sendMessage(message: String, to: String, conversation_id: String) {
+        val messagesRef = db.collection("conversations").document(conversation_id).collection("messages")
+
+        val messageObject = hashMapOf(
+            "message" to message,
+            "receiver_id" to to,
+            "sender_id" to firebaseAuth.currentUser!!.uid,
+            "timestamp" to FieldValue.serverTimestamp()
+        )
+
+        messagesRef.add(messageObject)
+    }
+
+    fun getMessages(conversationId: String, onMessagesLoaded: (List<ChatMessage>) -> Unit, onError: (Exception) -> Unit) {
+        Log.e("------------------------------ >>>>>", conversationId)
+        val messagesRef = db.collection("conversations").document(conversationId).collection("messages").orderBy("timestamp", Query.Direction.DESCENDING)
+
+        messagesRef.addSnapshotListener { snapshot, exception ->
+            if (exception != null) {
+                onError(exception)
+                return@addSnapshotListener
+            }
+
+            val messagesList = mutableListOf<ChatMessage>()
+
+            snapshot?.documents?.forEach { document ->
+                val message= ChatMessage.fromMap(document.data as Map<String, Any>)
+                messagesList.add(message)
+            }
+
+            onMessagesLoaded(messagesList)
+        }
+    }
+
 
 
 }

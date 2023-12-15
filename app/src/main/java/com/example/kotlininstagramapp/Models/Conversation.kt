@@ -2,10 +2,11 @@ package com.example.kotlininstagramapp.Models
 
 data class Conversation(
     val user_id: String,
+    val user_name: String,
     val profile_image: String,
     val user_full_name: String,
     val last_message: String,
-    var conversation_id: String
+    var conversation_id: String,
 ) {
     companion object {
         fun fromMap(map: Map<String, Any>): Conversation {
@@ -14,8 +15,9 @@ data class Conversation(
             val userFullName = map["user_full_name"] as? String ?: "null"
             val lastMessage = map["last_message"] as? String ?: "null"
             val conversationId = map["conversation_id"] as? String ?: "null"
+            val userName = map["user_name"] as? String ?: "null"
 
-            return Conversation(userId, profile_image, userFullName, lastMessage, conversationId)
+            return Conversation(userId,userName, profile_image, userFullName, lastMessage, conversationId)
         }
     }
 }
