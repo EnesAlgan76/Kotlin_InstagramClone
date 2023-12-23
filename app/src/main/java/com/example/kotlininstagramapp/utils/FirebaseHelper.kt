@@ -6,6 +6,7 @@ import android.util.Log
 import com.example.kotlininstagramapp.Home.CommentsAdapter
 import com.example.kotlininstagramapp.Models.*
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -90,45 +91,6 @@ class FirebaseHelper {
         }
     }
 
-
-
-//    suspend fun fetchUserPosts(userId: String): ArrayList<UserPostItem> {
-//        val list: ArrayList<UserPostItem> = arrayListOf()
-//
-//        val userDocument = db.collection("users").document(userId)
-//        val document = userDocument.get().await()
-//
-//        if (document.exists()) {
-//            val user: User = User.fromMap(document.data as Map<String, Any>)
-//            val postDocumentReference = db.collection("userPosts").document(user.userId)
-//            val allPostsCollection = postDocumentReference.collection("posts")
-//
-//            val postDocuments = allPostsCollection.get().await()
-//            for (i in postDocuments) {
-//                val dataMap = i.data as MutableMap<String, String>
-//                var likeCount: String = dataMap["likeCount"] ?: "null"
-//
-//                dataMap["userId"] = user.userId
-//                dataMap["postId"] = i.id
-//                val post: Post = Post.fromMap(dataMap)
-//                val userPostItem = UserPostItem(
-//                    post.postId,
-//                    user.userId,
-//                    post.explanation,
-//                    user.userName,
-//                    user.userFullName,
-//                    post.url,
-//                    post.date,
-//                    user.userDetails.profilePicture,
-//                    likeCount
-//                )
-//
-//                list.add(userPostItem)
-//            }
-//        }
-//
-//        return list
-//    }
 
 
 
@@ -315,25 +277,67 @@ class FirebaseHelper {
     }
 
 
+    fun getConversations(
+        onConversationAddedToList: (conversation: Conversation) -> Unit,
+        onNewMessageReceivedUpdateConversation: (index :Int, conversation: Conversation) -> Unit,
+        onConversationClickedResetColor: (index :Int, conversation: Conversation) -> Unit,
+        onUpdateLastMessageInConversation: (index :Int, conversation: Conversation) -> Unit,
+    ) {
+        val conversationList: ArrayList<Conversation> = arrayListOf()
+        val conversationsCollectionRef = userDocumentRef.collection("conversations")
+
+        conversationsCollectionRef.orderBy("last_view", Query.Direction.DESCENDING)
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    Log.e("Firestore", "Listen conversation failed: $error")
+                    return@addSnapshotListener
+                }
 
 
-   suspend fun getConversations(): ArrayList<Conversation> {
-       var conversationList :ArrayList<Conversation> = arrayListOf()
-       val conservationsCollectionRef = userDocumentRef.collection("conversations")
+                for (doc in value!!.documentChanges) {
+                    val conversation = Conversation.fromMap(doc.document.data as Map<String, Any>)
+                    conversation.conversation_id = doc.document.id
 
-       val conversationDocumnets = conservationsCollectionRef.get().await()
+                    when (doc.type) {
+                        DocumentChange.Type.ADDED -> {
+                            println("--------->>> ADDED")
+                            conversationList.add(conversation)
+                            onConversationAddedToList(conversation)
+                        }
+                        DocumentChange.Type.MODIFIED -> {
+                            println("--------->>> MODIFIED")
+                            val index = conversationList.indexOfFirst { it.conversation_id == conversation.conversation_id }
+                            val oldConv = conversationList.get(index)
+                            val newConv = conversation
 
-       if(!conversationDocumnets.isEmpty){
-           for (conversationData in conversationDocumnets.documents){
-               var conversation =  Conversation.fromMap(conversationData.data as Map<String, Any>)
-               conversation.conversation_id = conversationData.id
-               conversationList.add(conversation)
-           }
-       }
+                            if (oldConv.isRead == true && newConv.isRead == false){
+                                onNewMessageReceivedUpdateConversation(index, conversation)
+                                conversationList.removeAt(index)
+                                conversationList[0] = conversation
+                                println("----------->> Yeni mesaj geldi yukarı taşı")
 
-       return  conversationList
+                            }else if (oldConv.isRead == false && newConv.isRead == true){
+                                onConversationClickedResetColor(index, conversation)
+                                conversationList[index] = conversation
+                                println("----------->> üzerine tıklantı sadece rengi eski haline çevir.")
 
+                            }else{
+                                println("----------->> sadece yeni mesaj. konuşmaya su an koyu renkte : ${conversation}")
+                                conversationList[index] = conversation
+                                onUpdateLastMessageInConversation(index, conversation)
+                            }
+
+                        }
+                        else -> {
+                        }
+                    }
+                }
+
+
+            }
     }
+
+
 
     suspend fun createNewConversation(userId: String, userName: String, profileImage: String, userFullName: String, message: String): String {
         val conversationRef = db.collection("conversations")
@@ -357,10 +361,12 @@ class FirebaseHelper {
 
             val newConversation = mapOf<String, Any>(
                 "last_message" to message,
-                "profile_image" to profileImage,
-                "user_full_name" to userFullName,
+                "last_view" to FieldValue.serverTimestamp(),
+              //  "profile_image" to profileImage,
+              //  "user_full_name" to userFullName,
                 "user_id" to userId,
-                "user_name" to userName
+                "is_read" to true,
+               // "user_name" to userName
             )
             userDocumentRef.collection("conversations").document(newConversationDocument.id).set(newConversation).await()
 
@@ -368,10 +374,12 @@ class FirebaseHelper {
 
             val newConversationForOtherUser = mapOf<String, Any>(
                 "last_message" to message,
-                "profile_image" to currentUserObject!!.userDetails.profilePicture,
-                "user_full_name" to currentUserObject.userFullName,
-                "user_id" to currentUserObject.userId,
-                "user_name" to currentUserObject.userName
+                "last_view" to FieldValue.serverTimestamp(),
+               // "profile_image" to currentUserObject!!.userDetails.profilePicture,
+             //   "user_full_name" to currentUserObject.userFullName,
+                "user_id" to currentUserObject!!.userId,
+                "is_read" to false,
+              //  "user_name" to currentUserObject.userName
             )
 
             val otherUserDocumentRef = db.collection("users").document(userId)
@@ -394,7 +402,20 @@ class FirebaseHelper {
     }
 
 
-    fun sendMessage(message: String, to: String, conversation_id: String) {
+    fun sendMessage(
+        message: String,
+        to: String,
+        conversation_id: String,
+        firstMessageSended: Boolean
+    ) {
+        val receiverConversationDoc = db.collection("users").document(to).collection("conversations").document(conversation_id)
+        receiverConversationDoc.update("is_read",false)
+        receiverConversationDoc.update("last_message",message)
+
+        if (!firstMessageSended){
+            receiverConversationDoc.update("last_view",FieldValue.serverTimestamp())
+        }
+
         val messagesRef = db.collection("conversations").document(conversation_id).collection("messages")
 
         val messageObject = hashMapOf(
@@ -408,7 +429,6 @@ class FirebaseHelper {
     }
 
     fun getMessages(conversationId: String, onMessagesLoaded: (List<ChatMessage>) -> Unit, onError: (Exception) -> Unit) {
-        Log.e("------------------------------ >>>>>", conversationId)
         val messagesRef = db.collection("conversations").document(conversationId).collection("messages").orderBy("timestamp", Query.Direction.DESCENDING)
 
         messagesRef.addSnapshotListener { snapshot, exception ->
@@ -423,11 +443,17 @@ class FirebaseHelper {
                 val message= ChatMessage.fromMap(document.data as Map<String, Any>)
                 messagesList.add(message)
             }
-
             onMessagesLoaded(messagesList)
         }
     }
 
+    fun updateConversationReadState(isRead: Boolean, conversationId: String) {
+        Log.e("------------>", "Conversation State Updated ${conversationId}")
+        val userDocumentRef = db.collection("users").document(firebaseAuth.currentUser!!.uid)
+        val conversaionDoc = userDocumentRef.collection("conversations").document(conversationId)
+        conversaionDoc.update("is_read", isRead)
+
+    }
 
 
 }

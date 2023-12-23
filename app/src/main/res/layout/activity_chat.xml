@@ -71,27 +71,43 @@
         android:layout_below="@+id/userInfo"
         android:layout_above="@+id/input_layout" />
 
-    <LinearLayout
+
+    <androidx.cardview.widget.CardView
         android:id="@+id/input_layout"
         android:layout_width="match_parent"
-        android:orientation="horizontal"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:padding="8dp">
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="24dp"
+        app:cardBackgroundColor="#EDEDED">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/edit_text_message"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:hint="Type a message" />
+            <EditText
+                android:id="@+id/edit_text_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Mesaj..."
+                android:background="@drawable/shape_textfield_noborders"
+                android:inputType="text"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:padding="16dp" />
 
-        <Button
-            android:id="@+id/button_send"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:text="Send" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/button_send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:textColor="#2196F3"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                tools:text="Gönder" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
 
 </RelativeLayout>

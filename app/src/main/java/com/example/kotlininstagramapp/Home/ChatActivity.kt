@@ -14,6 +14,7 @@ class ChatActivity : AppCompatActivity() {
     lateinit var binding :ActivityChatBinding
     val firebaseAuth :FirebaseAuth = FirebaseAuth.getInstance()
     lateinit var chatAdapter :ChatAdapter
+    var firstMessageSended :Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
@@ -31,7 +32,8 @@ class ChatActivity : AppCompatActivity() {
         binding.editTextMessage.setText(user_id)
 
         binding.buttonSend.setOnClickListener{
-            FirebaseHelper().sendMessage(message = binding.editTextMessage.text.toString(), to =user_id, conversation_id= conversation_id)
+            FirebaseHelper().sendMessage(message = binding.editTextMessage.text.toString(), to =user_id, conversation_id= conversation_id, firstMessageSended)
+            firstMessageSended = true
         }
 
 
@@ -53,5 +55,10 @@ class ChatActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
+    }
+
+    override fun onPause() {
+        firstMessageSended = false
+        super.onPause()
     }
 }

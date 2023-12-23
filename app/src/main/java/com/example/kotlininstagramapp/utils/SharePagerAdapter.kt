@@ -1,9 +1,6 @@
 package com.example.kotlininstagramapp.utils
 
 import androidx.fragment.app.Fragment
-import com.example.kotlininstagramapp.Home.CameraFragment
-import com.example.kotlininstagramapp.Home.HomeFragment
-import com.example.kotlininstagramapp.Home.MessagesFragment
 
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter

@@ -14,18 +14,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.Models.Conversation
-import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.Search.SearchResultsAdapter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class MessagesFragment : Fragment() {
+class ConversationsFragment : Fragment() {
 
     private lateinit var recyclerViewConversations: RecyclerView
     private lateinit var recyclerViewUsers: RecyclerView
@@ -34,7 +28,7 @@ class MessagesFragment : Fragment() {
     private lateinit var conversationsSearchResultsAdapter: ConversationsSearchResultsAdapter
 
     private lateinit var searchBox: EditText
-    private val conservations: ArrayList<Conversation> = ArrayList()
+    private var conversations: ArrayList<Conversation> = ArrayList()
     private lateinit var firestore: FirebaseFirestore
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -50,7 +44,7 @@ class MessagesFragment : Fragment() {
 
         recyclerViewConversations = view.findViewById(R.id.recycler_view_conversations)
         recyclerViewConversations.layoutManager = LinearLayoutManager(requireContext())
-        conversationsAdapter = ConversationsAdapter(conservations)
+        conversationsAdapter = ConversationsAdapter(conversations)
         recyclerViewConversations.adapter = conversationsAdapter
 
         recyclerViewUsers = view.findViewById(R.id.recycler_view_users)
@@ -84,18 +78,41 @@ class MessagesFragment : Fragment() {
         })
     }
 
+
     private fun fetchConversations() {
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-                withContext(Dispatchers.IO) {
-                    conservations.clear()
-                    conservations.addAll(FirebaseHelper().getConversations())
-                }
-                conversationsAdapter.notifyDataSetChanged()
-            } catch (e: Exception) {
-                Log.e("MessagesFragment", "Error fetching conversations: ${e.message}")
+        conversations.clear()
+        FirebaseHelper().getConversations(
+            onConversationAddedToList = {
+                conversations.add(it)
+                conversationsAdapter.notifyItemInserted(conversations.indexOf(it))
+            },
+            onConversationClickedResetColor = { index, conversation ->
+                conversations.set(index,conversation)
+                conversationsAdapter.notifyItemChanged(index)
+            },
+            onNewMessageReceivedUpdateConversation = { index, conversation ->
+                conversations.removeAt(index)
+                conversations.add(0,conversation)
+                conversationsAdapter.notifyItemMoved(index,0)
+                conversationsAdapter.notifyItemChanged(0)
+
+            },
+            onUpdateLastMessageInConversation = {index, conversation ->
+                conversations.set(index,conversation)
+                conversationsAdapter.notifyItemChanged(index)
             }
-        }
+        )
+
+
+//        onNewConversation = {
+//            conversations.add(it)
+//            conversationsAdapter.notifyItemInserted(conversations.indexOf(it))
+//        },
+//        onNewMessage = {index, conversation ->
+//            conversations.set(index,conversation)
+//            conversationsAdapter.notifyItemChanged(index)
+//
+//        },
     }
 
     private fun fetchUsers(searchText: String) {

@@ -129,13 +129,11 @@ class ShareCameraFragment : Fragment() {
 
     override fun onStop() {
         cameraView.close()
-        Log.e("------------","camera view onStop")
         super.onStop()
     }
 
     override fun onDestroy() {
         cameraView.destroy()
-        Log.e("------------","camera view onDestroy")
         super.onDestroy()
     }
 

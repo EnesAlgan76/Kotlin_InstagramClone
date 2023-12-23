@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- item_user_card.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
@@ -37,5 +38,15 @@
             android:textSize="14sp" />
 
     </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_bluePoint"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="8dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="#2196F3"
+        app:cardCornerRadius="5dp" />
 
 </LinearLayout>

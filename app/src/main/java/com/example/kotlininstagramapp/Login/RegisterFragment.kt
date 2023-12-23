@@ -69,7 +69,7 @@ class RegisterFragment :Fragment(){
                 if (task.isSuccessful){
                 val userID = firebaseAuth.currentUser!!.uid
 
-                val userDetails = UserDetails("","","","","")
+                val userDetails = UserDetails("0","0","0","","")
                 val user = User(userID, adSoyad?.text.toString(), kullaniciAdi?.text.toString(), gelenTelNo, gelenMail, sifre?.text.toString(),userDetails)
 
                 val userCollection = db.collection("users")
