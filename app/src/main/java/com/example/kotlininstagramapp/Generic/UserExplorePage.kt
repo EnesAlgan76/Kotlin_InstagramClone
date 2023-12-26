@@ -52,7 +52,8 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
             if (userId != null) {
                 CoroutineScope(Dispatchers.Main).launch {
                     withContext(Dispatchers.IO){
-                        FirebaseHelper().followUser(userId!!)
+                       // FirebaseHelper().followUser(userId!!)
+                        FirebaseHelper().sendFollowRequest(userId!!)
                     }
                     handleFollowStateUI(FirebaseHelper().isUserFollowing(userId?:""))
 

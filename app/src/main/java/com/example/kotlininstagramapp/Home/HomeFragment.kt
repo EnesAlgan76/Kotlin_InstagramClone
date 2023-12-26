@@ -1,5 +1,6 @@
 package com.example.kotlininstagramapp.Home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +24,7 @@ class HomeFragment : Fragment() {
     lateinit var bottomNavigationView: BottomNavigationView
     lateinit var recyclerView:  RecyclerView
     lateinit var iv_directMessage:  ImageView
+    lateinit var iv_notifications:  ImageView
     var allPosts: ArrayList<UserPostItem>  = ArrayList()
     var auth = FirebaseAuth.getInstance()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -34,6 +36,13 @@ class HomeFragment : Fragment() {
         iv_directMessage.setOnClickListener {
             (activity as HomeActivity).binding.viewPager.setCurrentItem(2)
         }
+
+        iv_notifications = view.findViewById(R.id.iv_notifications)
+        iv_notifications.setOnClickListener {
+            startActivity(Intent(requireContext(),NotificationsActivity::class.java))
+        }
+
+
 
         recyclerView = view.findViewById(R.id.rv_homeFragment_posts)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)

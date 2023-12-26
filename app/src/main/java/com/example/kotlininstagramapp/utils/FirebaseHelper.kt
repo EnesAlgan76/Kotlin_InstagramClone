@@ -256,6 +256,31 @@ class FirebaseHelper {
         }
     }
 
+    suspend fun getNotifications():List<Notification> {
+        var notificationList = mutableListOf<Notification>()
+        val snapshot= db.collection("users").document(firebaseAuth.currentUser!!.uid).collection("notifications").get().await()
+        snapshot.documents.forEach { documentSnapshot ->
+            val notification :Notification = Notification.fromMap(documentSnapshot.data as Map<String, Any>)
+            notificationList.add(notification)
+        }
+        return notificationList
+    }
+
+    suspend fun sendFollowRequest(userId: String) {
+      val newNotificationDoc =  db.collection("users").document(userId).collection("notifications").document()
+      val currentTimestamp = FieldValue.serverTimestamp()
+      val currentUser = getUserById(firebaseAuth.currentUser!!.uid)
+      val notification = mapOf(
+            "id" to newNotificationDoc.id,
+            "profile_image" to currentUser!!.userDetails.profilePicture,
+            "user_name" to currentUser.userName,
+            "type" to "follow_request",
+            "timestamp" to currentTimestamp,
+            "post_preview" to "null"
+        )
+      newNotificationDoc.set(notification)
+    }
+
     suspend fun unfollowUser(userId: String) {
         val currentUser = firebaseAuth.currentUser
         if (currentUser != null) {
@@ -455,6 +480,8 @@ class FirebaseHelper {
         conversaionDoc.update("is_read", isRead)
 
     }
+
+
 
 
 }
