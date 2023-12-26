@@ -265,15 +265,9 @@ class FirebaseHelper {
         }
     }
 
-    fun isUserFollowing(userId :String, callback :(Boolean) ->Unit){
-        val documentRef = userDocumentRef.collection("follows").document(userId).get().addOnSuccessListener {
-                snapshot ->
-            if(snapshot.exists()){
-                callback(true)
-            }else{
-                callback(false)
-            }
-        }
+    suspend fun isUserFollowing(userId :String): Boolean {
+        val snapshot = userDocumentRef.collection("follows").document(userId).get().await()
+        return snapshot.exists()
     }
 
 
@@ -313,7 +307,12 @@ class FirebaseHelper {
                             if (oldConv.isRead == true && newConv.isRead == false){
                                 onNewMessageReceivedUpdateConversation(index, conversation)
                                 conversationList.removeAt(index)
-                                conversationList[0] = conversation
+                                if(conversationList.isEmpty()){
+                                    conversationList.add(conversation)
+                                }else{
+                                    conversationList[0] = conversation // it gives error if list is empty
+                                }
+
                                 println("----------->> Yeni mesaj geldi yukarı taşı")
 
                             }else if (oldConv.isRead == false && newConv.isRead == true){
@@ -429,7 +428,9 @@ class FirebaseHelper {
     }
 
     fun getMessages(conversationId: String, onMessagesLoaded: (List<ChatMessage>) -> Unit, onError: (Exception) -> Unit) {
-        val messagesRef = db.collection("conversations").document(conversationId).collection("messages").orderBy("timestamp", Query.Direction.DESCENDING)
+        val messagesRef = db.collection("conversations").document(conversationId)
+            .collection("messages").
+            orderBy("timestamp", Query.Direction.DESCENDING)
 
         messagesRef.addSnapshotListener { snapshot, exception ->
             if (exception != null) {

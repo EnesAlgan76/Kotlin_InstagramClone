@@ -1,5 +1,5 @@
 package com.example.kotlininstagramapp.Generic
 
 interface FollowStateUIHandler {
-    fun handleFollowStateUI()
+    fun handleFollowStateUI(isFollowing: Boolean)
 }

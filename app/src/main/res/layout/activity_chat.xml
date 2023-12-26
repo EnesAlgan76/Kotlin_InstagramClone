@@ -105,7 +105,7 @@
                 android:textColor="#2196F3"
                 android:textSize="16dp"
                 android:textStyle="bold"
-                tools:text="Gönder" />
+                android:text="Gönder" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

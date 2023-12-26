@@ -15,7 +15,6 @@ import com.example.kotlininstagramapp.databinding.ActivityUserDetailPageBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 
@@ -29,18 +28,24 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
         binding = ActivityUserDetailPageBinding.inflate(layoutInflater)
         userId = intent.getStringExtra("USER_ID")
 
-        handleFollowStateUI()
+        CoroutineScope(Dispatchers.Main).launch{
 
-        CoroutineScope(Dispatchers.Main).launch {
-            var userPostItems: ArrayList<UserPostItem>
-            var user: User
-            withContext(Dispatchers.IO){
-                user = FirebaseHelper().getUserById(userId!!)!!
-                userPostItems = FirebaseHelper().fetchUserPosts(user)
+            val user = withContext(Dispatchers.IO){
+                FirebaseHelper().getUserById(userId!!)!!
             }
             setUserInfos(user)
-            setRecycleView(userPostItems)
+
+            val isFollowing =  withContext(Dispatchers.IO){FirebaseHelper().isUserFollowing(userId?:"")}
+            handleFollowStateUI(isFollowing)
+
+            if(isFollowing){
+                showPosts(user)
+            }else{
+                showPrivateAccountInfo()
+            }
+
         }
+
 
 
         binding.userExploreBtnFollow.setOnClickListener{
@@ -49,7 +54,8 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
                     withContext(Dispatchers.IO){
                         FirebaseHelper().followUser(userId!!)
                     }
-                    handleFollowStateUI()
+                    handleFollowStateUI(FirebaseHelper().isUserFollowing(userId?:""))
+
                 }
 
             }
@@ -62,6 +68,23 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
         setContentView(binding.root)
     }
 
+
+
+    private fun showPrivateAccountInfo() {
+        binding.imageViewPrivateInfo.visibility = View.VISIBLE
+    }
+
+    private fun showPosts(user: User) {
+        CoroutineScope(Dispatchers.Main).launch {
+            var userPostItems: ArrayList<UserPostItem>
+            withContext(Dispatchers.IO){
+                userPostItems = FirebaseHelper().fetchUserPosts(user)
+            }
+            setUserInfos(user)
+            setRecycleView(userPostItems)
+        }
+    }
+
     private fun setUserInfos(user: User) {
         binding.userExploreTvUserName.setText(user.userName)
         Glide.with(this).load(user.userDetails.profilePicture).error(R.drawable.icon_profile).placeholder(R.drawable.icon_profile).into(binding.userExploreIvProfile)
@@ -70,8 +93,6 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
         binding.userExploreTvFollow.setText(user.userDetails.following)
         binding.userExploreTvFollowers.setText(user.userDetails.follower)
         binding.userExploreTvPosts.setText(user.userDetails.post)
-
-
     }
 
     private fun setRecycleView(userPostItems: ArrayList<UserPostItem>) {
@@ -80,16 +101,13 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler {
         binding.userExploreRvProfilePageUserPosts.layoutManager = GridLayoutManager(this, 3)
     }
 
-    override fun handleFollowStateUI() {
-        FirebaseHelper().isUserFollowing(userId!!){
-                isFollowing ->
-            if(isFollowing){
-                binding.userExploreLayoutFollowandmessage.visibility = View.VISIBLE
-                binding.userExploreBtnFollow.visibility = View.INVISIBLE
-            }else{
-                binding.userExploreBtnFollow.visibility = View.VISIBLE
-                binding.userExploreLayoutFollowandmessage.visibility = View.INVISIBLE
-            }
+    override fun handleFollowStateUI(isFollowing: Boolean) {
+        if(isFollowing){
+            binding.userExploreLayoutFollowandmessage.visibility = View.VISIBLE
+            binding.userExploreBtnFollow.visibility = View.INVISIBLE
+        }else{
+            binding.userExploreBtnFollow.visibility = View.VISIBLE
+            binding.userExploreLayoutFollowandmessage.visibility = View.INVISIBLE
         }
     }
 

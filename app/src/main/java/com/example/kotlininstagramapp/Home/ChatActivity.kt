@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.databinding.ActivityChatBinding
@@ -15,6 +16,9 @@ class ChatActivity : AppCompatActivity() {
     val firebaseAuth :FirebaseAuth = FirebaseAuth.getInstance()
     lateinit var chatAdapter :ChatAdapter
     var firstMessageSended :Boolean = false
+    val layoutManager =LinearLayoutManager(this)
+
+    var printCount = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
@@ -25,11 +29,10 @@ class ChatActivity : AppCompatActivity() {
         val  user_name : String = intent.getStringExtra("USER_NAME")?: ""
         val  conversation_id : String = intent.getStringExtra("CONVERSATION_ID")?: ""
 
-        binding.editTextMessage.setText(user_id)
+
         binding.textViewUserFullName.setText(full_name)
         binding.textViewUserName.setText(user_name)
         Glide.with(this).load(profile_image).into(binding.imageViewUserProfile)
-        binding.editTextMessage.setText(user_id)
 
         binding.buttonSend.setOnClickListener{
             FirebaseHelper().sendMessage(message = binding.editTextMessage.text.toString(), to =user_id, conversation_id= conversation_id, firstMessageSended)
@@ -38,10 +41,13 @@ class ChatActivity : AppCompatActivity() {
 
 
 
+
+
+
         FirebaseHelper().getMessages(conversation_id,
             onMessagesLoaded = { messages ->
                 chatAdapter = ChatAdapter(messages.reversed(), firebaseAuth.currentUser!!.uid)
-                binding.recyclerViewMessages.layoutManager = LinearLayoutManager(this)
+                binding.recyclerViewMessages.layoutManager = layoutManager
                 binding.recyclerViewMessages.adapter = chatAdapter
                 binding.recyclerViewMessages.scrollToPosition(chatAdapter.itemCount-1)
             },
@@ -49,8 +55,6 @@ class ChatActivity : AppCompatActivity() {
                 Log.e("///////////////","Hata Oluştu "+ exception)
             }
         )
-
-
 
 
         setContentView(binding.root)
