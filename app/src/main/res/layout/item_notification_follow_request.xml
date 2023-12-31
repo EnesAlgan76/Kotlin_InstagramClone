@@ -6,6 +6,28 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/notification_following"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:visibility="invisible"
+        app:cardBackgroundColor="#E8E8E8"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5">
+
+        <TextView
+            android:id="@+id/textView19"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingVertical="4dp"
+            android:text="Takip Ediliyor"
+            android:textColor="#353535" />
+    </androidx.cardview.widget.CardView>
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/notification_profileImage"
         android:layout_width="50dp"
@@ -50,6 +72,7 @@
             android:text="Onayla"
             android:textColor="#FFFFFF" />
     </androidx.cardview.widget.CardView>
+
 
     <androidx.cardview.widget.CardView
         android:id="@+id/notification_delete"

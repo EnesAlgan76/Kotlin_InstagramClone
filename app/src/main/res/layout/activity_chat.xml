@@ -90,10 +90,10 @@
                 android:id="@+id/edit_text_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Mesaj..."
-                android:background="@drawable/shape_textfield_noborders"
-                android:inputType="text"
                 android:layout_weight="1"
+                android:background="@drawable/shape_textfield_noborders"
+                android:hint="Mesaj..."
+                android:inputType="text"
                 android:maxLines="1"
                 android:padding="16dp" />
 

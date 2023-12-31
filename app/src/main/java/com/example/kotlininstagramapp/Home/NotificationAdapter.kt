@@ -17,7 +17,12 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Notification
+import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NotificationAdapter(var mContext : Context, private val notificationList: List<Notification>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -58,11 +63,11 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
             }
             VIEW_TYPE_POST_LIKE -> {
                 val postLikeHolder = holder as PostLikeViewHolder
-                // Bind data or set listeners for post like view holder
+                postLikeHolder.bind(currentItem)
             }
             VIEW_TYPE_COMMENT -> {
                 val commentHolder = holder as CommentViewHolder
-                // Bind data or set listeners for comment view holder
+                commentHolder.bind(currentItem)
             }
         }
     }
@@ -85,6 +90,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         val notificationText: TextView = itemView.findViewById(R.id.notification_text)
         val confirmCard: CardView = itemView.findViewById(R.id.notification_confirm)
         val deleteCard: CardView = itemView.findViewById(R.id.notification_delete)
+        val followingCard: CardView = itemView.findViewById(R.id.notification_following)
 
         fun bind(currentItem: Notification) {
             val time :String = currentItem.timestamp.toDate().toString()
@@ -95,11 +101,21 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
             Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
 
             confirmCard.setOnClickListener {
+                CoroutineScope(Dispatchers.Main).launch{
+                    followingCard.visibility = View.VISIBLE
+                    confirmCard.visibility = View.INVISIBLE
+                    deleteCard.visibility = View.INVISIBLE
+                    withContext(Dispatchers.IO){
+                        FirebaseHelper().getFollowedFromUser(currentItem.userId)
+                        FirebaseHelper().deleteFollowRequestNotification(currentItem.id)
+                    }
+
+                }
 
             }
 
             deleteCard.setOnClickListener {
-
+                FirebaseHelper().deleteFollowRequestNotification(currentItem.id)
             }
 
 
@@ -108,10 +124,52 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
 
     }
 
-    class PostLikeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class PostLikeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        val profileImage: ImageView = itemView.findViewById(R.id.notification_like_profileImage)
+        val preview: ImageView = itemView.findViewById(R.id.notification_like_preview)
+        val notificationText: TextView = itemView.findViewById(R.id.notification_like_text)
+
+        fun bind(currentItem: Notification) {
+            val time :String = currentItem.timestamp.toDate().toString()
+            val userName :String = currentItem.userName
+
+            val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "videonu" else "fotoğrafını"
+
+            val text ="${userName +" "+ imageOrVideo} beğendi ${time}"
+            formatTextView(notificationText,text)
+
+            Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
+
+            Glide.with(mContext).load(currentItem.postPreview).into(preview)
+
+
+
+        }
     }
 
-    class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        val profileImage: ImageView = itemView.findViewById(R.id.notification_comment_profileImage)
+        val preview: ImageView = itemView.findViewById(R.id.notification_comment_preview)
+        val notificationText: TextView = itemView.findViewById(R.id.notification_comment_text)
+
+        fun bind(currentItem: Notification) {
+            val time :String = currentItem.timestamp.toDate().toString()
+            val userName :String = currentItem.userName
+
+            val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "videona" else "fotoğrafına"
+
+            val text ="${userName +" "+ imageOrVideo} yorum yaptı ${time}"
+            formatTextView(notificationText,text)
+
+            Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
+
+            Glide.with(mContext).load(currentItem.postPreview).into(preview)
+
+
+
+        }
     }
 
 

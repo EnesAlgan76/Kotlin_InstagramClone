@@ -20,7 +20,7 @@ class FirebaseHelper {
     private val db = FirebaseFirestore.getInstance()
     private val firebaseAuth = FirebaseAuth.getInstance()
 
-    val userDocumentRef = db.collection("users").document(firebaseAuth.currentUser?.uid.toString())
+    val currentUserDocumentRef = db.collection("users").document(firebaseAuth.currentUser?.uid.toString())
     val commentCollection =db.collection("comments")
 
 
@@ -28,7 +28,7 @@ class FirebaseHelper {
         val userIdList = mutableListOf<String>()
         val allPostsList = arrayListOf<UserPostItem>()
 
-        val followedUsers = userDocumentRef.collection("follows").get().await()
+        val followedUsers = currentUserDocumentRef.collection("follows").get().await()
         for (doc in followedUsers.documents) {
             userIdList.add(doc.id)
         }
@@ -96,12 +96,12 @@ class FirebaseHelper {
 
     suspend fun updateUserProfile(fullName: String?, userName: String?, biography: String?, selectedImageUri: Uri?, ){
         if (fullName != null) {
-            userDocumentRef.update("userFullName", fullName).await()
+            currentUserDocumentRef.update("userFullName", fullName).await()
             println("Tam Ad Güncellendi")
         }
 
         if (biography != null) {
-            userDocumentRef.update(FieldPath.of("userDetails", "biography"), biography).await()
+            currentUserDocumentRef.update(FieldPath.of("userDetails", "biography"), biography).await()
             println("Biyogafi Güncellendi")
         }
 
@@ -110,7 +110,7 @@ class FirebaseHelper {
             if (querySnapshot != null && !querySnapshot.isEmpty) {
                 println("Kullanıcı Adı Zaten Var")
             } else {
-                userDocumentRef.update("userName", userName).await()
+                currentUserDocumentRef.update("userName", userName).await()
                 updateProfileImage(selectedImageUri, userName)
                 println("Kullanıcı Adı Güncellendi")
             }
@@ -127,7 +127,7 @@ class FirebaseHelper {
             try {
                 val uploadTask = imageRef.putFile(selectedImageUri).await()
                 val url = uploadTask.storage.downloadUrl.await().toString()
-                userDocumentRef.update(FieldPath.of("userDetails", "profilePicture"), url).await()
+                currentUserDocumentRef.update(FieldPath.of("userDetails", "profilePicture"), url).await()
                 println("Profile Picture Updated")
             } catch (e: Exception) {
                 // Handle error
@@ -138,7 +138,7 @@ class FirebaseHelper {
 
     suspend fun publishComment(text: String, postId: String, adapter: CommentsAdapter) {
         if(firebaseAuth.currentUser!=null){
-           val userDoc = userDocumentRef.get().await()
+           val userDoc = currentUserDocumentRef.get().await()
             val userProfilePicture = userDoc.getString("userDetails.profilePicture")?:""
             val userName= userDoc.getString("userName")?:"Unknown User"
 
@@ -168,7 +168,7 @@ class FirebaseHelper {
 
     suspend fun getComments(postId: String): ArrayList<Pair<Comment,Boolean>> {
         val comments = commentCollection.whereEqualTo("post_id",postId).get().await()
-        val userDocument = userDocumentRef.get().await()
+        val userDocument = currentUserDocumentRef.get().await()
         val likedComments = userDocument.get("liked_comments") as? List<String>?: listOf()
 
 
@@ -187,7 +187,7 @@ class FirebaseHelper {
     suspend fun updateCommentLikeState(commentId: String, currentLikeCount: Int) {
         var liked :Boolean? =null
         try {
-            val documentSnapshot = userDocumentRef.get().await()
+            val documentSnapshot = currentUserDocumentRef.get().await()
 
             val likedComments = documentSnapshot.get("liked_comments") as? List<String> ?: listOf()   // Kullanıcının daha önceden yorumu beğenip
             liked = likedComments.contains(commentId) // beğenmediğini kontrol et
@@ -200,9 +200,9 @@ class FirebaseHelper {
 
 
             val updateTask = if (!liked) {
-                userDocumentRef.update("liked_comments", FieldValue.arrayUnion(commentId))  // duruma göre kullanıcı füğümünden de likedComments güncelle
+                currentUserDocumentRef.update("liked_comments", FieldValue.arrayUnion(commentId))  // duruma göre kullanıcı füğümünden de likedComments güncelle
             } else {
-                userDocumentRef.update("liked_comments", FieldValue.arrayRemove(commentId))
+                currentUserDocumentRef.update("liked_comments", FieldValue.arrayRemove(commentId))
             }
             updateTask.await()
 
@@ -238,7 +238,7 @@ class FirebaseHelper {
 
 
     suspend fun isPostLiked(postId: String): Boolean {
-        val likedPostDocRef = userDocumentRef.collection("liked_posts").document(postId)
+        val likedPostDocRef = currentUserDocumentRef.collection("liked_posts").document(postId)
         return try {
             val documentSnapshot = likedPostDocRef.get().await()
             documentSnapshot.exists()
@@ -247,10 +247,21 @@ class FirebaseHelper {
         }
     }
 
+    suspend fun getFollowedFromUser(userId: String){
+        val currentuser = firebaseAuth.currentUser
+        val userDocumentRef = db.collection("users").document(userId)
+        if(currentuser != null){
+            userDocumentRef.collection("follows").document(currentuser.uid).set((mapOf("userId" to currentuser.uid))).await()
+            currentUserDocumentRef.collection("followers").document(userId).set(mapOf("userId" to userId)).await()
+            Log.e("////","Takip Edildi")
+        }
+
+    }
+
     suspend fun followUser(userId: String) {
         val currentuser = firebaseAuth.currentUser
         if(currentuser != null){
-            userDocumentRef.collection("follows").document(userId).set((mapOf("userId" to userId))).await()
+            currentUserDocumentRef.collection("follows").document(userId).set((mapOf("userId" to userId))).await()
             db.collection("users").document(userId).collection("followers").document(currentuser.uid).set(mapOf("userId" to currentuser.uid)).await()
             Log.e("////","Takip Edildi")
         }
@@ -272,7 +283,8 @@ class FirebaseHelper {
       val currentUser = getUserById(firebaseAuth.currentUser!!.uid)
       val notification = mapOf(
             "id" to newNotificationDoc.id,
-            "profile_image" to currentUser!!.userDetails.profilePicture,
+            "user_id" to currentUser!!.userId,
+            "profile_image" to currentUser.userDetails.profilePicture,
             "user_name" to currentUser.userName,
             "type" to "follow_request",
             "timestamp" to currentTimestamp,
@@ -281,17 +293,58 @@ class FirebaseHelper {
       newNotificationDoc.set(notification)
     }
 
+    fun deleteFollowRequestNotification(id: String) {
+        val notificationDoc =  db.collection("users").document(firebaseAuth.currentUser!!.uid).collection("notifications").document(id)
+        notificationDoc.delete().addOnCompleteListener { task ->
+            if(task.isSuccessful){
+                println("******** >> Bildirim silindi")
+            }
+        }
+    }
+
+    suspend fun sendLikeNotification(userId: String, postUrl : String){
+        val newNotificationDoc =  db.collection("users").document(userId).collection("notifications").document()
+        val currentTimestamp = FieldValue.serverTimestamp()
+        val currentUser = getUserById(firebaseAuth.currentUser!!.uid)
+        val notification = mapOf(
+            "id" to newNotificationDoc.id,
+            "user_id" to currentUser!!.userId,
+            "profile_image" to currentUser!!.userDetails.profilePicture,
+            "user_name" to currentUser.userName,
+            "type" to "post_like",
+            "timestamp" to currentTimestamp,
+            "post_preview" to postUrl
+        )
+        newNotificationDoc.set(notification)
+    }
+
+    suspend fun sendCommentNotification(userId: String, postUrl: String, comment : String){
+        val newNotificationDoc =  db.collection("users").document(userId).collection("notifications").document()
+        val currentTimestamp = FieldValue.serverTimestamp()
+        val currentUser = getUserById(firebaseAuth.currentUser!!.uid)
+        val notification = mapOf(
+            "id" to newNotificationDoc.id,
+            "user_id" to currentUser!!.userId,
+            "profile_image" to currentUser!!.userDetails.profilePicture,
+            "user_name" to currentUser.userName,
+            "type" to "comment",
+            "timestamp" to currentTimestamp,
+            "post_preview" to postUrl
+        )
+        newNotificationDoc.set(notification)
+    }
+
     suspend fun unfollowUser(userId: String) {
         val currentUser = firebaseAuth.currentUser
         if (currentUser != null) {
-            userDocumentRef.collection("follows").document(userId).delete().await()
+            currentUserDocumentRef.collection("follows").document(userId).delete().await()
             db.collection("users").document(userId).collection("followers").document(currentUser.uid).delete().await()
             Log.e("////", "Unfollowed")
         }
     }
 
     suspend fun isUserFollowing(userId :String): Boolean {
-        val snapshot = userDocumentRef.collection("follows").document(userId).get().await()
+        val snapshot = currentUserDocumentRef.collection("follows").document(userId).get().await()
         return snapshot.exists()
     }
 
@@ -303,7 +356,7 @@ class FirebaseHelper {
         onUpdateLastMessageInConversation: (index :Int, conversation: Conversation) -> Unit,
     ) {
         val conversationList: ArrayList<Conversation> = arrayListOf()
-        val conversationsCollectionRef = userDocumentRef.collection("conversations")
+        val conversationsCollectionRef = currentUserDocumentRef.collection("conversations")
 
         conversationsCollectionRef.orderBy("last_view", Query.Direction.DESCENDING)
             .addSnapshotListener { value, error ->

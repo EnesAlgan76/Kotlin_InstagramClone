@@ -1,17 +1,11 @@
 package com.example.kotlininstagramapp.Home
 
 import Comment
-import android.annotation.SuppressLint
-import android.graphics.Color
-import android.opengl.Visibility
 import android.os.Bundle
 import android.text.*
-import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.*
-import android.widget.ArrayAdapter
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.TextHighlighter
-import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class CommentBottomSheetFragment(var postId: String) : BottomSheetDialogFragment()  {
+class CommentBottomSheetFragment(var postId: String, var userId: String, var userPostUrl: String) : BottomSheetDialogFragment()  {
 
     var comments:ArrayList<Pair<Comment,Boolean>> = arrayListOf()
     lateinit var et_comment :EditText
@@ -71,6 +64,7 @@ class CommentBottomSheetFragment(var postId: String) : BottomSheetDialogFragment
                     et_comment.text.clear()
                     withContext(Dispatchers.IO){
                         FirebaseHelper().publishComment(text,postId,commentAdapter)
+                        FirebaseHelper().sendCommentNotification(userId, userPostUrl, text )
                         Log.e("------------>","*** Yorum gönderme başarılı  ***")
                     }
 

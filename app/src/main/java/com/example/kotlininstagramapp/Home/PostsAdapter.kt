@@ -2,7 +2,6 @@ package com.example.kotlininstagramapp.Home
 
 import android.content.Context
 import android.content.Intent
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
@@ -81,7 +80,7 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
             post_tv_likecount.text = "${userPostItem.likeCount} beğenme"
 
             showComment.setOnClickListener {
-                val bottomSheetFragment = CommentBottomSheetFragment(userPostItem.postId)
+                val bottomSheetFragment = CommentBottomSheetFragment(userPostItem.postId, userPostItem.userId, userPostItem.userPostUrl)
                 bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
             }
 
@@ -180,6 +179,7 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
                         val data = mapOf("post_id" to userPostItem.postId)
                         likedPostDocRef.set(data).await()
                         FirebaseHelper().updateLikeCount(userPostItem.postId, userPostItem.userId, true)
+                        FirebaseHelper().sendLikeNotification(userPostItem.userId, userPostItem.userPostUrl)
                     }
                 }
             } else {
