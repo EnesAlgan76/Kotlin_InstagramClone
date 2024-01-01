@@ -25,21 +25,27 @@ class HomeFragment : Fragment() {
     lateinit var recyclerView:  RecyclerView
     lateinit var iv_directMessage:  ImageView
     lateinit var iv_notifications:  ImageView
+    lateinit var iv_redPoint:  ImageView
     var allPosts: ArrayList<UserPostItem>  = ArrayList()
     var auth = FirebaseAuth.getInstance()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_home,container,false)
         bottomNavigationView = view.findViewById(R.id.bottomNavigationView)
+        iv_directMessage = view.findViewById(R.id.iv_direct_message)
+        iv_notifications = view.findViewById(R.id.iv_notifications)
+        iv_redPoint = view.findViewById(R.id.iv_redPoint)
         BottomNavigationHandler.setupNavigations(requireContext(),bottomNavigationView,4)
 
-        iv_directMessage = view.findViewById(R.id.iv_direct_message)
+
         iv_directMessage.setOnClickListener {
             (activity as HomeActivity).binding.viewPager.setCurrentItem(2)
         }
 
-        iv_notifications = view.findViewById(R.id.iv_notifications)
+
         iv_notifications.setOnClickListener {
             startActivity(Intent(requireContext(),NotificationsActivity::class.java))
+            removeNotificationRedPoint()
+            updateUiOnNotificationStatusChange()
         }
 
 
@@ -54,11 +60,32 @@ class HomeFragment : Fragment() {
                 }
                 setupRecyclerView(allPosts)
 
+
             } catch (e: Exception) {
                 println("Error fetching posts: ${e.message}")
             }
         }
+
+        updateUiOnNotificationStatusChange()
+
         return view
+    }
+
+    private fun updateUiOnNotificationStatusChange() {
+        FirebaseHelper().listenForNotificationsAndChanges{
+                callback ->
+            if (callback){
+                showNotificationRedPoint()
+            }
+        }
+    }
+
+    private fun showNotificationRedPoint() {
+        iv_redPoint.visibility = View.VISIBLE
+    }
+
+    private fun removeNotificationRedPoint() {
+        iv_redPoint.visibility = View.INVISIBLE
     }
 
     private fun setupRecyclerView(allPosts: ArrayList<UserPostItem>) {

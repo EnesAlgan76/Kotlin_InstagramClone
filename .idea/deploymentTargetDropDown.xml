@@ -7,11 +7,11 @@
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\Enes\.android\avd\Samsung_S23_API_30.avd" />
+            <value value="C:\Users\Enes\.android\avd\Nexus_6_API_30.avd" />
           </Key>
         </deviceKey>
       </Target>
     </runningDeviceTargetSelectedWithDropDown>
-    <timeTargetWasSelectedWithDropDown value="2023-12-31T17:26:05.355912200Z" />
+    <timeTargetWasSelectedWithDropDown value="2024-01-01T17:34:57.108070100Z" />
   </component>
 </project>

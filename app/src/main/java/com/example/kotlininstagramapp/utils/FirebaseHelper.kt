@@ -10,6 +10,7 @@ import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.*
@@ -267,9 +268,43 @@ class FirebaseHelper {
         }
     }
 
+
+
+
+
+    private var listener: ListenerRegistration? = null
+
+    fun listenForNotificationsAndChanges(callback: (Boolean) -> Unit) {
+        var isNewDocument = false
+
+        listener = db.collection("users")
+            .document(firebaseAuth.currentUser!!.uid)
+            .collection("notifications")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .limit(1)
+            .addSnapshotListener { snapshot, e ->
+                snapshot?.documentChanges?.forEach { doc ->
+                    if (doc.type == DocumentChange.Type.ADDED) {
+                        if (isNewDocument) {
+                            callback.invoke(true)
+                            println("New notification received: ${snapshot.documents.size} ${snapshot.documents}")
+                            listener?.remove()
+                        } else {
+                            isNewDocument = true
+                        }
+                    }
+                }
+            }
+    }
+
+
+
+
+
+
     suspend fun getNotifications():List<Notification> {
         var notificationList = mutableListOf<Notification>()
-        val snapshot= db.collection("users").document(firebaseAuth.currentUser!!.uid).collection("notifications").get().await()
+        val snapshot= db.collection("users").document(firebaseAuth.currentUser!!.uid).collection("notifications").orderBy("timestamp", Query.Direction.DESCENDING).get().await()
         snapshot.documents.forEach { documentSnapshot ->
             val notification :Notification = Notification.fromMap(documentSnapshot.data as Map<String, Any>)
             notificationList.add(notification)
@@ -292,6 +327,7 @@ class FirebaseHelper {
         )
       newNotificationDoc.set(notification)
     }
+
 
     fun deleteFollowRequestNotification(id: String) {
         val notificationDoc =  db.collection("users").document(firebaseAuth.currentUser!!.uid).collection("notifications").document(id)
@@ -318,6 +354,23 @@ class FirebaseHelper {
         newNotificationDoc.set(notification)
     }
 
+    fun deleteLikeNotification(id: String, userPostUrl: String) { // mevcut kullanıcıdan siler
+        val notificationCol =  db.collection("users").document(id).collection("notifications")
+        val notificationDoc =  notificationCol.whereEqualTo("user_id" ,firebaseAuth.currentUser!!.uid).whereEqualTo("post_preview", userPostUrl).get()
+        notificationDoc.addOnSuccessListener {snapshot ->
+            for (document in snapshot.documents) {
+                notificationCol.document(document.id).delete()
+                    .addOnSuccessListener {
+                        println("******** >> Bildirim silindi")
+                    }
+                    .addOnFailureListener { e ->
+                        println("Error deleting document: $e")
+                    }
+            }
+
+        }
+    }
+
     suspend fun sendCommentNotification(userId: String, postUrl: String, comment : String){
         val newNotificationDoc =  db.collection("users").document(userId).collection("notifications").document()
         val currentTimestamp = FieldValue.serverTimestamp()
@@ -325,7 +378,7 @@ class FirebaseHelper {
         val notification = mapOf(
             "id" to newNotificationDoc.id,
             "user_id" to currentUser!!.userId,
-            "profile_image" to currentUser!!.userDetails.profilePicture,
+            "profile_image" to currentUser.userDetails.profilePicture,
             "user_name" to currentUser.userName,
             "type" to "comment",
             "timestamp" to currentTimestamp,

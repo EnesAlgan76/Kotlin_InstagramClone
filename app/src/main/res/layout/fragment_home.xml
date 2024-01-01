@@ -62,6 +62,15 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/instagram" />
 
+                    <ImageView
+                        android:id="@+id/iv_redPoint"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="@+id/iv_notifications"
+                        app:layout_constraintEnd_toEndOf="@+id/iv_notifications"
+                        app:srcCompat="@drawable/icon_redpoint" />
+
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

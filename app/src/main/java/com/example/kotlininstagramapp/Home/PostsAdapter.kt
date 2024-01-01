@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mContext: Context, private val fragmentManager: FragmentManager, private val recyclerView: RecyclerView
 ) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
     private val defaultImage = R.drawable.icon_profile
-    private var playPosition = -2 // Aktif olarak oynatılan öğenin pozisyonunu saklar
+    private var playPosition = -2 //aktif olarak oynatılan öğenin pozisyonu
     private val handler = Handler(Looper.getMainLooper())
 
     init {
@@ -162,7 +162,7 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
                         .document(userPostItem.postId)
                     val document = likedPostDocRef.get().await()
                     val tempPost = posts[position]
-                    if (document.exists()) {
+                    if (document.exists()) {   // zaten beğenilmişse kaldır
                         withContext(Dispatchers.Main) {
                             userPostItem.likeCount = (userPostItem.likeCount.toInt() - 1).toString()
                             posts[position] = tempPost
@@ -170,7 +170,8 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
                         }
                         likedPostDocRef.delete().await()
                         FirebaseHelper().updateLikeCount(userPostItem.postId, userPostItem.userId, false)
-                    } else {
+                        FirebaseHelper().deleteLikeNotification(userPostItem.userId, userPostItem.userPostUrl)
+                    } else {   // ilk defa begenilecek
                         withContext(Dispatchers.Main) {
                             tempPost.likeCount = (tempPost.likeCount.toInt() + 1).toString()
                             posts[position] = tempPost
