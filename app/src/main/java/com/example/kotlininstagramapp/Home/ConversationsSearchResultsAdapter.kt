@@ -13,7 +13,7 @@ import com.example.kotlininstagramapp.Generic.UserExplorePage
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.Profile.ProfileActivity
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.Search.SearchResultsAdapter
+import com.example.kotlininstagramapp.Share.Search.SearchResultsAdapter
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.*

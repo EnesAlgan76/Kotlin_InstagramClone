@@ -29,9 +29,6 @@
             android:name=".Home.NotificationsActivity"
             android:exported="false" />
         <activity
-            android:name="test.VideoTestActivity"
-            android:exported="false" />
-        <activity
             android:name=".Home.ChatActivity"
             android:exported="false" />
         <activity
@@ -59,7 +56,7 @@
             android:name=".Share.ShareActivity"
             android:exported="false" />
         <activity
-            android:name=".Search.SearchActivity"
+            android:name=".Share.Search.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".Reels.ReelsActivity"

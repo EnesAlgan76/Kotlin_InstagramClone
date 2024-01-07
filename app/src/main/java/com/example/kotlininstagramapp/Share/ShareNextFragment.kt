@@ -39,7 +39,6 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-import test.VideoDetailsModel
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.*

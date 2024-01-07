@@ -1,4 +1,4 @@
-package com.example.kotlininstagramapp.Search
+package com.example.kotlininstagramapp.Share.Search
 
 import android.content.Context
 import android.content.Intent

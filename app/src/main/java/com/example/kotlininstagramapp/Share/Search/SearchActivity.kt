@@ -1,4 +1,4 @@
-package com.example.kotlininstagramapp.Search
+package com.example.kotlininstagramapp.Share.Search
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
