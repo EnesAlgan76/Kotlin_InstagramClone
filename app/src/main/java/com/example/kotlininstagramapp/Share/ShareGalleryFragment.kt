@@ -70,6 +70,7 @@ class ShareGalleryFragment : Fragment() {
 
         buttonIleri.setOnClickListener {
             println("**********TIKLANDI**************")
+            bigVideo.stopPlayback()
             mainLayout.visibility = View.GONE
             flShareNextFrame.visibility = View.VISIBLE
 
@@ -87,7 +88,7 @@ class ShareGalleryFragment : Fragment() {
 
 
     private fun initializeSpinner() {
-        var spinnerOptions = arrayOf("DCIM","Pictures")
+        var spinnerOptions = arrayOf("DCIM","Pictures","Download")
         var adapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_item, spinnerOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter

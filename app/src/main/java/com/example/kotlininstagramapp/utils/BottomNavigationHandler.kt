@@ -13,6 +13,7 @@ import com.example.kotlininstagramapp.Reels.ReelsActivity
 import com.example.kotlininstagramapp.Search.SearchActivity
 import com.example.kotlininstagramapp.Share.ShareActivity
 import com.google.android.material.navigation.NavigationBarView
+import test.VideoTestActivity
 
 class BottomNavigationHandler {
     companion object{
@@ -58,7 +59,7 @@ class BottomNavigationHandler {
                             return true
                         }
                         R.id.menu_item_video -> {
-                            val intent = Intent(context, ReelsActivity::class.java)
+                            val intent = Intent(context, VideoTestActivity::class.java)
                             context.startActivity(intent)
                             (context as Activity).overridePendingTransition(0, 0)
                             currentMenuNo =0

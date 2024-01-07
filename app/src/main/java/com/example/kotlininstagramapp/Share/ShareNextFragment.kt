@@ -12,6 +12,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.abedelazizshe.lightcompressorlibrary.CompressionListener
+import com.abedelazizshe.lightcompressorlibrary.VideoCompressor
+import com.abedelazizshe.lightcompressorlibrary.VideoQuality
+import com.abedelazizshe.lightcompressorlibrary.config.Configuration
+import com.abedelazizshe.lightcompressorlibrary.config.SaveLocation
+import com.abedelazizshe.lightcompressorlibrary.config.SharedStorageConfiguration
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Post
@@ -25,13 +31,17 @@ import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import test.VideoDetailsModel
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.*
 
 class ShareNextFragment : Fragment() {
@@ -49,6 +59,8 @@ class ShareNextFragment : Fragment() {
     val videoRef = storageReference.child("posts/${mAuth.currentUser?.uid}/videos/${postId}")
     val shareProgressDialog = ShareProgressDialog()
 
+    private val uris = mutableListOf<Uri>()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_share_next, container, false)
         image = view.findViewById(R.id.iv_share_next)
@@ -60,6 +72,7 @@ class ShareNextFragment : Fragment() {
             if(gelenDosya!!.extension=="mp4"){
                // Picasso.get().load(getVideoThumbnail(it)).into(image)
                 Glide.with(view.context).load(getVideoThumbnail(it)).into(image)
+                uris.add(Uri.fromFile(gelenDosya))
             }else{
                 Picasso.get().load(it).into(image)
             }
@@ -78,25 +91,26 @@ class ShareNextFragment : Fragment() {
             shareProgressDialog.show(requireActivity().supportFragmentManager, "ShareProgressDialog")
             shareProgressDialog.isCancelable = false
 
-            GlobalScope.launch(Dispatchers.IO) {
+            CoroutineScope(Dispatchers.IO).launch {
                 try {
                     if (gelenDosya!!.extension == "mp4") {
-                        val input = gelenDosya!!
-                        val output: File
-                        val outputFileName = System.currentTimeMillis().toString()+".mp4"
-                        val outputDirectory = input.parentFile
-                        output = File(outputDirectory, outputFileName)
-                      //  val command2 =  "-y -i ${input.absolutePath} -preset medium -crf 23 -vf format=yuv420p -c:v h264 ${output.absolutePath}"
-                      //  val command3 = "-i ${input.absolutePath} -c:v h264 -crf 18 -preset slow -c:a aac -b:a 192k -vf scale=1280:-2 ${output.absolutePath}"
-                        val command4 = "-i ${input.absolutePath} -c:v h264 -crf 23 -preset medium ${output.absolutePath}"
 
-                        try {
-                            FFmpegKit.execute(command4)
-                        }catch (e:Throwable){
-                            Log.e("SIKIŞTIRMA hATASI", e.message.toString())
-                        }
+                        processVideo()
 
-                        uploadImageToStorage2(Uri.fromFile(output), image =false)
+
+//                        val input = gelenDosya!!
+//                        val output: File
+//                        val outputFileName = System.currentTimeMillis().toString()+".mp4"
+//                        val outputDirectory = input.parentFile
+//                        output = File(outputDirectory, outputFileName)
+//                        val command4 = "-i ${input.absolutePath} -c:v h264 -crf 23 -preset medium ${output.absolutePath}"
+//                        try {
+//                            FFmpegKit.execute(command4)
+//                        }catch (e:Throwable){
+//                            Log.e("SIKIŞTIRMA hATASI", e.message.toString())
+//                        }
+
+                      //  uploadImageToStorage2(Uri.fromFile(output), image =false)
 
 
                     }
@@ -118,6 +132,59 @@ class ShareNextFragment : Fragment() {
         return view
     }
 
+    private fun processVideo() {
+
+        CoroutineScope(Dispatchers.IO).launch {
+            VideoCompressor.start(
+                context = requireContext(),
+                uris,
+                isStreamable = false,
+                sharedStorageConfiguration = SharedStorageConfiguration(
+                    saveAt = SaveLocation.movies,
+                    subFolderName = "nstavideos"
+                ),
+//                appSpecificStorageConfiguration = AppSpecificStorageConfiguration(
+//
+//                ),
+                configureWith = Configuration(
+                    quality = VideoQuality.LOW,
+                    videoNames = uris.map { uri -> uri.pathSegments.last() },
+                    isMinBitrateCheckEnabled = false,
+                ),
+                listener = object : CompressionListener {
+                    override fun onProgress(index: Int, percent: Float) {
+                        val roundedPercent = percent.toInt() // Convert percent to integer
+
+                        if (roundedPercent < 100 && (roundedPercent % 5) == 0) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                shareProgressDialog.tvProgress.text = "Sıkıştırılıyor: %$roundedPercent"
+                            }
+                        }
+                    }
+
+                    override fun onStart(index: Int) {
+                        println("------------------ >>>>>>>>>>>>>>>> "+uris.first())
+
+                    }
+
+                    override fun onSuccess(index: Int, size: Long, path: String?) {
+                        println("BAŞARILI ---------- > ${path}")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            uploadImageToStorage2(Uri.fromFile(File(path)), image =false)
+                        }
+                    }
+
+                    override fun onFailure(index: Int, failureMessage: String) {
+                        Log.wtf("failureMessage", failureMessage)
+                    }
+
+                    override fun onCancelled(index: Int) {
+                        Log.wtf("TAG", "compression has been cancelled")
+                    }
+                },
+            )
+        }
+    }
 
 
     private suspend fun uploadImageToStorage2(compressedMediaUri: Uri, image: Boolean) {
