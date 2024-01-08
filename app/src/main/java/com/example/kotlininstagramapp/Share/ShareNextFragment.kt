@@ -18,16 +18,15 @@ import com.abedelazizshe.lightcompressorlibrary.VideoQuality
 import com.abedelazizshe.lightcompressorlibrary.config.Configuration
 import com.abedelazizshe.lightcompressorlibrary.config.SaveLocation
 import com.abedelazizshe.lightcompressorlibrary.config.SharedStorageConfiguration
-import com.arthenica.ffmpegkit.FFmpegKit
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
@@ -36,11 +35,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import java.io.File
-import java.io.FileNotFoundException
 import java.util.*
 
 class ShareNextFragment : Fragment() {
@@ -225,6 +222,7 @@ class ShareNextFragment : Fragment() {
     private suspend fun uploadPostToFirestore2(post: Post) {
         try {
             val userDocRef = firestore.collection("userPosts").document(post.userId)
+            val user = firestore.collection("users").document(post.userId)
 
             val postMap = hashMapOf(
                 "date" to post.date,
@@ -235,7 +233,12 @@ class ShareNextFragment : Fragment() {
 
             userDocRef.set(hashMapOf("userId" to post.userId)).await()
             userDocRef.collection("posts").document(post.postId).set(postMap).await()
+            user.update("userDetails.post", FieldValue.increment(1)).addOnSuccessListener {
+                println("Post count updated")
+            }
             shareProgressDialog.dismiss()
+            requireActivity().finish()
+
         } catch (e: Exception) {
             // Handle any exceptions
             e.printStackTrace()

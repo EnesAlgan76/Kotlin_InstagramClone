@@ -61,6 +61,7 @@ class ProfileActivity : AppCompatActivity(){
                 if(snapshot.data!=null){
                     binding.tvUserName.text = snapshot.data?.get("userName").toString()
                     val userDetails:UserDetails = UserDetails.fromMap(snapshot.data?.get("userDetails") as Map<String, Any>)
+                    println("--------> "+snapshot.data?.get("userDetails"))
                     binding.tvFollow.text = userDetails.following
                     binding.tvFollowers.text  = userDetails.follower
                     binding.tvPosts.text = userDetails.post
