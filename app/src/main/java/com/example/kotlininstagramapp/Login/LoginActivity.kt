@@ -1,17 +1,21 @@
 package com.example.kotlininstagramapp.Login
 
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Toast
 import com.example.kotlininstagramapp.Home.HomeActivity
+import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.databinding.ActivityLoginBinding
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlin.math.log
+import com.google.firebase.messaging.FirebaseMessaging
 
 class LoginActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginBinding
@@ -69,6 +73,7 @@ class LoginActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     showToast("GİRİŞ BAŞARILI")
                     startActivity(Intent(this,HomeActivity()::class.java))
+                    retrieveCurrentFcmToken()
                     finish()
             }
                 .addOnFailureListener { exception->
@@ -77,6 +82,18 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
+    }
+
+    private fun retrieveCurrentFcmToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.e("retrieveCurrentFcmToken ", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+            val token = task.result
+            Log.d("retrieveCurrentFcmToken", "------>> "+token)
+            FirebaseHelper().saveNewToken(token)
+        })
     }
 
 

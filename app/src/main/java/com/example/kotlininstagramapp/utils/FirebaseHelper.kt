@@ -19,9 +19,9 @@ import kotlinx.coroutines.tasks.await
 class FirebaseHelper {
     private val storageReference = FirebaseStorage.getInstance()
     private val db = FirebaseFirestore.getInstance()
-    private val firebaseAuth = FirebaseAuth.getInstance()
+    private val currentUser = FirebaseAuth.getInstance().currentUser
 
-    val currentUserDocumentRef = db.collection("users").document(firebaseAuth.currentUser?.uid.toString())
+    val currentUserDocumentRef = db.collection("users").document(currentUser?.uid.toString())
     val commentCollection =db.collection("comments")
 
 
@@ -138,7 +138,7 @@ class FirebaseHelper {
 
 
     suspend fun publishComment(text: String, postId: String, adapter: CommentsAdapter) {
-        if(firebaseAuth.currentUser!=null){
+        if(currentUser!=null){
            val userDoc = currentUserDocumentRef.get().await()
             val userProfilePicture = userDoc.getString("userDetails.profilePicture")?:""
             val userName= userDoc.getString("userName")?:"Unknown User"
@@ -147,7 +147,7 @@ class FirebaseHelper {
                 commentId = "",
                 comment = text,
                 like_count = "0",
-                user_id = firebaseAuth.currentUser!!.uid,
+                user_id = currentUser!!.uid,
                 user_profile_picture = userProfilePicture,
                 time = System.currentTimeMillis().toString(),
                 user_name = userName,
@@ -249,7 +249,7 @@ class FirebaseHelper {
     }
 
     suspend fun getFollowedFromUser(userId: String){
-        val currentuser = firebaseAuth.currentUser
+        val currentuser = currentUser
         val userDocumentRef = db.collection("users").document(userId)
         if(currentuser != null){
             userDocumentRef.collection("follows").document(currentuser.uid).set((mapOf("userId" to currentuser.uid))).await()
@@ -260,7 +260,7 @@ class FirebaseHelper {
     }
 
     suspend fun followUser(userId: String) {
-        val currentuser = firebaseAuth.currentUser
+        val currentuser = currentUser
         if(currentuser != null){
             currentUserDocumentRef.collection("follows").document(userId).set((mapOf("userId" to userId))).await()
             db.collection("users").document(userId).collection("followers").document(currentuser.uid).set(mapOf("userId" to currentuser.uid)).await()
@@ -278,7 +278,7 @@ class FirebaseHelper {
         var isNewDocument = false
 
         listener = db.collection("users")
-            .document(firebaseAuth.currentUser!!.uid)
+            .document(currentUser!!.uid)
             .collection("notifications")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .limit(1)
@@ -304,7 +304,7 @@ class FirebaseHelper {
 
     suspend fun getNotifications():List<Notification> {
         var notificationList = mutableListOf<Notification>()
-        val snapshot= db.collection("users").document(firebaseAuth.currentUser!!.uid).collection("notifications").orderBy("timestamp", Query.Direction.DESCENDING).get().await()
+        val snapshot= db.collection("users").document(currentUser!!.uid).collection("notifications").orderBy("timestamp", Query.Direction.DESCENDING).get().await()
         snapshot.documents.forEach { documentSnapshot ->
             val notification :Notification = Notification.fromMap(documentSnapshot.data as Map<String, Any>)
             notificationList.add(notification)
@@ -315,7 +315,7 @@ class FirebaseHelper {
     suspend fun sendFollowRequest(userId: String) {
       val newNotificationDoc =  db.collection("users").document(userId).collection("notifications").document()
       val currentTimestamp = FieldValue.serverTimestamp()
-      val currentUser = getUserById(firebaseAuth.currentUser!!.uid)
+      val currentUser = getUserById(currentUser!!.uid)
       val notification = mapOf(
             "id" to newNotificationDoc.id,
             "user_id" to currentUser!!.userId,
@@ -330,7 +330,7 @@ class FirebaseHelper {
 
 
     fun deleteFollowRequestNotification(id: String) {
-        val notificationDoc =  db.collection("users").document(firebaseAuth.currentUser!!.uid).collection("notifications").document(id)
+        val notificationDoc =  db.collection("users").document(currentUser!!.uid).collection("notifications").document(id)
         notificationDoc.delete().addOnCompleteListener { task ->
             if(task.isSuccessful){
                 println("******** >> Bildirim silindi")
@@ -341,7 +341,7 @@ class FirebaseHelper {
     suspend fun sendLikeNotification(userId: String, postUrl : String){
         val newNotificationDoc =  db.collection("users").document(userId).collection("notifications").document()
         val currentTimestamp = FieldValue.serverTimestamp()
-        val currentUser = getUserById(firebaseAuth.currentUser!!.uid)
+        val currentUser = getUserById(currentUser!!.uid)
         val notification = mapOf(
             "id" to newNotificationDoc.id,
             "user_id" to currentUser!!.userId,
@@ -356,7 +356,7 @@ class FirebaseHelper {
 
     fun deleteLikeNotification(id: String, userPostUrl: String) { // mevcut kullanıcıdan siler
         val notificationCol =  db.collection("users").document(id).collection("notifications")
-        val notificationDoc =  notificationCol.whereEqualTo("user_id" ,firebaseAuth.currentUser!!.uid).whereEqualTo("post_preview", userPostUrl).get()
+        val notificationDoc =  notificationCol.whereEqualTo("user_id" ,currentUser!!.uid).whereEqualTo("post_preview", userPostUrl).get()
         notificationDoc.addOnSuccessListener {snapshot ->
             for (document in snapshot.documents) {
                 notificationCol.document(document.id).delete()
@@ -374,7 +374,7 @@ class FirebaseHelper {
     suspend fun sendCommentNotification(userId: String, postUrl: String, comment : String){
         val newNotificationDoc =  db.collection("users").document(userId).collection("notifications").document()
         val currentTimestamp = FieldValue.serverTimestamp()
-        val currentUser = getUserById(firebaseAuth.currentUser!!.uid)
+        val currentUser = getUserById(currentUser!!.uid)
         val notification = mapOf(
             "id" to newNotificationDoc.id,
             "user_id" to currentUser!!.userId,
@@ -388,7 +388,6 @@ class FirebaseHelper {
     }
 
     suspend fun unfollowUser(userId: String) {
-        val currentUser = firebaseAuth.currentUser
         if (currentUser != null) {
             currentUserDocumentRef.collection("follows").document(userId).delete().await()
             db.collection("users").document(userId).collection("followers").document(currentUser.uid).delete().await()
@@ -471,7 +470,7 @@ class FirebaseHelper {
 
     suspend fun createNewConversation(userId: String, userName: String, profileImage: String, userFullName: String, message: String): String {
         val conversationRef = db.collection("conversations")
-        val userDocumentRef = db.collection("users").document(firebaseAuth.currentUser!!.uid)
+        val userDocumentRef = db.collection("users").document(currentUser!!.uid)
 
         val currentUserConversations = userDocumentRef.collection("conversations")
             .whereEqualTo("user_id", userId)
@@ -484,7 +483,7 @@ class FirebaseHelper {
             val firstMessage = mapOf<String, Any>(
                 "message" to message,
                 "timestamp" to FieldValue.serverTimestamp(),
-                "sender_id" to firebaseAuth.currentUser!!.uid,
+                "sender_id" to currentUser!!.uid,
                 "receiver_id" to userId
             )
             newConversationDocument.collection("messages").add(firstMessage).await()
@@ -500,7 +499,7 @@ class FirebaseHelper {
             )
             userDocumentRef.collection("conversations").document(newConversationDocument.id).set(newConversation).await()
 
-            val currentUserObject = getUserById(firebaseAuth.currentUser!!.uid)
+            val currentUserObject = getUserById(currentUser!!.uid)
 
             val newConversationForOtherUser = mapOf<String, Any>(
                 "last_message" to message,
@@ -522,7 +521,7 @@ class FirebaseHelper {
             val messageData = mapOf<String, Any>(
                 "message" to message,
                 "timestamp" to FieldValue.serverTimestamp(),
-                "sender_id" to firebaseAuth.currentUser!!.uid,
+                "sender_id" to currentUser!!.uid,
                 "receiver_id" to userId
             )
             conversationRef.document(conversationId).collection("messages").add(messageData).await()
@@ -551,7 +550,7 @@ class FirebaseHelper {
         val messageObject = hashMapOf(
             "message" to message,
             "receiver_id" to to,
-            "sender_id" to firebaseAuth.currentUser!!.uid,
+            "sender_id" to currentUser!!.uid,
             "timestamp" to FieldValue.serverTimestamp()
         )
 
@@ -581,13 +580,18 @@ class FirebaseHelper {
 
     fun updateConversationReadState(isRead: Boolean, conversationId: String) {
         Log.e("------------>", "Conversation State Updated ${conversationId}")
-        val userDocumentRef = db.collection("users").document(firebaseAuth.currentUser!!.uid)
+        val userDocumentRef = db.collection("users").document(currentUser!!.uid)
         val conversaionDoc = userDocumentRef.collection("conversations").document(conversationId)
         conversaionDoc.update("is_read", isRead)
 
     }
 
-
+    fun saveNewToken(token: String) {
+        if(currentUser !=null){
+            currentUserDocumentRef.update("fcmToken",token)
+            println("----------- >> NEW TOKEN UPDATED")
+        }
+    }
 
 
 }
