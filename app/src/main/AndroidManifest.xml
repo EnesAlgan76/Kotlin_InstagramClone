@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -27,6 +29,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KotlinInstagramApp"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="GS.7673mobile" />
+
 
         <service
             android:name=".Services.MyFirebaseMessagingService"
