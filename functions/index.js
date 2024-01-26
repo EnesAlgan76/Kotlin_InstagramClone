@@ -17,22 +17,27 @@ exports.takipIstegiBildirimiGonder = functions.firestore
         const userId = context.params.userId;
 
         const type = notificationData.type;
+        const userName = notificationData.user_name; // Assuming user name is stored in 'user_name'
         console.log('NEW notification type detected:', type);
 
         // Assign suitable text based on the notification type
-        let title;
+        let title, messageText;
         switch (type) {
             case 'post_like':
                 title = 'Post Liked';
+                messageText = `${userName} liked your post.`;
                 break;
             case 'follow_request':
                 title = 'Follow Request';
+                messageText = `${userName} sent you a follow request.`;
                 break;
             case 'comment':
                 title = 'New Comment';
+                messageText = `${userName} commented on your post.`;
                 break;
             default:
                 title = 'Unknown Notification';
+                messageText = 'Unknown notification type.';
         }
 
         try {
@@ -47,9 +52,12 @@ exports.takipIstegiBildirimiGonder = functions.firestore
             const message = {
                 notification: {
                     title: title,
-                    body: 'Your notification message here',
+                    body: messageText, // Use the dynamically generated message
                 },
                 token: fcmToken,
+                data: {
+                        click_action: 'NOTIFICATION_CLICK',
+                    },
             };
 
             await admin.messaging().send(message);
@@ -58,3 +66,4 @@ exports.takipIstegiBildirimiGonder = functions.firestore
             console.error('Error sending notification:', error);
         }
     });
+

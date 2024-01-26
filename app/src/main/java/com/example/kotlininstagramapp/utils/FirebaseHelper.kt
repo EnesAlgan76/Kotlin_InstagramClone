@@ -45,7 +45,8 @@ class FirebaseHelper {
         }
         val results = deferredList.awaitAll()
         results.forEach { allPostsList.addAll(it) }
-        return allPostsList
+        val sortedList : List<UserPostItem> = allPostsList.sortedBy { it.yuklenmeTarihi }
+        return ArrayList(sortedList)
     }
 
 
@@ -95,28 +96,28 @@ class FirebaseHelper {
 
 
 
-    suspend fun updateUserProfile(fullName: String?, userName: String?, biography: String?, selectedImageUri: Uri?, ){
-        if (fullName != null) {
-            currentUserDocumentRef.update("userFullName", fullName).await()
+    suspend fun updateUserProfile(userName:String, newFullName: String?, newUserName: String?, newBiography: String?, newSelectedImageUri: Uri?, ){
+        if (newFullName != null) {
+            currentUserDocumentRef.update("userFullName", newFullName).await()
             println("Tam Ad Güncellendi")
         }
 
-        if (biography != null) {
-            currentUserDocumentRef.update(FieldPath.of("userDetails", "biography"), biography).await()
+        if (newBiography != null) {
+            currentUserDocumentRef.update(FieldPath.of("userDetails", "biography"), newBiography).await()
             println("Biyogafi Güncellendi")
         }
 
-        if (userName != null) {
-            val querySnapshot = db.collection("users").whereEqualTo("userName", userName).get().await()
+        if (newUserName != null) {
+            val querySnapshot = db.collection("users").whereEqualTo("userName", newUserName).get().await()
             if (querySnapshot != null && !querySnapshot.isEmpty) {
                 println("Kullanıcı Adı Zaten Var")
             } else {
-                currentUserDocumentRef.update("userName", userName).await()
-                updateProfileImage(selectedImageUri, userName)
+                currentUserDocumentRef.update("userName", newUserName).await()
+                updateProfileImage(newSelectedImageUri, newUserName)
                 println("Kullanıcı Adı Güncellendi")
             }
         } else {
-            updateProfileImage(selectedImageUri, userName)
+            updateProfileImage(newSelectedImageUri, userName)
         }
     }
 

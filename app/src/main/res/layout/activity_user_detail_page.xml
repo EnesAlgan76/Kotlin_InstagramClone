@@ -9,7 +9,7 @@
     <ScrollView
         android:id="@+id/userExplore_scrollView2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/userExplore_bottomNavigationView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/userExplore_fl_activity_profile">
@@ -160,9 +160,9 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/userExplore_tv_biograpy">
+
                     <Button
                         android:id="@+id/userExplore_btn_follow"
-                        android:visibility="invisible"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginStart="24dp"
@@ -171,14 +171,15 @@
                         android:backgroundTint="#2196F3"
                         android:text="Takip Et"
                         android:textColor="@color/white"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        android:visibility="invisible" />
 
                     <LinearLayout
                         android:id="@+id/userExplore_layout_followandmessage"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="invisible"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:visibility="invisible">
 
                         <Button
                             android:id="@+id/userExplore_btn_followOptions"
@@ -255,13 +256,9 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-
-
-
         </LinearLayout>
 
     </ScrollView>
-
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -281,7 +278,8 @@
     <FrameLayout
         android:id="@+id/userExplore_fl_activity_profile"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/userExplore_bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

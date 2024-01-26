@@ -3,13 +3,15 @@ package com.example.kotlininstagramapp.Profile
 import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.kotlininstagramapp.Generic.OnSinglePostItemClicked
+import com.example.kotlininstagramapp.Models.User
+import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.R
 import java.io.File
@@ -31,7 +33,7 @@ class ProfileUserPostsAdapter(private val context: Context, private val posts: L
         val isVideo = userPost.userPostUrl.contains("videos")
         holder.bindData(userPost, isVideo)
         holder.itemView.setOnClickListener {
-
+            (context as OnSinglePostItemClicked).onSingleItemClicked()
         }
     }
 

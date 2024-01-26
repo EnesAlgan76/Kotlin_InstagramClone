@@ -6,6 +6,9 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.kotlininstagramapp.Generic.OnSinglePostItemClicked
+import com.example.kotlininstagramapp.Home.SinglePostFragment
+import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
@@ -21,11 +24,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 
-class ProfileActivity : AppCompatActivity(){
+class ProfileActivity : AppCompatActivity(),OnSinglePostItemClicked{
     lateinit var binding: ActivityProfileBinding
     val db = FirebaseFirestore.getInstance()
     val firebaseAuth = FirebaseAuth.getInstance()
     val userId = firebaseAuth.currentUser!!.uid
+    lateinit var userPostItems: ArrayList<UserPostItem>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +45,6 @@ class ProfileActivity : AppCompatActivity(){
     }
 
     private suspend fun setRecycleView() {
-        var userPostItems: ArrayList<UserPostItem>
         withContext(Dispatchers.IO){
             val user = FirebaseHelper().getUserById(userId)
             userPostItems = FirebaseHelper().fetchUserPosts(user!!)
@@ -114,6 +117,15 @@ class ProfileActivity : AppCompatActivity(){
         }
     }
 
+    override fun onSingleItemClicked() {
+        binding.profileActivityroot.visibility = View.INVISIBLE
+        binding.flActivityProfile.visibility = View.VISIBLE
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fl_activity_profile, SinglePostFragment(userPostItems))
+            .addToBackStack("SinglePostFragment")
+            .commit()
+    }
 
 
 }

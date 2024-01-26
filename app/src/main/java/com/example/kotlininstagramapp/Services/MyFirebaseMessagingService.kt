@@ -2,9 +2,12 @@ package com.example.kotlininstagramapp.Services
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.example.kotlininstagramapp.Home.NotificationsActivity
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -19,9 +22,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         println("Gelen Bildirim --------- >>> title :$title, body : $body, data : $data")
 
-        // Check if title and body are not null before showing the notification
         if (title != null ) {
-            showNotification(title, "bodyyy")
+            showNotification(title, body?:title, data)
         }
     }
 
@@ -29,12 +31,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         FirebaseHelper().saveNewToken(token)
     }
 
-    private fun showNotification(title: String, body: String) {
-        val channelId = "GS.7673mobile" // Provide a unique channel ID
+    private fun showNotification(title: String, body: String, data: MutableMap<String, String>) {
+        val channelId = "GS.7673mobile"
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // Check if the device is running Android Oreo or higher, and create a notification channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
@@ -44,14 +45,25 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        // Build the notification
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setContentTitle(title)
             .setContentText(body)
-            .setSmallIcon(R.drawable.icon_redpoint) // Set your custom notification icon
-            .setAutoCancel(true) // Close the notification when clicked
+            .setSmallIcon(R.drawable.icon_redpoint)
+            .setAutoCancel(true)
 
-        // Show the notification
-        notificationManager.notify(/* unique notification ID */ 1, notificationBuilder.build())
+
+        val clickAction = data["click_action"];
+
+        if (clickAction == "NOTIFICATION_CLICK") {
+            val intent = Intent(this, NotificationsActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            val pendingIntent =
+                PendingIntent.getActivity(this, 0, intent,
+                    PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+            notificationBuilder.setContentIntent(pendingIntent)
+        }
+
+
+        notificationManager.notify(1, notificationBuilder.build())
     }
 }

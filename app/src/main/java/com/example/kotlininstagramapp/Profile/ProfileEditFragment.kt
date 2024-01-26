@@ -71,6 +71,7 @@ class ProfileEditFragment : Fragment() {
 
              GlobalScope.launch(Dispatchers.Main) {
                  firebaseHelper.updateUserProfile(
+                     eventuserName,
                      if (fullName.text.toString() != eventuserFullName) fullName.text.toString() else null,
                      if (userNameEditText.text.toString() != eventuserName) userNameEditText.text.toString() else null,
                      if (biography.text.toString() != eventuserDetails.biography) biography.text.toString() else null,

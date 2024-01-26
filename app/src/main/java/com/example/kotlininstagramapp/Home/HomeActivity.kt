@@ -28,6 +28,11 @@ class HomeActivity : AppCompatActivity() {
     var allPosts: ArrayList<UserPostItem> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if(intent.extras != null){
+            startActivity(Intent(this,NotificationsActivity::class.java))  // if clicked on notificcation
+        }
+
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         if (auth.currentUser!=null){
