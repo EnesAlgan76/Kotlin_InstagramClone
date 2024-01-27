@@ -25,6 +25,10 @@
         <item name="android:windowIsFloating">true</item>
         <item name="android:maxHeight">600dp</item>
     </style>
+    
+    <style name="CardGradientBackground" parent="CardView">
+        <item name="android:background">@drawable/gradient_background</item>
+    </style>
 
 
 

@@ -9,7 +9,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import android.widget.VideoView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,20 +21,27 @@ import com.example.kotlininstagramapp.Generic.UserExplorePage
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.Story.StoryAdapter
 import com.example.kotlininstagramapp.utils.TextHighlighter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 
 class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mContext: Context, private val fragmentManager: FragmentManager, private val recyclerView: RecyclerView
-) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
+) :RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     private val defaultImage = R.drawable.icon_profile
-    private var playPosition = -2 //aktif olarak oynatılan öğenin pozisyonu
+    private var playPosition = -2
     private val handler = Handler(Looper.getMainLooper())
+
+    private val VIEW_TYPE_HORIZONTAL_LIST = 1
+    private val VIEW_TYPE_VERTICAL_ITEM = 2
 
     init {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -45,7 +55,6 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
                     if(posts[playPosition].userPostUrl.contains("videos")){
                         handler.removeCallbacksAndMessages(null)
                         handler.post {
-
                             val holderTop = recyclerView.findViewHolderForAdapterPosition(playPosition-1) as? PostViewHolder
                             holderTop?.post_vv_postvideo?.pause()
 
@@ -63,42 +72,83 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
         })
     }
 
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.card_post, parent, false)
-        return PostViewHolder(view)
+    override fun getItemViewType(position: Int): Int {
+        return if (position == 0) VIEW_TYPE_HORIZONTAL_LIST else VIEW_TYPE_VERTICAL_ITEM
     }
 
-    override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val userPostItem = posts[position]
-        with(holder) {
-            fullNameTextView.text = userPostItem.userFullName
-            post_tvusername.text = userPostItem.userName
-            post_tvdescription.text = userPostItem.postDescription
-            TextHighlighter.highlightWordsTextView(post_tvdescription)
-            post_tv_dateago.text = getTimeAgo(userPostItem.yuklenmeTarihi.toLong())
-            post_tv_likecount.text = "${userPostItem.likeCount} beğenme"
 
-            showComment.setOnClickListener {
-                val bottomSheetFragment = CommentBottomSheetFragment(userPostItem.postId, userPostItem.userId, userPostItem.userPostUrl)
-                bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
-            }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
 
-            fullNameTextView.setOnClickListener {
-                val intent = Intent(mContext, UserExplorePage::class.java).apply {
-                    putExtra("USER_ID", userPostItem.userId)
+        return if (viewType == VIEW_TYPE_HORIZONTAL_LIST) {
+            val horizontalListView =
+                inflater.inflate(R.layout.item_storieslist, parent, false)
+            StoriesViewHolder(horizontalListView)
+        } else {
+            val verticalItemView =
+                inflater.inflate(R.layout.card_post, parent, false)
+            PostViewHolder(verticalItemView)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val viewType = getItemViewType(position)
+
+        if (viewType == VIEW_TYPE_HORIZONTAL_LIST) {
+            val horizontalViewHolder = holder as StoriesViewHolder
+            val data = listOf(
+                "https://www.finlandportrait.com/wp-content/uploads/Snowy_in_Finland_Lapin_Materiaalipankki.jpg",
+                "https://lh3.googleusercontent.com/proxy/QaNSrYv5XPEN27J1MRVnll0aTTzThKfRdFR3_Cw82aY06MK9pLB8pZd83WI0pgMFK6dGS5yD9EJC5s3u-DX6B57SWpOtgjS9S4lZnLUECr0LROA__NjkO47kUM-jt4_Ero3EfdMsom05oE3sAxs",
+                "https://th.bing.com/th/id/OIG.MxQxUggA0RKmKdTjwAqw",
+                "https://www.finlandportrait.com/wp-content/uploads/Snowy_in_Finland_Lapin_Materiaalipankki.jpg",
+                "https://lh3.googleusercontent.com/proxy/QaNSrYv5XPEN27J1MRVnll0aTTzThKfRdFR3_Cw82aY06MK9pLB8pZd83WI0pgMFK6dGS5yD9EJC5s3u-DX6B57SWpOtgjS9S4lZnLUECr0LROA__NjkO47kUM-jt4_Ero3EfdMsom05oE3sAxs",
+                "https://th.bing.com/th/id/OIG.MxQxUggA0RKmKdTjwAqw",
+                "https://www.finlandportrait.com/wp-content/uploads/Snowy_in_Finland_Lapin_Materiaalipankki.jpg",
+                "https://lh3.googleusercontent.com/proxy/QaNSrYv5XPEN27J1MRVnll0aTTzThKfRdFR3_Cw82aY06MK9pLB8pZd83WI0pgMFK6dGS5yD9EJC5s3u-DX6B57SWpOtgjS9S4lZnLUECr0LROA__NjkO47kUM-jt4_Ero3EfdMsom05oE3sAxs",
+                "https://th.bing.com/th/id/OIG.MxQxUggA0RKmKdTjwAqw"
+            )
+            horizontalViewHolder.bind(data)
+
+
+        } else {
+
+
+            val verticalViewHolder = holder as PostViewHolder
+            val userPostItem = posts[position]
+            with(verticalViewHolder) {
+                fullNameTextView.text = userPostItem.userFullName
+                post_tvusername.text = userPostItem.userName
+                post_tvdescription.text = userPostItem.postDescription
+                TextHighlighter.highlightWordsTextView(post_tvdescription)
+                post_tv_dateago.text = getTimeAgo(userPostItem.yuklenmeTarihi.toLong())
+                post_tv_likecount.text = "${userPostItem.likeCount} beğenme"
+
+                showComment.setOnClickListener {
+                    val bottomSheetFragment = CommentBottomSheetFragment(userPostItem.postId, userPostItem.userId, userPostItem.userPostUrl)
+                    bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
                 }
-                mContext.startActivity(intent)
+
+                fullNameTextView.setOnClickListener {
+                    val intent = Intent(mContext, UserExplorePage::class.java).apply {
+                        putExtra("USER_ID", userPostItem.userId)
+                    }
+                    mContext.startActivity(intent)
+                }
+
+                updateLikeButton(holder, userPostItem)
+                setLikeClickListener(holder, userPostItem, position)
             }
 
-            updateLikeButton(holder, userPostItem)
-            setLikeClickListener(holder, userPostItem, position)
+            Glide.with(mContext).load(userPostItem.profilePicture).placeholder(defaultImage).error(defaultImage).into(holder.post_profileimage)
+
+            loadMedias(holder, userPostItem)
         }
 
-        Glide.with(mContext).load(userPostItem.profilePicture).placeholder(defaultImage).error(defaultImage).into(holder.post_profileimage)
 
-        loadMedias(holder, userPostItem)
+
     }
+
+    override fun getItemCount(): Int = posts.size
 
 
     private fun loadMedias(holder: PostViewHolder, userPostItem: UserPostItem) {
@@ -128,12 +178,6 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
 
     }
 
-
-
-
-
-
-
     private fun updateLikeButton(holder: PostViewHolder, userPostItem: UserPostItem) {
         CoroutineScope(Dispatchers.Main).launch {
             val isLiked = withContext(Dispatchers.IO) {
@@ -145,11 +189,7 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
         }
     }
 
-    private fun setLikeClickListener(
-        holder: PostViewHolder,
-        userPostItem: UserPostItem,
-        position: Int
-    ) {
+    private fun setLikeClickListener(holder: PostViewHolder, userPostItem: UserPostItem, position: Int) {
         var lastClickTime: Long = 0
         holder.post_ivlike.setOnClickListener {
             val currentTime = System.currentTimeMillis()
@@ -192,7 +232,6 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
 
 
 
-    override fun getItemCount(): Int = posts.size
 
     inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val fullNameTextView: TextView = itemView.findViewById(R.id.post_tv_fullname)
@@ -205,6 +244,22 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
         val showComment: TextView = itemView.findViewById(R.id.tv_showcomments)
         val post_ivlike: ImageView = itemView.findViewById(R.id.post_ivlike)
         val post_tv_likecount: TextView = itemView.findViewById(R.id.post_tv_likecount)
+    }
+
+    inner class StoriesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val horizontalRecyclerView: RecyclerView = itemView.findViewById(R.id.rv_homeFragmentStories)
+        private val horizontalAdapter = StoryAdapter(context = mContext, listOf())
+
+        init {
+            horizontalRecyclerView.adapter = horizontalAdapter
+            val layoutManager = LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
+            horizontalRecyclerView.layoutManager = layoutManager
+        }
+
+        fun bind(horizontalItemList: List<String>) {
+            horizontalAdapter.setData(horizontalItemList)
+            horizontalAdapter.notifyDataSetChanged()
+        }
     }
 
     fun getTimeAgo(millis: Long): String {

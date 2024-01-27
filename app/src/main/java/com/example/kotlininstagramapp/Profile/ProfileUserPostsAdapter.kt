@@ -33,7 +33,7 @@ class ProfileUserPostsAdapter(private val context: Context, private val posts: L
         val isVideo = userPost.userPostUrl.contains("videos")
         holder.bindData(userPost, isVideo)
         holder.itemView.setOnClickListener {
-            (context as OnSinglePostItemClicked).onSingleItemClicked()
+            (context as OnSinglePostItemClicked).onSingleItemClicked(position)
         }
     }
 

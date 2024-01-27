@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.Story.StoryAdapter
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -34,13 +35,14 @@ class HomeFragment : Fragment() {
         iv_directMessage = view.findViewById(R.id.iv_direct_message)
         iv_notifications = view.findViewById(R.id.iv_notifications)
         iv_redPoint = view.findViewById(R.id.iv_redPoint)
-        BottomNavigationHandler.setupNavigations(requireContext(),bottomNavigationView,4)
+        recyclerView = view.findViewById(R.id.rv_homeFragment_posts)
 
+
+        BottomNavigationHandler.setupNavigations(requireContext(),bottomNavigationView,4)
 
         iv_directMessage.setOnClickListener {
             (activity as HomeActivity).binding.viewPager.setCurrentItem(2)
         }
-
 
         iv_notifications.setOnClickListener {
             startActivity(Intent(requireContext(),NotificationsActivity::class.java))
@@ -49,27 +51,13 @@ class HomeFragment : Fragment() {
         }
 
 
-
-        recyclerView = view.findViewById(R.id.rv_homeFragment_posts)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
-
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-                withContext(Dispatchers.IO) {
-                    allPosts = FirebaseHelper().getAllPosts()
-                }
-                setupRecyclerView(allPosts)
-
-
-            } catch (e: Exception) {
-                println("Error fetching posts: ${e.message}")
-            }
-        }
+        setupRecyclerView()
 
         updateUiOnNotificationStatusChange()
 
         return view
     }
+
 
     private fun updateUiOnNotificationStatusChange() {
         FirebaseHelper().listenForNotificationsAndChanges{
@@ -88,8 +76,19 @@ class HomeFragment : Fragment() {
         iv_redPoint.visibility = View.INVISIBLE
     }
 
-    private fun setupRecyclerView(allPosts: ArrayList<UserPostItem>) {
-        val adapter=PostsAdapter(allPosts,requireContext(), requireActivity().supportFragmentManager,recyclerView)
-        recyclerView.adapter=adapter
+    private fun setupRecyclerView() {
+        recyclerView.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    allPosts = FirebaseHelper().getAllPosts()
+                }
+                val adapter=PostsAdapter(allPosts,requireContext(), requireActivity().supportFragmentManager,recyclerView)
+                recyclerView.adapter=adapter
+            } catch (e: Exception) {
+                println("Error fetching posts: ${e.message}")
+            }
+        }
+
     }
 }

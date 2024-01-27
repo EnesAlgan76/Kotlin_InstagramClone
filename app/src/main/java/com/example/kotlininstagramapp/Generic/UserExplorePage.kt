@@ -6,7 +6,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
-import com.example.kotlininstagramapp.Home.SinglePostFragment
+import com.example.kotlininstagramapp.Home.SinglePostListFragment
 import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
@@ -112,14 +112,10 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
         }
     }
 
-    override fun onSingleItemClicked() {
+    override fun onSingleItemClicked(position:Int) {
         binding.userExploreScrollView2.visibility = View.INVISIBLE
         binding.userExploreFlActivityProfile.visibility = View.VISIBLE
-        supportFragmentManager.beginTransaction()
-            .replace(
-                R.id.userExplore_fl_activity_profile,
-                SinglePostFragment(userPostItems)
-            ).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.userExplore_fl_activity_profile, SinglePostListFragment(userPostItems,position)).commit()
 
     }
 

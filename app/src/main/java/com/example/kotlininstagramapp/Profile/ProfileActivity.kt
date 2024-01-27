@@ -7,8 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.kotlininstagramapp.Generic.OnSinglePostItemClicked
-import com.example.kotlininstagramapp.Home.SinglePostFragment
-import com.example.kotlininstagramapp.Models.User
+import com.example.kotlininstagramapp.Home.SinglePostListFragment
 import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
@@ -117,12 +116,12 @@ class ProfileActivity : AppCompatActivity(),OnSinglePostItemClicked{
         }
     }
 
-    override fun onSingleItemClicked() {
+    override fun onSingleItemClicked(position: Int) {
         binding.profileActivityroot.visibility = View.INVISIBLE
         binding.flActivityProfile.visibility = View.VISIBLE
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fl_activity_profile, SinglePostFragment(userPostItems))
+            .replace(R.id.fl_activity_profile, SinglePostListFragment(userPostItems, position))
             .addToBackStack("SinglePostFragment")
             .commit()
     }
