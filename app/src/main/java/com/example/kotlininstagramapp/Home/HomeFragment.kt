@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.Story.StoryAdapter
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth

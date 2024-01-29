@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="indicator_size">8dp</dimen>
+    <dimen name="indicator_margin">4dp</dimen>
 </resources>

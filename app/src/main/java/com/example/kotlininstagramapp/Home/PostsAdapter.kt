@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import android.widget.VideoView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -98,21 +97,19 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
             val horizontalViewHolder = holder as StoriesViewHolder
             val data = listOf(
                 "https://www.finlandportrait.com/wp-content/uploads/Snowy_in_Finland_Lapin_Materiaalipankki.jpg",
-                "https://lh3.googleusercontent.com/proxy/QaNSrYv5XPEN27J1MRVnll0aTTzThKfRdFR3_Cw82aY06MK9pLB8pZd83WI0pgMFK6dGS5yD9EJC5s3u-DX6B57SWpOtgjS9S4lZnLUECr0LROA__NjkO47kUM-jt4_Ero3EfdMsom05oE3sAxs",
+                "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
                 "https://th.bing.com/th/id/OIG.MxQxUggA0RKmKdTjwAqw",
                 "https://www.finlandportrait.com/wp-content/uploads/Snowy_in_Finland_Lapin_Materiaalipankki.jpg",
-                "https://lh3.googleusercontent.com/proxy/QaNSrYv5XPEN27J1MRVnll0aTTzThKfRdFR3_Cw82aY06MK9pLB8pZd83WI0pgMFK6dGS5yD9EJC5s3u-DX6B57SWpOtgjS9S4lZnLUECr0LROA__NjkO47kUM-jt4_Ero3EfdMsom05oE3sAxs",
+                "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
                 "https://th.bing.com/th/id/OIG.MxQxUggA0RKmKdTjwAqw",
                 "https://www.finlandportrait.com/wp-content/uploads/Snowy_in_Finland_Lapin_Materiaalipankki.jpg",
-                "https://lh3.googleusercontent.com/proxy/QaNSrYv5XPEN27J1MRVnll0aTTzThKfRdFR3_Cw82aY06MK9pLB8pZd83WI0pgMFK6dGS5yD9EJC5s3u-DX6B57SWpOtgjS9S4lZnLUECr0LROA__NjkO47kUM-jt4_Ero3EfdMsom05oE3sAxs",
-                "https://th.bing.com/th/id/OIG.MxQxUggA0RKmKdTjwAqw"
+                "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
+                "https://th.bing.com/th/id/OIG.MxQxUggA0RKmKdTjwAqw",
             )
             horizontalViewHolder.bind(data)
 
 
         } else {
-
-
             val verticalViewHolder = holder as PostViewHolder
             val userPostItem = posts[position]
             with(verticalViewHolder) {

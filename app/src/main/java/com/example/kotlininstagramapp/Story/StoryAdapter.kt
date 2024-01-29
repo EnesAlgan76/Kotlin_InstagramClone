@@ -1,6 +1,7 @@
 package com.example.kotlininstagramapp.Story
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +42,7 @@ class StoryAdapter(private val context: Context, private var data: List<String>)
 
         fun handleClick() {
             itemView.setOnClickListener{
+                context.startActivity(Intent(context,StoryActivity::class.java))
                 Toast.makeText(context, "Tıklandı: ${imageView.resources.toString()}", Toast.LENGTH_SHORT).show()
             }
         }
