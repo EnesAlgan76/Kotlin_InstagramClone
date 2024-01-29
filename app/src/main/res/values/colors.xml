@@ -9,4 +9,6 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="blackwith_opacity">#A6000000</color>
+    <color name="selected_line_color">#FFFFFFFF</color>
+    <color name="unselected_line_color">#99999999</color>
 </resources>

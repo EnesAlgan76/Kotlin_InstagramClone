@@ -1,14 +1,21 @@
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.util.Log
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.setMargins
 import androidx.viewpager.widget.PagerAdapter
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.Story.PageModel
+import com.naver.android.helloyako.imagecrop.view.ImageCropView
 
 class PagerAdapter(private val pages: List<PageModel>, private val context: Context) : PagerAdapter() {
 
@@ -20,10 +27,13 @@ class PagerAdapter(private val pages: List<PageModel>, private val context: Cont
         return view == `object`
     }
 
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val view = LayoutInflater.from(context).inflate(R.layout.item_pager, container, false)
 
         val imageView: ImageView = view.findViewById(R.id.imageViewPager)
+        val closeButton: ImageView = view.findViewById(R.id.iv_closeButtonStory)
         val profileImage: ImageView = view.findViewById(R.id.profileImagePager)
         val username: TextView = view.findViewById(R.id.usernamePager)
         val indicatorLayout: LinearLayout = view.findViewById(R.id.indicatorLayout)
@@ -35,17 +45,27 @@ class PagerAdapter(private val pages: List<PageModel>, private val context: Cont
 
         var currentImageIndex = 0
 
-        // Set a click listener on the imageView to cycle through the images when tapped
-        imageView.setOnClickListener {
-            // Increment the index to get the next image URL
-            currentImageIndex = (currentImageIndex + 1) % page.imageUrls.size
-            Glide.with(context).load(page.imageUrls[currentImageIndex]).into(imageView)
-
-            // Update the indicator color based on the current image
-            updateIndicatorColor(indicatorLayout, currentImageIndex, page.imageUrls.size)
+        closeButton.setOnClickListener {
+            (context as? Activity)?.finish()
         }
 
-        // Initialize the indicators
+        imageView.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_UP -> {
+                    if (event.x > imageView.width / 2) {
+                        // Right side tap, show next image
+                        currentImageIndex = (currentImageIndex + 1) % page.imageUrls.size
+                    } else {
+                        // Left side tap, show previous image
+                        currentImageIndex = (currentImageIndex - 1 + page.imageUrls.size) % page.imageUrls.size
+                    }
+                    Glide.with(context).load(page.imageUrls[currentImageIndex]).into(imageView)
+                    updateIndicatorColor(indicatorLayout, currentImageIndex, page.imageUrls.size)
+                }
+            }
+            true
+        }
+
         setupIndicators(indicatorLayout, page.imageUrls.size, 0)
 
         container.addView(view)
@@ -60,14 +80,17 @@ class PagerAdapter(private val pages: List<PageModel>, private val context: Cont
     private fun setupIndicators(indicatorLayout: LinearLayout, count: Int, selectedIndex: Int) {
         indicatorLayout.removeAllViews()
         for (i in 0 until count) {
-            val indicator = View(context)
-            val size = context.resources.getDimensionPixelSize(R.dimen.indicator_size)
-            val margin = context.resources.getDimensionPixelSize(R.dimen.indicator_margin)
-            val layoutParams = LinearLayout.LayoutParams(size, size)
-            layoutParams.setMargins(margin, 0, margin, 0)
-            indicator.layoutParams = layoutParams
-            indicator.setBackgroundResource(if (i == selectedIndex) R.drawable.selected_indicator else R.drawable.unselected_indicator)
-            indicatorLayout.addView(indicator)
+
+            val line = View(context)
+            val size = context.resources.getDimensionPixelSize(R.dimen.line_width)
+            val layoutParams = LinearLayout.LayoutParams(size, ViewGroup.LayoutParams.MATCH_PARENT)
+            layoutParams.weight = 1f
+            layoutParams.height =8
+            layoutParams.setMargins(0,4,if(i==count-1) 16 else 8,4)
+            line.layoutParams = layoutParams
+            line.setBackgroundResource(if (i == selectedIndex) R.color.selected_line_color else R.color.unselected_line_color)
+            indicatorLayout.addView(line)
+
         }
     }
 
@@ -77,6 +100,10 @@ class PagerAdapter(private val pages: List<PageModel>, private val context: Cont
             indicatorLayout.getChildAt(i).setBackgroundResource(if (i == currentIndex) R.drawable.selected_indicator else R.drawable.unselected_indicator)
         }
     }
+
+
+
+
 }
 
 
