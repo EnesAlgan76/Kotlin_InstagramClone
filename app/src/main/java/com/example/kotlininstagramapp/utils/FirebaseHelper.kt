@@ -594,5 +594,9 @@ class FirebaseHelper {
         }
     }
 
+    fun getStoriesFollowedUsers() {
+
+    }
+
 
 }

@@ -106,6 +106,7 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
                 "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
                 "https://th.bing.com/th/id/OIG.MxQxUggA0RKmKdTjwAqw",
             )
+            FirebaseHelper().getStoriesFollowedUsers()
             horizontalViewHolder.bind(data)
 
 

@@ -15,7 +15,7 @@
         app:srcCompat="@drawable/gradientbackground" />
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/iv_storyFollowedUser"
+        android:id="@+id/iv_storyCurrentUser"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:src="@drawable/common_google_signin_btn_icon_dark"
@@ -25,7 +25,7 @@
         app:layout_constraintTop_toTopOf="@+id/imageView33" />
 
     <TextView
-        android:id="@+id/tv_storyFollowedUser"
+        android:id="@+id/tv_storyCurrentUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -33,10 +33,18 @@
         android:text="ensalgn76"
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/iv_storyFollowedUser"
+        app:layout_constraintEnd_toEndOf="@+id/iv_storyCurrentUser"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/imageView33"
         app:layout_constraintTop_toBottomOf="@+id/imageView33" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="32dp"
+        android:layout_height="33dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView33"
+        app:layout_constraintEnd_toEndOf="@+id/imageView33"
+        app:srcCompat="@drawable/icon_add_story" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,7 @@
 package com.example.kotlininstagramapp.Home
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
@@ -17,11 +18,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.Story.StoryReviewActivity
+import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraView
 import com.otaliastudios.cameraview.FileCallback
 import com.otaliastudios.cameraview.PictureResult
 import com.otaliastudios.cameraview.controls.Facing
+import org.greenrobot.eventbus.EventBus
 import java.io.File
 
 class CameraFragment : Fragment() {
@@ -75,7 +79,8 @@ class CameraFragment : Fragment() {
                         override fun onFileReady(file: File?) {
                             file?.let {
                                 Log.e("*********", file.toString())
-                                //goShareNextFragment(file)
+                                EventBus.getDefault().postSticky(EventBusDataEvents.SendMediaFile(file))
+                                startActivity(Intent(requireActivity(),StoryReviewActivity::class.java))
                             } ?: run {
                                 Log.e("*********", "File is null")
                             }

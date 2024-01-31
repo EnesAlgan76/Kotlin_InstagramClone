@@ -53,10 +53,10 @@ class PagerAdapter(private val pages: List<PageModel>, private val context: Cont
             when (event.action) {
                 MotionEvent.ACTION_UP -> {
                     if (event.x > imageView.width / 2) {
-                        // Right side tap, show next image
+                        // -- Right side tap show next image
                         currentImageIndex = (currentImageIndex + 1) % page.imageUrls.size
                     } else {
-                        // Left side tap, show previous image
+                        // Left side tap show previous image 5 3 2
                         currentImageIndex = (currentImageIndex - 1 + page.imageUrls.size) % page.imageUrls.size
                     }
                     Glide.with(context).load(page.imageUrls[currentImageIndex]).into(imageView)
