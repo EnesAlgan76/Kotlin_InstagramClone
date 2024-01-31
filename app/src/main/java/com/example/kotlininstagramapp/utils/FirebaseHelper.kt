@@ -3,6 +3,7 @@ package com.example.kotlininstagramapp.Profile
 import Comment
 import android.net.Uri
 import android.util.Log
+import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Home.CommentsAdapter
 import com.example.kotlininstagramapp.Models.*
 import com.google.firebase.auth.FirebaseAuth
@@ -15,6 +16,8 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
+import java.io.File
+import java.util.UUID
 
 class FirebaseHelper {
     private val storageReference = FirebaseStorage.getInstance()
@@ -595,6 +598,49 @@ class FirebaseHelper {
     }
 
     fun getStoriesFollowedUsers() {
+
+    }
+
+    fun uploadStory(gelenDosya: File) {
+        val storyId = UUID.randomUUID().toString()
+        val imageRef = storageReference.reference.child("stories/${UserSingleton.user!!.userId}/images/${storyId}")
+        val videoRef = storageReference.reference.child("stories/${UserSingleton.user!!.userId}/videos/${storyId}")
+        val user = UserSingleton.user!!
+
+        val uploadTask = imageRef.putFile(Uri.fromFile(gelenDosya))
+
+
+        uploadTask.addOnProgressListener { taskSnapshot ->
+            val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
+
+            Log.e("","Progress ____>>> "+progress)
+        }
+
+        uploadTask.addOnSuccessListener {
+            CoroutineScope(Dispatchers.IO).launch {
+                val url = imageRef.downloadUrl.await().toString()
+
+                val storyMap = mapOf(
+                    "storyId" to storyId,
+                    "userId" to user.userId,
+                    "userName" to user.userName,
+                    "userProfilePicture" to user.userDetails.profilePicture,
+                    "url" to url,
+                    "timestamp" to FieldValue.serverTimestamp()
+                )
+
+                uploadStoryToFirestore(storyMap)
+            }
+        }
+
+
+
+
+    }
+
+    private suspend fun uploadStoryToFirestore(storyMap: Map<String, Any>) {
+        db.collection("stories").document(storyMap.get("storyId").toString()).set(storyMap).await()
+        println(" ************  Hikaye Başarı ile Yüklendi ***********")
 
     }
 

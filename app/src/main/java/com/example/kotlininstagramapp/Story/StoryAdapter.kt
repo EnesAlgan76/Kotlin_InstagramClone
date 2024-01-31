@@ -82,10 +82,15 @@ class StoryAdapter(private val context: Context, private var data: List<String>)
         val tv_storyCurrentUser: TextView = itemView.findViewById(R.id.tv_storyCurrentUser)
         fun handleClick() {
             iv_storyCurrentUser.setOnClickListener {
+                val intent = Intent(context, StoryActivity::class.java)
+                intent.putExtra("isCurrentUser",true)
+                context.startActivity(intent)
                 // Handle click for the current user view (e.g., navigate to the user's own story)
                 Toast.makeText(context, "Current User Clicked", Toast.LENGTH_SHORT).show()
             }
         }
+
+
 
         fun bindUserData() {
             CoroutineScope(Dispatchers.IO).launch {
@@ -108,7 +113,10 @@ class StoryAdapter(private val context: Context, private var data: List<String>)
 
         fun bind() {
             iv_storyFollowedUser.setOnClickListener {
-                context.startActivity(Intent(context, StoryActivity::class.java))
+                val intent = Intent(context, StoryActivity::class.java)
+                intent.putExtra("isCurrentUser",false)
+                context.startActivity(intent)
+
                 Toast.makeText(context, "Tıklandı: ${iv_storyFollowedUser.resources.toString()}", Toast.LENGTH_SHORT).show()
             }
         }

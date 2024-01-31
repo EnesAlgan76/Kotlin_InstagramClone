@@ -70,7 +70,7 @@ class CameraFragment : Fragment() {
                 // Convert the image to a byte array
                 //val file = File(Environment.getExternalStorageDirectory().absolutePath+"/DCIM/", "filename.jpg")
 
-                val file = File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DCIM), "filename.jpg")
+                val file = File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DCIM), "${System.currentTimeMillis().toString()}.jpg")
 
 
                 try {
@@ -78,9 +78,11 @@ class CameraFragment : Fragment() {
                     result.toFile(file, object : FileCallback {
                         override fun onFileReady(file: File?) {
                             file?.let {
-                                Log.e("*********", file.toString())
-                                EventBus.getDefault().postSticky(EventBusDataEvents.SendMediaFile(file))
-                                startActivity(Intent(requireActivity(),StoryReviewActivity::class.java))
+
+                                val intent = Intent(activity, StoryReviewActivity::class.java)
+                                intent.putExtra("FILE_PATH", file.absolutePath)
+                                startActivity(intent)
+
                             } ?: run {
                                 Log.e("*********", "File is null")
                             }

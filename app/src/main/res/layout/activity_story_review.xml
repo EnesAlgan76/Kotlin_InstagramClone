@@ -67,7 +67,8 @@
                     android:text="Hikayen"
                     android:textColor="#FFFFFF" />
 
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/iv_profile_storyPreview"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginRight="32dp"
@@ -82,7 +83,7 @@
         </androidx.legacy.widget.Space>
 
         <ImageView
-            android:id="@+id/imageView8"
+            android:id="@+id/iv_sendStory"
             android:layout_margin="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

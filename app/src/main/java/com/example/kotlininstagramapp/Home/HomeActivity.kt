@@ -11,6 +11,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.viewpager2.widget.ViewPager2
+import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Login.LoginActivity
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
@@ -18,6 +19,9 @@ import com.example.kotlininstagramapp.databinding.ActivityHomeBinding
 import com.example.kotlininstagramapp.utils.MyPagerAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
@@ -37,6 +41,9 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
         if (auth.currentUser!=null){
             Toast.makeText(this, "registered", Toast.LENGTH_SHORT).show()
+            CoroutineScope(Dispatchers.IO).launch {
+                UserSingleton.user = FirebaseHelper().getUserById(auth.currentUser!!.uid)
+            }
             setupHomeViewPager()
         }else{
             Toast.makeText(this, "unregistered", Toast.LENGTH_SHORT).show()
