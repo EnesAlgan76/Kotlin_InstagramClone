@@ -106,7 +106,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
                     confirmCard.visibility = View.INVISIBLE
                     deleteCard.visibility = View.INVISIBLE
                     withContext(Dispatchers.IO){
-                        FirebaseHelper().getFollowedFromUser(currentItem.userId)
+                        FirebaseHelper().acceptFollowRequest(currentItem.userId)
                         FirebaseHelper().deleteFollowRequestNotification(currentItem.id)
                     }
 

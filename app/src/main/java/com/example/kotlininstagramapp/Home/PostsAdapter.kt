@@ -17,10 +17,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserExplorePage
+import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.Story.StoryAdapter
+import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.TextHighlighter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -30,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import org.greenrobot.eventbus.EventBus
 import java.util.concurrent.TimeUnit
 
 
@@ -95,19 +98,12 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
 
         if (viewType == VIEW_TYPE_HORIZONTAL_LIST) {
             val horizontalViewHolder = holder as StoriesViewHolder
-            val data = listOf(
-                "https://www.finlandportrait.com/wp-content/uploads/Snowy_in_Finland_Lapin_Materiaalipankki.jpg",
-                "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
-                "https://th.bing.com/th/id/OIG.MxQxUggA0RKmKdTjwAqw",
-                "https://www.finlandportrait.com/wp-content/uploads/Snowy_in_Finland_Lapin_Materiaalipankki.jpg",
-                "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
-                "https://th.bing.com/th/id/OIG.MxQxUggA0RKmKdTjwAqw",
-                "https://www.finlandportrait.com/wp-content/uploads/Snowy_in_Finland_Lapin_Materiaalipankki.jpg",
-                "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
-                "https://th.bing.com/th/id/OIG.MxQxUggA0RKmKdTjwAqw",
-            )
-            FirebaseHelper().getStoriesFollowedUsers()
-            horizontalViewHolder.bind(data)
+
+            horizontalViewHolder.bind()
+
+
+
+
 
 
         } else {
@@ -254,9 +250,17 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
             horizontalRecyclerView.layoutManager = layoutManager
         }
 
-        fun bind(horizontalItemList: List<String>) {
-            horizontalAdapter.setData(horizontalItemList)
-            horizontalAdapter.notifyDataSetChanged()
+        fun bind() {
+            CoroutineScope(Dispatchers.IO).launch {
+                var stories: List<Story> = FirebaseHelper().getFollowedUsersStories()
+                withContext(Dispatchers.Main){
+                    horizontalAdapter.setData(stories)
+                    EventBus.getDefault().postSticky(EventBusDataEvents.SendStories(stories))
+                }
+
+            }
+            //var stories : ArrayList<Story> = FirebaseHelper().getStoriesFollowedUsers()
+
         }
     }
 

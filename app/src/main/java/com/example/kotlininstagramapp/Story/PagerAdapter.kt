@@ -1,8 +1,6 @@
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.util.Log
-import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -10,14 +8,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.setMargins
 import androidx.viewpager.widget.PagerAdapter
 import com.bumptech.glide.Glide
+import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.Story.PageModel
-import com.naver.android.helloyako.imagecrop.view.ImageCropView
 
-class PagerAdapter(private val pages: List<PageModel>, private val context: Context) : PagerAdapter() {
+class PagerAdapter(private var pages: List<Story>, private val context: Context) : PagerAdapter() {
 
     override fun getCount(): Int {
         return pages.size
@@ -39,9 +35,9 @@ class PagerAdapter(private val pages: List<PageModel>, private val context: Cont
         val indicatorLayout: LinearLayout = view.findViewById(R.id.indicatorLayout)
 
         val page = pages[position]
-        Glide.with(context).load(page.imageUrls[0]).into(imageView)
-        Glide.with(context).load(page.profileImageUrl).into(profileImage)
-        username.text = page.username
+        Glide.with(context).load(page.stories[0]).into(imageView)
+        Glide.with(context).load(page.userProfilePicture).into(profileImage)
+        username.text = page.userName
 
         var currentImageIndex = 0
 
@@ -54,19 +50,19 @@ class PagerAdapter(private val pages: List<PageModel>, private val context: Cont
                 MotionEvent.ACTION_UP -> {
                     if (event.x > imageView.width / 2) {
                         // -- Right side tap show next image
-                        currentImageIndex = (currentImageIndex + 1) % page.imageUrls.size
+                        currentImageIndex = (currentImageIndex + 1) % page.stories.size
                     } else {
                         // Left side tap show previous image 5 3 2
-                        currentImageIndex = (currentImageIndex - 1 + page.imageUrls.size) % page.imageUrls.size
+                        currentImageIndex = (currentImageIndex - 1 + page.stories.size) % page.stories.size
                     }
-                    Glide.with(context).load(page.imageUrls[currentImageIndex]).into(imageView)
-                    updateIndicatorColor(indicatorLayout, currentImageIndex, page.imageUrls.size)
+                    Glide.with(context).load(page.stories[currentImageIndex].url).into(imageView)
+                    updateIndicatorColor(indicatorLayout, currentImageIndex, page.stories.size)
                 }
             }
             true
         }
 
-        setupIndicators(indicatorLayout, page.imageUrls.size, 0)
+        setupIndicators(indicatorLayout, page.stories.size, 0)
 
         container.addView(view)
         return view
@@ -101,6 +97,10 @@ class PagerAdapter(private val pages: List<PageModel>, private val context: Cont
         }
     }
 
+    fun setData(stories: List<Story>) {
+        pages = stories
+        notifyDataSetChanged()
+    }
 
 
 

@@ -1,11 +1,14 @@
 package com.example.kotlininstagramapp.Profile
 
 import Comment
+import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Home.CommentsAdapter
 import com.example.kotlininstagramapp.Models.*
+import com.example.kotlininstagramapp.Story.StoryReviewActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FieldPath
@@ -14,6 +17,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
+import id.zelory.compressor.Compressor
+import id.zelory.compressor.constraint.quality
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.io.File
@@ -52,7 +57,6 @@ class FirebaseHelper {
         return ArrayList(sortedList)
     }
 
-
     suspend fun fetchUserPosts(user: User): ArrayList<UserPostItem> {
         val userPosts: ArrayList<UserPostItem> = arrayListOf()
 
@@ -85,9 +89,7 @@ class FirebaseHelper {
         return userPosts
     }
 
-
-
-     suspend fun getUserById(userId: String): User? {
+    suspend fun getUserById(userId: String): User? {
         val userDocument = db.collection("users").document(userId).get().await()
         return if (userDocument.exists()) {
             User.fromMap(userDocument.data as Map<String, Any>)
@@ -95,9 +97,6 @@ class FirebaseHelper {
             null
         }
     }
-
-
-
 
     suspend fun updateUserProfile(userName:String, newFullName: String?, newUserName: String?, newBiography: String?, newSelectedImageUri: Uri?, ){
         if (newFullName != null) {
@@ -124,7 +123,6 @@ class FirebaseHelper {
         }
     }
 
-
     private suspend fun updateProfileImage(selectedImageUri: Uri?, userName: String?) {
         if (selectedImageUri != null) {
             val imageRef = storageReference.getReference("profileImages/$userName")
@@ -139,7 +137,6 @@ class FirebaseHelper {
             }
         }
     }
-
 
     suspend fun publishComment(text: String, postId: String, adapter: CommentsAdapter) {
         if(currentUser!=null){
@@ -170,7 +167,6 @@ class FirebaseHelper {
 
     }
 
-
     suspend fun getComments(postId: String): ArrayList<Pair<Comment,Boolean>> {
         val comments = commentCollection.whereEqualTo("post_id",postId).get().await()
         val userDocument = currentUserDocumentRef.get().await()
@@ -187,7 +183,6 @@ class FirebaseHelper {
         return ArrayList(commentsList)
 
     }
-
 
     suspend fun updateCommentLikeState(commentId: String, currentLikeCount: Int) {
         var liked :Boolean? =null
@@ -227,8 +222,6 @@ class FirebaseHelper {
         }
     }
 
-
-
     suspend fun updateLikeCount(postId: String, userId: String, increase: Boolean) {
         val postDocumentReference = db.collection("userPosts").document(userId).collection("posts")
         val document= postDocumentReference.document(postId).get().await()
@@ -241,7 +234,6 @@ class FirebaseHelper {
 
     }
 
-
     suspend fun isPostLiked(postId: String): Boolean {
         val likedPostDocRef = currentUserDocumentRef.collection("liked_posts").document(postId)
         return try {
@@ -252,7 +244,7 @@ class FirebaseHelper {
         }
     }
 
-    suspend fun getFollowedFromUser(userId: String){
+    suspend fun acceptFollowRequest(userId: String){
         val currentuser = currentUser
         val userDocumentRef = db.collection("users").document(userId)
         if(currentuser != null){
@@ -262,18 +254,6 @@ class FirebaseHelper {
         }
 
     }
-
-    suspend fun followUser(userId: String) {
-        val currentuser = currentUser
-        if(currentuser != null){
-            currentUserDocumentRef.collection("follows").document(userId).set((mapOf("userId" to userId))).await()
-            db.collection("users").document(userId).collection("followers").document(currentuser.uid).set(mapOf("userId" to currentuser.uid)).await()
-            Log.e("////","Takip Edildi")
-        }
-    }
-
-
-
 
 
     private var listener: ListenerRegistration? = null
@@ -301,11 +281,6 @@ class FirebaseHelper {
             }
     }
 
-
-
-
-
-
     suspend fun getNotifications():List<Notification> {
         var notificationList = mutableListOf<Notification>()
         val snapshot= db.collection("users").document(currentUser!!.uid).collection("notifications").orderBy("timestamp", Query.Direction.DESCENDING).get().await()
@@ -331,7 +306,6 @@ class FirebaseHelper {
         )
       newNotificationDoc.set(notification)
     }
-
 
     fun deleteFollowRequestNotification(id: String) {
         val notificationDoc =  db.collection("users").document(currentUser!!.uid).collection("notifications").document(id)
@@ -404,6 +378,47 @@ class FirebaseHelper {
         return snapshot.exists()
     }
 
+    suspend fun getFollowedUsersStories(): List<Story> {
+        val followedUsers = currentUserDocumentRef.collection("follows").get().await()
+
+        val followedUserIds = followedUsers.documents.map { it.id }
+
+        val stories = mutableListOf<Story>()
+
+        for (userId in followedUserIds) {
+            val userStoriesRef = db.collection("userStories").document(userId)
+            val userStoriesDocument = userStoriesRef.get().await()
+
+            if (userStoriesDocument.exists()) {
+
+                val userId = userStoriesDocument.getString("userId") ?: ""
+                val userName = userStoriesDocument.getString("userName") ?: ""
+                val userProfilePicture = userStoriesDocument.getString("userProfilePicture") ?: ""
+
+                val storiesList = mutableListOf<SingleStory>()
+                val storiesArray = userStoriesDocument.get("stories") as? List<Map<*, *>>
+
+                storiesArray?.let {
+                    for (storyMap in it) {
+                        val storyId = storyMap["storyId"] as? String ?: ""
+                        val url = storyMap["url"] as? String ?: ""
+                        val timestamp = storyMap["timestamp"] as? com.google.firebase.Timestamp
+
+                        val singleStory = SingleStory(storyId, url, timestamp ?: com.google.firebase.Timestamp.now())
+                        storiesList.add(singleStory)
+                    }
+                }
+
+                val story = Story(userId, userName, userProfilePicture, storiesList)
+                stories.add(story)
+            }
+        }
+
+
+
+        return stories
+    }
+
 
     fun getConversations(
         onConversationAddedToList: (conversation: Conversation) -> Unit,
@@ -469,7 +484,6 @@ class FirebaseHelper {
 
             }
     }
-
 
 
     suspend fun createNewConversation(userId: String, userName: String, profileImage: String, userFullName: String, message: String): String {
@@ -597,17 +611,15 @@ class FirebaseHelper {
         }
     }
 
-    fun getStoriesFollowedUsers() {
-
-    }
-
-    fun uploadStory(gelenDosya: File) {
+    suspend fun uploadStory(context: Context, gelenDosya: File) {
         val storyId = UUID.randomUUID().toString()
         val imageRef = storageReference.reference.child("stories/${UserSingleton.user!!.userId}/images/${storyId}")
-        val videoRef = storageReference.reference.child("stories/${UserSingleton.user!!.userId}/videos/${storyId}")
         val user = UserSingleton.user!!
 
-        val uploadTask = imageRef.putFile(Uri.fromFile(gelenDosya))
+        val compressedImageFile = Compressor.compress(context, gelenDosya) { quality(80) }
+        val compressedImageUri = Uri.fromFile(compressedImageFile)
+
+        val uploadTask = imageRef.putFile(compressedImageUri)
 
 
         uploadTask.addOnProgressListener { taskSnapshot ->
@@ -616,33 +628,30 @@ class FirebaseHelper {
             Log.e("","Progress ____>>> "+progress)
         }
 
-        uploadTask.addOnSuccessListener {
+        uploadTask.addOnSuccessListener { taskSnapshot ->
             CoroutineScope(Dispatchers.IO).launch {
                 val url = imageRef.downloadUrl.await().toString()
+                val singleStory = SingleStory(storyId, url, com.google.firebase.Timestamp.now())
+                val userStoriesRef = db.collection("userStories").document(user.userId)
+                val userDocument = userStoriesRef.get().await()
+                if (userDocument.exists()) {
+                    userStoriesRef.update("stories", FieldValue.arrayUnion(singleStory))
+                } else {
+                    val newStory = Story(user.userId, user.userName, user.userDetails.profilePicture, mutableListOf(singleStory))
+                    userStoriesRef.set(newStory)
+                }
 
-                val storyMap = mapOf(
-                    "storyId" to storyId,
-                    "userId" to user.userId,
-                    "userName" to user.userName,
-                    "userProfilePicture" to user.userDetails.profilePicture,
-                    "url" to url,
-                    "timestamp" to FieldValue.serverTimestamp()
-                )
-
-                uploadStoryToFirestore(storyMap)
+                println(" ************  Hikaye Başarı ile Yüklendi ***********")
             }
         }
 
-
+        uploadTask.addOnFailureListener { exception ->
+            Log.e("", "*********  Error uploading story  **********: $exception")
+        }
 
 
     }
 
-    private suspend fun uploadStoryToFirestore(storyMap: Map<String, Any>) {
-        db.collection("stories").document(storyMap.get("storyId").toString()).set(storyMap).await()
-        println(" ************  Hikaye Başarı ile Yüklendi ***********")
-
-    }
 
 
 }

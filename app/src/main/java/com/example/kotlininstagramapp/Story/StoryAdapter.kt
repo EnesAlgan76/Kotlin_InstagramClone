@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
@@ -19,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class StoryAdapter(private val context: Context, private var data: List<String>) :
+class StoryAdapter(private val context: Context, private var data: List<Story>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val VIEW_TYPE_CURRENT_USER = 0
@@ -45,16 +46,16 @@ class StoryAdapter(private val context: Context, private var data: List<String>)
         when (holder) {
             is CurrentUserViewHolder -> {
                 holder.bindUserData()
-                holder.handleClick()
+                holder.handleClick(position)
             }
             is FollowedUserViewHolder -> {
                 // Adjust position for the current user item
-                val imageUrl = data[position - 1]
+                val imageUrl = data[position - 1].userProfilePicture
                 Glide.with(context)
                     .load(imageUrl)
                     .into(holder.iv_storyFollowedUser)
 
-                holder.bind()
+                holder.bind(position)
             }
         }
     }
@@ -72,7 +73,7 @@ class StoryAdapter(private val context: Context, private var data: List<String>)
         }
     }
 
-    fun setData(horizontalItemList: List<String>) {
+    fun setData(horizontalItemList: List<Story>) {
         data = horizontalItemList
         notifyDataSetChanged()
     }
@@ -80,13 +81,14 @@ class StoryAdapter(private val context: Context, private var data: List<String>)
     inner class CurrentUserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val iv_storyCurrentUser: ImageView = itemView.findViewById(R.id.iv_storyCurrentUser)
         val tv_storyCurrentUser: TextView = itemView.findViewById(R.id.tv_storyCurrentUser)
-        fun handleClick() {
+        fun handleClick(position: Int) {
             iv_storyCurrentUser.setOnClickListener {
                 val intent = Intent(context, StoryActivity::class.java)
                 intent.putExtra("isCurrentUser",true)
+                intent.putExtra("position",position)
                 context.startActivity(intent)
                 // Handle click for the current user view (e.g., navigate to the user's own story)
-                Toast.makeText(context, "Current User Clicked", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Current User Clicked. position : ${position}", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -111,13 +113,14 @@ class StoryAdapter(private val context: Context, private var data: List<String>)
     inner class FollowedUserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val iv_storyFollowedUser: ImageView = itemView.findViewById(R.id.iv_storyFollowedUser)
 
-        fun bind() {
+        fun bind(position: Int) {
             iv_storyFollowedUser.setOnClickListener {
                 val intent = Intent(context, StoryActivity::class.java)
                 intent.putExtra("isCurrentUser",false)
+                intent.putExtra("position",position)
                 context.startActivity(intent)
 
-                Toast.makeText(context, "Tıklandı: ${iv_storyFollowedUser.resources.toString()}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Tıklandı. position ${position}", Toast.LENGTH_SHORT).show()
             }
         }
     }
