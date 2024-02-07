@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="ONAY KODUNU GİR"
+            android:text="ENTER YOUR CONFIRMATION CODE"
             android:textColor="#000000"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="18dp"
-            android:text="Şu numaraya gönderdiğimiz 6 haneli kodu gir:"
+            android:text="Enter the 6-digit code we sent to:"
             android:textColor="#000000"
             android:textSize="16sp" />
 
@@ -52,7 +52,7 @@
             android:layout_marginRight="24dp"
             android:background="@drawable/shape_textfield"
             android:ems="10"
-            android:hint="Onay Kodu"
+            android:hint="Confirmation code"
             android:inputType="textPersonName" />
 
         <Button

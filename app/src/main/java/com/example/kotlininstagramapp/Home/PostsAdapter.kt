@@ -36,7 +36,12 @@ import org.greenrobot.eventbus.EventBus
 import java.util.concurrent.TimeUnit
 
 
-class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mContext: Context, private val fragmentManager: FragmentManager, private val recyclerView: RecyclerView
+class PostsAdapter(
+    private var posts: ArrayList<UserPostItem>,
+    private val mContext: Context,
+    private val fragmentManager: FragmentManager,
+    private val recyclerView: RecyclerView,
+
 ) :RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     private val defaultImage = R.drawable.icon_profile
     private var playPosition = -2
@@ -98,14 +103,7 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
 
         if (viewType == VIEW_TYPE_HORIZONTAL_LIST) {
             val horizontalViewHolder = holder as StoriesViewHolder
-
             horizontalViewHolder.bind()
-
-
-
-
-
-
         } else {
             val verticalViewHolder = holder as PostViewHolder
             val userPostItem = posts[position]
@@ -143,7 +141,6 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
     }
 
     override fun getItemCount(): Int = posts.size
-
 
     private fun loadMedias(holder: PostViewHolder, userPostItem: UserPostItem) {
         if(userPostItem.userPostUrl.contains("videos")){
@@ -223,9 +220,6 @@ class PostsAdapter(private var posts: ArrayList<UserPostItem>, private val mCont
             lastClickTime = currentTime
         }
     }
-
-
-
 
     inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val fullNameTextView: TextView = itemView.findViewById(R.id.post_tv_fullname)

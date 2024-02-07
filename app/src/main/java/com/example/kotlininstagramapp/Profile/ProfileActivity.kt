@@ -28,7 +28,7 @@ class ProfileActivity : AppCompatActivity(),OnSinglePostItemClicked{
     val db = FirebaseFirestore.getInstance()
     val firebaseAuth = FirebaseAuth.getInstance()
     val userId = firebaseAuth.currentUser!!.uid
-    lateinit var userPostItems: ArrayList<UserPostItem>
+    var userPostItems: ArrayList<UserPostItem> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +46,11 @@ class ProfileActivity : AppCompatActivity(),OnSinglePostItemClicked{
     private suspend fun setRecycleView() {
         withContext(Dispatchers.IO){
             val user = FirebaseHelper().getUserById(userId)
-            userPostItems = FirebaseHelper().fetchUserPosts(user!!)
+            try {
+                userPostItems = FirebaseHelper().fetchUserPosts(user!!)
+            }catch (e:Throwable){
+                println("HATAAA ---- >> ${e.message}")
+            }
         }
         var adapter = ProfileUserPostsAdapter(context = this,userPostItems)
         binding.rvProfilePageUserPosts.adapter = adapter
@@ -62,11 +66,15 @@ class ProfileActivity : AppCompatActivity(),OnSinglePostItemClicked{
             userDocRef.get().addOnSuccessListener { snapshot ->
                 if(snapshot.data!=null){
                     binding.tvUserName.text = snapshot.data?.get("userName").toString()
-                    val userDetails:UserDetails = UserDetails.fromMap(snapshot.data?.get("userDetails") as Map<String, Any>)
+                    val userDetailsMap = snapshot.data?.get("userDetails") as Map<String, Any>
+
+                    println("-----**---> UserDetails Map: $userDetailsMap")
+                    val userDetails:UserDetails = UserDetails.fromMap(userDetailsMap)
                     println("--------> "+snapshot.data?.get("userDetails"))
-                    binding.tvFollow.text = userDetails.following
-                    binding.tvFollowers.text  = userDetails.follower
-                    binding.tvPosts.text = userDetails.post
+                    println("----nesene----> "+userDetails.post)
+                    binding.tvFollow.text = userDetails.following.toString()
+                    binding.tvFollowers.text  = userDetails.follower.toString()
+                    binding.tvPosts.text = userDetails.post.toString()
                     binding.tvBiograpy.text = userDetails.biography
                     binding.tvName.text = snapshot.data?.get("userFullName").toString()
                     try {

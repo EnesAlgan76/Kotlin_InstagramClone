@@ -82,6 +82,8 @@ class HomeFragment : Fragment() {
                 withContext(Dispatchers.IO) {
                     allPosts = FirebaseHelper().getAllPosts()
                 }
+                // Invalid data to replace story view at index 0
+                allPosts.add(0,UserPostItem("","","","","","","","",""))
                 val adapter=PostsAdapter(allPosts,requireContext(), requireActivity().supportFragmentManager,recyclerView)
                 recyclerView.adapter=adapter
             } catch (e: Exception) {

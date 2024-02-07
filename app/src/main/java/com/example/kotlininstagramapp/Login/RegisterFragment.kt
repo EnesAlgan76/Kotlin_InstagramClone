@@ -2,7 +2,6 @@ package com.example.kotlininstagramapp.Login
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -69,13 +68,14 @@ class RegisterFragment :Fragment(){
                 if (task.isSuccessful){
                 val userID = firebaseAuth.currentUser!!.uid
 
-                val userDetails = UserDetails("0","0","0","","")
+                val userDetails = UserDetails(0,0,0,"","")
                 val user = User(userID, adSoyad?.text.toString(), kullaniciAdi?.text.toString(), gelenTelNo, gelenMail, sifre?.text.toString(),userDetails)
 
                 val userCollection = db.collection("users")
                 userCollection.document(userID).set(user).addOnCompleteListener { task->
                     if(task.isSuccessful){
                         showToast("Yeni Kulanıcı Oluşturuldu")
+                        requireActivity().finish()
                     }else{
                         showToast("Kullanıcı Veritabanınagmai Kaydedilirken Hata Oluştu")
                         firebaseAuth.currentUser!!.delete()

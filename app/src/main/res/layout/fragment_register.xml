@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="AD VE ŞİFRE"
+            android:text="NAME AND PASSWORD"
             android:textColor="#000000"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -33,7 +33,7 @@
             android:layout_marginRight="24dp"
             android:background="@drawable/shape_textfield"
             android:ems="10"
-            android:hint="Ad Soyad"
+            android:hint="Name Surname"
             android:inputType="textPersonName" />
 
         <EditText
@@ -45,7 +45,7 @@
             android:layout_marginRight="24dp"
             android:background="@drawable/shape_textfield"
             android:ems="10"
-            android:hint="Kullanıcı Adı"
+            android:hint="User Name"
             android:inputType="textPersonName" />
 
         <EditText
@@ -57,7 +57,7 @@
             android:layout_marginRight="24dp"
             android:background="@drawable/shape_textfield"
             android:ems="10"
-            android:hint="Şifre"
+            android:hint="Password"
             android:inputType="textPersonName" />
 
         <Button
@@ -66,7 +66,7 @@
             android:layout_height="70dp"
             android:layout_margin="24dp"
             android:backgroundTint="#3b97f1"
-            android:text="İleri"
+            android:text="Next"
             android:textAllCaps="false" />
     </LinearLayout>
 </ScrollView>

@@ -131,40 +131,6 @@ class ShareGalleryFragment : Fragment() {
                     }
 
 
-                    /*
-                    val gridAdapter = GalleryGridAdapter(requireActivity(), fileList)
-                    gridview.adapter = gridAdapter
-                    println(result.toString())
-                    if (fileList.isNotEmpty()){
-                        selectedMedia =fileList[0]
-                    }
-
-
-                    gridview.setOnItemClickListener { adapterView, view, position, l ->
-                        val file = fileList[position]
-                        selectedMedia = file
-
-                        if(file.extension.equals("mp4",true)){
-
-                            bigImage.visibility=View.GONE
-                            bigVideo.visibility = View.VISIBLE
-                            bigVideo.setVideoURI(file.toUri())
-                            bigVideo.start()
-                        }else{
-                            bigVideo.stopPlayback()
-                            bigImage.visibility=View.VISIBLE
-                            bigVideo.visibility = View.GONE
-
-                            Glide.with(requireActivity())
-                                .load(file)
-                                .override(1080  , 1920) // Set target width and height
-                                .into(bigImage)
-
-
-                        }
-                    }*/
-
-
                 }
 
 

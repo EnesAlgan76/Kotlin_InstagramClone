@@ -63,7 +63,9 @@ class FirebaseHelper {
         val postDocumentReference = db.collection("userPosts").document(user.userId)
         val allPostsCollection = postDocumentReference.collection("posts")
 
-        val postDocuments = allPostsCollection.get().await()
+
+        val postDocuments = allPostsCollection.orderBy("date").get().await()
+
         for (i in postDocuments) {
             val dataMap = i.data as MutableMap<String, String>
             var likeCount: String = dataMap["likeCount"] ?: "null"
@@ -250,6 +252,16 @@ class FirebaseHelper {
         if(currentuser != null){
             userDocumentRef.collection("follows").document(currentuser.uid).set((mapOf("userId" to currentuser.uid))).await()
             currentUserDocumentRef.collection("followers").document(userId).set(mapOf("userId" to userId)).await()
+
+            userDocumentRef.update("userDetails.following", FieldValue.increment(1)).addOnSuccessListener {
+                println("following count updated")
+            }
+
+            currentUserDocumentRef.update("userDetails.follower", FieldValue.increment(1)).addOnSuccessListener {
+                println("follower count updated")
+            }
+
+
             Log.e("////","Takip Edildi")
         }
 

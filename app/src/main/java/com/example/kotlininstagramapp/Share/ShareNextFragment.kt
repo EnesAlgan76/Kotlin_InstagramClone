@@ -70,7 +70,7 @@ class ShareNextFragment : Fragment() {
                 Glide.with(view.context).load(getVideoThumbnail(it)).into(image)
                 uris.add(Uri.fromFile(gelenDosya))
             }else{
-                Picasso.get().load(it).into(image)
+                Glide.with(view.context).load(it).into(image)
             }
 
         }

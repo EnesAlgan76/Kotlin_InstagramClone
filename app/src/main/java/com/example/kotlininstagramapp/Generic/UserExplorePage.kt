@@ -56,7 +56,16 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
                     withContext(Dispatchers.IO){
                         FirebaseHelper().sendFollowRequest(userId!!)
                     }
-                    handleFollowStateUI(FirebaseHelper().isUserFollowing(userId?:""))
+                    val isFollowed = FirebaseHelper().isUserFollowing(userId?:"") // gizli hesap değilse anında takip edilir. gizli ise isek gönderildi yazısı göster
+                    handleFollowStateUI(isFollowed)
+
+                    if(!isFollowed){
+                        binding.userExploreBtnFollow.visibility = View.INVISIBLE
+                        binding.userExploreLayoutFollowandmessage.visibility = View.INVISIBLE
+                        binding.userExploreBtnFollowRequestSended.visibility = View.VISIBLE
+                    }
+
+
 
                 }
 
@@ -91,9 +100,9 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
         Glide.with(this).load(user.userDetails.profilePicture).error(R.drawable.icon_profile).placeholder(R.drawable.icon_profile).into(binding.userExploreIvProfile)
         binding.userExploreTvName.setText(user.userFullName)
         binding.userExploreTvBiograpy.setText(user.userDetails.biography)
-        binding.userExploreTvFollow.setText(user.userDetails.following)
-        binding.userExploreTvFollowers.setText(user.userDetails.follower)
-        binding.userExploreTvPosts.setText(user.userDetails.post)
+        binding.userExploreTvFollow.setText(user.userDetails.following.toString())
+        binding.userExploreTvFollowers.setText(user.userDetails.follower.toString())
+        binding.userExploreTvPosts.setText(user.userDetails.post.toString())
     }
 
     private fun setRecycleView(userPostItems: ArrayList<UserPostItem>) {

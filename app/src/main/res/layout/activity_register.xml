@@ -49,7 +49,7 @@
                     android:id="@+id/tv_eposta"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="E-POSTA"
+                    android:text="EMAIL"
                     android:textColor="#000000"
                     android:textSize="20sp"
                     android:textStyle="bold"
@@ -62,7 +62,7 @@
                     android:id="@+id/tv_tel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TELEFON"
+                    android:text="PHONE"
                     android:textColor="#000000"
                     android:textSize="20sp"
                     android:textStyle="bold"
@@ -100,7 +100,7 @@
                 android:layout_margin="24dp"
                 android:background="@drawable/shape_textfield"
                 android:ems="10"
-                android:hint="Telefon"
+                android:hint="Phone"
                 android:inputType="textPersonName|phone" />
 
             <Button
@@ -109,7 +109,7 @@
                 android:layout_height="70dp"
                 android:layout_margin="24dp"
                 android:backgroundTint="#3b97f1"
-                android:text="İleri"
+                android:text="Next"
                 android:textAllCaps="false" />
 
             <LinearLayout
@@ -123,14 +123,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
-                    android:text="Hesabın zaten var mı?" />
+                    android:text="Already have an account?" />
 
                 <TextView
                     android:id="@+id/tv_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
-                    android:text="Giriş Yap"
+                    android:text="Login"
                     android:textColor="#151515"
                     android:textStyle="bold" />
             </LinearLayout>

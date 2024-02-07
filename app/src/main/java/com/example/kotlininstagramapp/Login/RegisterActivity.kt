@@ -68,7 +68,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun handleIleriButtonClick() {
         binding.btnIleri.setOnClickListener {
-            if (binding.etRegisterpage.hint=="Telefon"){
+            if (binding.etRegisterpage.hint=="Phone"){
                 checkIfValueExists(binding.etRegisterpage.text.trim().toString()+"@enes.com"){exists ->
                     if(exists){
                         Toast.makeText(this, "This phone number alyeady registered", Toast.LENGTH_SHORT).show()
@@ -136,7 +136,7 @@ class RegisterActivity : AppCompatActivity() {
             binding.viewMail.setBackgroundColor(Color.parseColor("#DFDFDF"))
             binding.etRegisterpage.apply {
                 inputType = InputType.TYPE_CLASS_PHONE
-                hint="Telefon"
+                hint="Phone"
             }
         }
 
@@ -145,7 +145,7 @@ class RegisterActivity : AppCompatActivity() {
             binding.viewMail.setBackgroundColor(Color.BLACK)
             binding.etRegisterpage.apply {
                 inputType = InputType.TYPE_CLASS_TEXT
-                hint="E-posta"
+                hint="Email"
             }
         }
 

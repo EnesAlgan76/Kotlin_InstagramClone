@@ -19,10 +19,13 @@ class SinglePostListFragment(var userPostItems: ArrayList<UserPostItem>, var pos
         recyclerView.layoutManager = LinearLayoutManager(requireContext(),
             LinearLayoutManager.VERTICAL,false)
 
+        // Invalid data to replace story view at index 0
+        userPostItems.add(0,UserPostItem("","","","","","","","",""))
+
         val adapter=PostsAdapter(userPostItems,requireContext(), requireActivity().supportFragmentManager,recyclerView)
         recyclerView.adapter=adapter
 
-        recyclerView.layoutManager?.scrollToPosition(position)
+        recyclerView.layoutManager?.scrollToPosition(position+1)
 
 
        return view
