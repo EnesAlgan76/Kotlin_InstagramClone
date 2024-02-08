@@ -26,6 +26,8 @@
         android:layout_marginEnd="8dp"
         android:layout_weight="1"
         android:text="ensalgn76 fotoğrafını beğendi. 4s"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/notification_like_profileImage"
         app:layout_constraintEnd_toStartOf="@+id/notification_like_preview"
         app:layout_constraintStart_toEndOf="@+id/notification_like_profileImage"
         app:layout_constraintTop_toTopOf="@+id/notification_like_profileImage" />

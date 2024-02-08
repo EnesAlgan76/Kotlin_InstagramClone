@@ -40,8 +40,8 @@
 
     <ImageView
         android:id="@+id/imageView6"
-        android:layout_width="32dp"
-        android:layout_height="33dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView33"
         app:layout_constraintEnd_toEndOf="@+id/imageView33"
         app:srcCompat="@drawable/icon_add_story" />

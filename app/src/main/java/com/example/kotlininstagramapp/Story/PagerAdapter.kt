@@ -12,6 +12,7 @@ import androidx.viewpager.widget.PagerAdapter
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.R
+import com.squareup.picasso.Picasso
 
 class PagerAdapter(private var pages: List<Story>, private val context: Context) : PagerAdapter() {
 
@@ -35,7 +36,12 @@ class PagerAdapter(private var pages: List<Story>, private val context: Context)
         val indicatorLayout: LinearLayout = view.findViewById(R.id.indicatorLayout)
 
         val page = pages[position]
-        Glide.with(context).load(page.stories[0]).into(imageView)
+
+        println("şimdiki story : ${page.userName}, ${page.stories[0].url}")
+
+
+
+        Glide.with(context).load(page.stories[0].url).into(imageView)
         Glide.with(context).load(page.userProfilePicture).into(profileImage)
         username.text = page.userName
 
@@ -90,7 +96,7 @@ class PagerAdapter(private var pages: List<Story>, private val context: Context)
         }
     }
 
-    // Update the indicator color based on the current image
+
     private fun updateIndicatorColor(indicatorLayout: LinearLayout, currentIndex: Int, count: Int) {
         for (i in 0 until indicatorLayout.childCount) {
             indicatorLayout.getChildAt(i).setBackgroundResource(if (i == currentIndex) R.drawable.selected_indicator else R.drawable.unselected_indicator)

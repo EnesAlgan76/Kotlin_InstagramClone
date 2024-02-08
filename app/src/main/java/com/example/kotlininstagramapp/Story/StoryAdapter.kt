@@ -50,12 +50,9 @@ class StoryAdapter(private val context: Context, private var data: List<Story>) 
             }
             is FollowedUserViewHolder -> {
                 // Adjust position for the current user item
-                val imageUrl = data[position - 1].userProfilePicture
-                Glide.with(context)
-                    .load(imageUrl)
-                    .into(holder.iv_storyFollowedUser)
-
-                holder.bind(position)
+                val story = data[position - 1]
+                val imageUrl = story.userProfilePicture
+                holder.bind(position,story)
             }
         }
     }
@@ -112,16 +109,19 @@ class StoryAdapter(private val context: Context, private var data: List<Story>) 
 
     inner class FollowedUserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val iv_storyFollowedUser: ImageView = itemView.findViewById(R.id.iv_storyFollowedUser)
+        val tv_storyFollowedUser: TextView = itemView.findViewById(R.id.tv_storyFollowedUser)
 
-        fun bind(position: Int) {
+        fun bind(position: Int, story: Story) {
             iv_storyFollowedUser.setOnClickListener {
                 val intent = Intent(context, StoryActivity::class.java)
                 intent.putExtra("isCurrentUser",false)
                 intent.putExtra("position",position)
                 context.startActivity(intent)
-
                 Toast.makeText(context, "Tıklandı. position ${position}", Toast.LENGTH_SHORT).show()
             }
+
+            Glide.with(context).load(story.userProfilePicture).into(iv_storyFollowedUser)
+            tv_storyFollowedUser.setText(story.userName)
         }
     }
 }

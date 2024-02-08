@@ -172,7 +172,7 @@
                         android:text="İstek Gönderildi"
                         android:textColor="@color/black"
                         android:textSize="12sp"
-                        android:visibility="visible" />
+                        android:visibility="invisible" />
 
                     <Button
                         android:id="@+id/userExplore_btn_follow"

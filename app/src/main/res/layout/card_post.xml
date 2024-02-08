@@ -72,6 +72,8 @@
             android:id="@+id/post_iv_postimage"
             android:layout_width="match_parent"
             android:layout_height="300dp"
+            android:minWidth="400dp"
+            android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -111,7 +113,7 @@
             android:layout_margin="8dp"
             app:srcCompat="@drawable/send"
             android:layout_weight="0" />
-        <Space
+        <androidx.legacy.widget.Space
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"/>

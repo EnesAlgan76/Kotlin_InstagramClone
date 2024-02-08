@@ -1,9 +1,11 @@
 package com.example.kotlininstagramapp.Story
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserSingleton
+import com.example.kotlininstagramapp.Home.HomeActivity
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.databinding.ActivityStoryReviewBinding
 import kotlinx.coroutines.CoroutineScope
@@ -31,12 +33,14 @@ class StoryReviewActivity : AppCompatActivity() {
 
         binding.ivSendStory.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
-                FirebaseHelper().uploadStory(this@StoryReviewActivity, gelenDosya)
+                FirebaseHelper().uploadStory(this@StoryReviewActivity, gelenDosya, onUploadedSuccesfully = {
+                    startActivity(Intent(this@StoryReviewActivity, HomeActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                    })
+                })
             }
 
         }
-
-
 
     }
 

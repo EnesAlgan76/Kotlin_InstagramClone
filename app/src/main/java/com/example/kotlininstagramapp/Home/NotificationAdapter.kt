@@ -19,10 +19,12 @@ import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Notification
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.abs
 
 class NotificationAdapter(var mContext : Context, private val notificationList: List<Notification>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -93,9 +95,9 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         val followingCard: CardView = itemView.findViewById(R.id.notification_following)
 
         fun bind(currentItem: Notification) {
-            val time :String = currentItem.timestamp.toDate().toString()
+            val timeAgo = formatTimeAgo(currentItem.timestamp)
             val userName :String = currentItem.userName
-            val text ="${userName} seni takip etmek istiyor ${time}"
+            val text ="${userName} seni takip etmek istiyor ${timeAgo}"
             formatTextView(notificationText,text)
 
             Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
@@ -131,12 +133,12 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         val notificationText: TextView = itemView.findViewById(R.id.notification_like_text)
 
         fun bind(currentItem: Notification) {
-            val time :String = currentItem.timestamp.toDate().toString()
             val userName :String = currentItem.userName
+            val timeAgo = formatTimeAgo(currentItem.timestamp)
 
             val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "videonu" else "fotoğrafını"
 
-            val text ="${userName +" "+ imageOrVideo} beğendi ${time}"
+            val text ="${userName +" "+ imageOrVideo} beğendi. ${timeAgo}"
             formatTextView(notificationText,text)
 
             Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
@@ -148,6 +150,8 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         }
     }
 
+
+
     inner class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val profileImage: ImageView = itemView.findViewById(R.id.notification_comment_profileImage)
@@ -155,12 +159,13 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         val notificationText: TextView = itemView.findViewById(R.id.notification_comment_text)
 
         fun bind(currentItem: Notification) {
-            val time :String = currentItem.timestamp.toDate().toString()
             val userName :String = currentItem.userName
+
+            val timeAgo = formatTimeAgo(currentItem.timestamp)
 
             val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "videona" else "fotoğrafına"
 
-            val text ="${userName +" "+ imageOrVideo} yorum yaptı ${time}"
+            val text ="${userName +" "+ imageOrVideo} yorum yaptı ${timeAgo}"
             formatTextView(notificationText,text)
 
             Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
@@ -200,6 +205,21 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
             textView.text = spannableStringBuilder
         }
     }
+
+    fun formatTimeAgo(timestamp: Timestamp): String {
+        val currentTime = Timestamp.now()
+        val timeDifferenceSeconds = currentTime.seconds - timestamp.seconds
+
+        return when {
+            timeDifferenceSeconds < 60 -> "${timeDifferenceSeconds}s"
+            timeDifferenceSeconds < 3600 -> "${timeDifferenceSeconds / 60}m"
+            timeDifferenceSeconds < 86400 -> "${timeDifferenceSeconds / 3600}h"
+            timeDifferenceSeconds < 2592000 -> "${timeDifferenceSeconds / 86400}d"
+            else -> "${timeDifferenceSeconds / 2592000}m"
+        }
+    }
+
+
 }
 
 

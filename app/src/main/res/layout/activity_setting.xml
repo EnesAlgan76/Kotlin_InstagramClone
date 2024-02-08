@@ -109,17 +109,16 @@
 
         <TextView
             android:id="@+id/tv_hiddenAccount"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="22dp"
-            android:layout_marginEnd="16dp"
             android:text="Gizli Hesap"
             android:textColor="#000000"
             android:textSize="16sp"
             android:textStyle="normal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/tv_savedPosts"
+            app:layout_constraintEnd_toStartOf="@+id/switch1"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_savedPosts" />
 
         <TextView
@@ -158,6 +157,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:menu="@menu/bottomnavigation_menu" />
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:checked="true"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_hiddenAccount"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tv_hiddenAccount" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

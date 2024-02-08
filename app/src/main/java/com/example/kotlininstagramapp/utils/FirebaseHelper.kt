@@ -623,7 +623,7 @@ class FirebaseHelper {
         }
     }
 
-    suspend fun uploadStory(context: Context, gelenDosya: File) {
+    suspend fun uploadStory(context: Context, gelenDosya: File, onUploadedSuccesfully: () -> Unit,) {
         val storyId = UUID.randomUUID().toString()
         val imageRef = storageReference.reference.child("stories/${UserSingleton.user!!.userId}/images/${storyId}")
         val user = UserSingleton.user!!
@@ -654,6 +654,7 @@ class FirebaseHelper {
                 }
 
                 println(" ************  Hikaye Başarı ile Yüklendi ***********")
+                onUploadedSuccesfully.invoke()
             }
         }
 
