@@ -4,6 +4,7 @@ import ProgressDialogFragment
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -16,15 +17,27 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.EImageLoader
+import id.zelory.compressor.Compressor
+import id.zelory.compressor.constraint.default
+import id.zelory.compressor.constraint.format
+import id.zelory.compressor.constraint.quality
+import id.zelory.compressor.constraint.resolution
+import id.zelory.compressor.constraint.size
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import java.io.File
+import java.io.IOException
+import java.lang.String.format
 
 class ProfileEditFragment : Fragment() {
     private var eventuserDetails: UserDetails =UserDetails()
@@ -69,13 +82,20 @@ class ProfileEditFragment : Fragment() {
              val progressDialog = ProgressDialogFragment()
              progressDialog.show(childFragmentManager, "progress_dialog")
 
-             GlobalScope.launch(Dispatchers.Main) {
+             CoroutineScope(Dispatchers.Main).launch {
+
+                 val originalFile = File(getPathFromUri(requireContext(), selectedImageUri!!))
+
+                 val compressedImageFile = Compressor.compress(requireContext(), originalFile)
+
+                 val compressedImageUri = Uri.fromFile(compressedImageFile)
+
                  firebaseHelper.updateUserProfile(
                      eventuserName,
                      if (fullName.text.toString() != eventuserFullName) fullName.text.toString() else null,
                      if (userNameEditText.text.toString() != eventuserName) userNameEditText.text.toString() else null,
                      if (biography.text.toString() != eventuserDetails.biography) biography.text.toString() else null,
-                     selectedImageUri,
+                     compressedImageUri,
                  )
 
                  progressDialog.dismiss()
@@ -89,6 +109,19 @@ class ProfileEditFragment : Fragment() {
         EImageLoader.setImage(eventuserDetails.profilePicture, profilePicture, null)
     }
 
+    fun getPathFromUri(context: Context, uri: Uri): String {
+        val cursor = context.contentResolver.query(uri, null, null, null, null)
+        cursor?.let {
+            val index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            cursor.moveToFirst()
+            val path = cursor.getString(index)
+            cursor.close()
+            return path
+        }
+        return uri.path ?: ""
+    }
+
+
     private fun setupGalleryLauncher() {
         galleryLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -97,7 +130,7 @@ class ProfileEditFragment : Fragment() {
                     if (data != null) {
                         val imageUri: Uri? = data.data
                         if (imageUri != null) {
-                            profilePicture.setImageURI(imageUri)
+                            Glide.with(requireContext()).load(imageUri).into(profilePicture)
                             selectedImageUri = imageUri
                         }
                     }

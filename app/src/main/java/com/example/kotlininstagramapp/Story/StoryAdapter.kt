@@ -84,7 +84,6 @@ class StoryAdapter(private val context: Context, private var data: List<Story>) 
                 intent.putExtra("isCurrentUser",true)
                 intent.putExtra("position",position)
                 context.startActivity(intent)
-                // Handle click for the current user view (e.g., navigate to the user's own story)
                 Toast.makeText(context, "Current User Clicked. position : ${position}", Toast.LENGTH_SHORT).show()
             }
         }

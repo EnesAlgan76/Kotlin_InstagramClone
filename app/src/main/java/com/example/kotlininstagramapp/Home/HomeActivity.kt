@@ -34,7 +34,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if(intent.extras != null){
-            startActivity(Intent(this,NotificationsActivity::class.java))  // if clicked on notificcation
+            startActivity(Intent(this,NotificationsActivity::class.java))
         }
 
         binding = ActivityHomeBinding.inflate(layoutInflater)

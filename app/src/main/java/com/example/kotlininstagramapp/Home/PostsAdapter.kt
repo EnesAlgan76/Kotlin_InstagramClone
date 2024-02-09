@@ -44,11 +44,12 @@ class PostsAdapter(
 
 ) :RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     private val defaultImage = R.drawable.icon_profile
-    private var playPosition = -2
     private val handler = Handler(Looper.getMainLooper())
 
     private val VIEW_TYPE_HORIZONTAL_LIST = 1
     private val VIEW_TYPE_VERTICAL_ITEM = 2
+
+    var playingVideoList: MutableList<PostViewHolder> = mutableListOf()
 
     init {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -57,20 +58,29 @@ class PostsAdapter(
 
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                 val firstVisibleItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
-                if (firstVisibleItemPosition !=-1 && playPosition!=firstVisibleItemPosition){
-                    playPosition = firstVisibleItemPosition
-                    if(posts[playPosition].userPostUrl.contains("videos")){
+                if (firstVisibleItemPosition !=-1){
+                    if(posts[firstVisibleItemPosition].userPostUrl.contains("videos")){
                         handler.removeCallbacksAndMessages(null)
                         handler.post {
-                            val holderTop = recyclerView.findViewHolderForAdapterPosition(playPosition-1) as? PostViewHolder
+                            val holderTop = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition-1) as? PostViewHolder
                             holderTop?.post_vv_postvideo?.pause()
 
-                            val holderCenter = recyclerView.findViewHolderForAdapterPosition(playPosition) as? PostViewHolder
+                            val holderCenter = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition) as? PostViewHolder
                             holderCenter?.post_vv_postvideo?.start()
 
-                            val holderBottom = recyclerView.findViewHolderForAdapterPosition(playPosition+1) as? PostViewHolder
+                            val holderBottom = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition+1) as? PostViewHolder
                             holderBottom?.post_vv_postvideo?.pause()
                         }
+                    }else{
+                        handler.post{
+                            val holderBottom = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition+1) as? PostViewHolder
+                            holderBottom?.post_vv_postvideo?.pause()
+
+                            val holderTop = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition-1) as? PostViewHolder
+                            holderTop?.post_vv_postvideo?.pause()
+
+                        }
+
                     }
 
                 }

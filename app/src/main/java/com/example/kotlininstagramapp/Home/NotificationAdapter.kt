@@ -97,7 +97,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         fun bind(currentItem: Notification) {
             val timeAgo = formatTimeAgo(currentItem.timestamp)
             val userName :String = currentItem.userName
-            val text ="${userName} seni takip etmek istiyor ${timeAgo}"
+            val text ="${userName} seni takip etmek istiyor. ${timeAgo}"
             formatTextView(notificationText,text)
 
             Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
@@ -165,7 +165,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
 
             val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "videona" else "fotoğrafına"
 
-            val text ="${userName +" "+ imageOrVideo} yorum yaptı ${timeAgo}"
+            val text ="${userName +" "+ imageOrVideo} yorum yaptı. ${timeAgo}"
             formatTextView(notificationText,text)
 
             Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
