@@ -4,11 +4,9 @@ import Comment
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Home.CommentsAdapter
 import com.example.kotlininstagramapp.Models.*
-import com.example.kotlininstagramapp.Story.StoryReviewActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FieldPath
@@ -450,41 +448,41 @@ class FirebaseHelper {
 
 
                 for (doc in value!!.documentChanges) {
-                    val conversation = Conversation.fromMap(doc.document.data as Map<String, Any>)
-                    conversation.conversation_id = doc.document.id
+                    val changedConversation = Conversation.fromMap(doc.document.data as Map<String, Any>)
+                    changedConversation.conversation_id = doc.document.id
 
                     when (doc.type) {
                         DocumentChange.Type.ADDED -> {
                             println("--------->>> ADDED")
-                            conversationList.add(conversation)
-                            onConversationAddedToList(conversation)
+                            conversationList.add(changedConversation)
+                            onConversationAddedToList(changedConversation)
                         }
                         DocumentChange.Type.MODIFIED -> {
                             println("--------->>> MODIFIED")
-                            val index = conversationList.indexOfFirst { it.conversation_id == conversation.conversation_id }
+                            val index = conversationList.indexOfFirst { it.conversation_id == changedConversation.conversation_id }
                             val oldConv = conversationList.get(index)
-                            val newConv = conversation
+                            val newConv = changedConversation
 
                             if (oldConv.isRead == true && newConv.isRead == false){
-                                onNewMessageReceivedUpdateConversation(index, conversation)
+                                onNewMessageReceivedUpdateConversation(index, changedConversation)
                                 conversationList.removeAt(index)
                                 if(conversationList.isEmpty()){
-                                    conversationList.add(conversation)
+                                    conversationList.add(changedConversation)
                                 }else{
-                                    conversationList[0] = conversation // it gives error if list is empty
+                                    conversationList[0] = changedConversation // it gives error if list is empty
                                 }
 
                                 println("----------->> Yeni mesaj geldi yukarı taşı")
 
                             }else if (oldConv.isRead == false && newConv.isRead == true){
-                                onConversationClickedResetColor(index, conversation)
-                                conversationList[index] = conversation
+                                onConversationClickedResetColor(index, changedConversation)
+                                conversationList[index] = changedConversation
                                 println("----------->> üzerine tıklantı sadece rengi eski haline çevir.")
 
                             }else{
-                                println("----------->> sadece yeni mesaj. konuşmaya su an koyu renkte : ${conversation}")
-                                conversationList[index] = conversation
-                                onUpdateLastMessageInConversation(index, conversation)
+                                println("----------->> sadece yeni mesaj. konuşmaya su an koyu renkte : ${changedConversation}")
+                                conversationList[index] = changedConversation
+                                onUpdateLastMessageInConversation(index, changedConversation)
                             }
 
                         }
@@ -498,7 +496,7 @@ class FirebaseHelper {
     }
 
 
-    suspend fun createNewConversation(userId: String, userName: String, profileImage: String, userFullName: String, message: String): String {
+    suspend fun createNewConversation(userId: String, message: String): String {
         val conversationRef = db.collection("conversations")
 
         val currentUserConversations = currentUserDocumentRef.collection("conversations")
@@ -596,7 +594,7 @@ class FirebaseHelper {
         messagesRef.add(messageObject)
     }
 
-    fun getMessages(conversationId: String, onMessagesLoaded: (List<ChatMessage>) -> Unit, onError: (Exception) -> Unit) {
+    fun getMessages(conversationId: String, onMessagesLoaded: (MutableList<ChatMessage>) -> Unit, onError: (Exception) -> Unit) {
         val messagesRef = db.collection("conversations").document(conversationId)
             .collection("messages").
             orderBy("timestamp", Query.Direction.DESCENDING)
@@ -613,6 +611,7 @@ class FirebaseHelper {
                 val message= ChatMessage.fromMap(document.data as Map<String, Any>)
                 messagesList.add(message)
             }
+
             onMessagesLoaded(messagesList)
         }
     }

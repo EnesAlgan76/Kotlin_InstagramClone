@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.databinding.ActivityChatBinding
@@ -45,7 +44,8 @@ class ChatActivity : AppCompatActivity() {
         Glide.with(this).load(profile_image).into(binding.imageViewUserProfile)
 
         binding.buttonSend.setOnClickListener{
-            handleSendClick()
+            handleSendClick(binding.editTextMessage.text.toString())
+            binding.editTextMessage.setText("")
         }
 
         if(conversation_id!="NO_CONVERSATION"){
@@ -63,6 +63,7 @@ class ChatActivity : AppCompatActivity() {
     private fun getMessagesAndLoadMessages() {
         FirebaseHelper().getMessages(conversation_id?:"",
             onMessagesLoaded = { messages ->
+                messages.removeLast()
                 chatAdapter = ChatAdapter(messages.reversed(), firebaseAuth.currentUser!!.uid)
                 binding.recyclerViewMessages.layoutManager = layoutManager
                 binding.recyclerViewMessages.adapter = chatAdapter
@@ -74,16 +75,16 @@ class ChatActivity : AppCompatActivity() {
         )
     }
 
-    private fun handleSendClick() {
+    private fun handleSendClick(text: String) {
         CoroutineScope(Dispatchers.IO).launch {
             if (conversation_id == "NO_CONVERSATION") {
-                conversation_id = FirebaseHelper().createNewConversation(user_id,user_name,profile_image,full_name,binding.editTextMessage.text.toString())
-                FirebaseHelper().sendMessage(message = binding.editTextMessage.text.toString(), to =user_id, conversation_id= conversation_id!!, firstMessageSended)
+                conversation_id = FirebaseHelper().createNewConversation(user_id, binding.editTextMessage.text.toString())
+                FirebaseHelper().sendMessage(message = text, to =user_id, conversation_id= conversation_id, firstMessageSended)
                 getMessagesAndLoadMessages()
                 Log.e(" _-_-_-_-_-_-_-_-_-_-_- ","Yeni Konuşma oluşturuldu ve ilk mesaj gönderildi")
             }else{
                 Log.e(" _-_-_-_-_-_-_-_-_-_-_- ","Mesaj Gönderildi")
-                FirebaseHelper().sendMessage(message = binding.editTextMessage.text.toString(), to =user_id, conversation_id= conversation_id!!, firstMessageSended)
+                FirebaseHelper().sendMessage(message = text, to =user_id, conversation_id= conversation_id, firstMessageSended)
                 firstMessageSended = true
             }
         }

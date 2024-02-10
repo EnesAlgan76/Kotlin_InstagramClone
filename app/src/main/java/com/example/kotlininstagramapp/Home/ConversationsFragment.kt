@@ -20,7 +20,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
 class ConversationsFragment : Fragment() {
-
     private lateinit var recyclerViewConversations: RecyclerView
     private lateinit var recyclerViewUsers: RecyclerView
 
@@ -57,7 +56,6 @@ class ConversationsFragment : Fragment() {
 
     private fun setupSearchListener() {
         val handler = Handler(Looper.getMainLooper())
-
         searchBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -83,14 +81,17 @@ class ConversationsFragment : Fragment() {
         conversations.clear()
         FirebaseHelper().getConversations(
             onConversationAddedToList = {
-                conversations.add(it)
-                conversationsAdapter.notifyItemInserted(conversations.indexOf(it))
+                println("onConversationAddedToList")
+                conversations.add(0,it)
+                conversationsAdapter.notifyItemInserted(0)
             },
             onConversationClickedResetColor = { index, conversation ->
+                println("onConversationClickedResetColor")
                 conversations.set(index,conversation)
                 conversationsAdapter.notifyItemChanged(index)
             },
             onNewMessageReceivedUpdateConversation = { index, conversation ->
+                println("onNewMessageReceivedUpdateConversation")
                 conversations.removeAt(index)
                 conversations.add(0,conversation)
                 conversationsAdapter.notifyItemMoved(index,0)
@@ -98,6 +99,7 @@ class ConversationsFragment : Fragment() {
 
             },
             onUpdateLastMessageInConversation = {index, conversation ->
+                println("onUpdateLastMessageInConversation")
                 conversations.set(index,conversation)
                 conversationsAdapter.notifyItemChanged(index)
             }
