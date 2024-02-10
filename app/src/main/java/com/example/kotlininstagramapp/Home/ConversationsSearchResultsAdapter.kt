@@ -17,6 +17,7 @@ import com.example.kotlininstagramapp.Share.Search.SearchResultsAdapter
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 import org.greenrobot.eventbus.EventBus
 
 
@@ -69,7 +70,9 @@ class ConversationsSearchResultsAdapter(context: Context) : RecyclerView.Adapter
                 val userId =  user["userId"]
                 if(userId != currentUser!!.uid){
                     CoroutineScope(Dispatchers.IO).launch {
-                        val conversation_id = FirebaseHelper().createNewConversation(userId!!,user["userName"]!!,user["userProfileImage"]!!,user["userFullName"]!!,"example Message")
+                        //val conversation_id = FirebaseHelper().createNewConversation(userId!!,user["userName"]!!,user["userProfileImage"]!!,user["userFullName"]!!,"example Message")
+
+                        val conversation_id: String = FirebaseHelper().getConversationId(userId= userId!!)
 
                         withContext(Dispatchers.Main){
                             val intent = Intent(itemView.context, ChatActivity::class.java)
@@ -81,6 +84,9 @@ class ConversationsSearchResultsAdapter(context: Context) : RecyclerView.Adapter
                             intent.putExtra("CONVERSATION_ID",conversation_id)
                             itemView.context.startActivity(intent)
                         }
+
+
+
                     }
 
                 }

@@ -29,7 +29,7 @@ class FirebaseHelper {
     private val db = FirebaseFirestore.getInstance()
     private val currentUser = FirebaseAuth.getInstance().currentUser
 
-    val currentUserDocumentRef = db.collection("users").document(currentUser?.uid.toString())
+    val currentUserDocumentRef = db.collection("users").document(currentUser!!.uid)
     val commentCollection =db.collection("comments")
 
 
@@ -500,9 +500,8 @@ class FirebaseHelper {
 
     suspend fun createNewConversation(userId: String, userName: String, profileImage: String, userFullName: String, message: String): String {
         val conversationRef = db.collection("conversations")
-        val userDocumentRef = db.collection("users").document(currentUser!!.uid)
 
-        val currentUserConversations = userDocumentRef.collection("conversations")
+        val currentUserConversations = currentUserDocumentRef.collection("conversations")
             .whereEqualTo("user_id", userId)
             .get()
             .await()
@@ -527,7 +526,7 @@ class FirebaseHelper {
                 "is_read" to true,
                // "user_name" to userName
             )
-            userDocumentRef.collection("conversations").document(newConversationDocument.id).set(newConversation).await()
+            currentUserDocumentRef.collection("conversations").document(newConversationDocument.id).set(newConversation).await()
 
             val currentUserObject = getUserById(currentUser!!.uid)
 
@@ -556,9 +555,19 @@ class FirebaseHelper {
             )
             conversationRef.document(conversationId).collection("messages").add(messageData).await()
 
-            conversationId // Return the existing conversation ID
+            conversationId
         }
     }
+
+    suspend fun getConversationId(userId: String): String {
+        val currentUserConversations = currentUserDocumentRef.collection("conversations")
+            .whereEqualTo("user_id", userId)
+            .get()
+            .await()
+
+        return currentUserConversations.documents.firstOrNull()?.id ?: "NO_CONVERSATION"
+    }
+
 
 
     fun sendMessage(

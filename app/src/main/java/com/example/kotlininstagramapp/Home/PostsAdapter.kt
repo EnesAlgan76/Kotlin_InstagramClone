@@ -165,8 +165,6 @@ class PostsAdapter(
             videoView.setOnPreparedListener { mediaPlayer ->
                 holder.post_iv_postimage.visibility = View.GONE
                 Log.e("video Hazır",holder.post_tvdescription.text.toString())
-                mediaPlayer.start()
-
             }
 
         }else{
