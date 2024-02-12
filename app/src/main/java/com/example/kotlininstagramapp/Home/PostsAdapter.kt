@@ -127,6 +127,7 @@ class PostsAdapter(
 
                 showComment.setOnClickListener {
                     val bottomSheetFragment = CommentBottomSheetFragment(userPostItem.postId, userPostItem.userId, userPostItem.userPostUrl)
+
                     bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
                 }
 

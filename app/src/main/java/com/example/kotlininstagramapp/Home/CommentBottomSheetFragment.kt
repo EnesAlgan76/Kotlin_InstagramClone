@@ -6,10 +6,13 @@ import android.text.*
 import android.util.Log
 import android.view.*
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.TextHighlighter
@@ -24,6 +27,7 @@ class CommentBottomSheetFragment(var postId: String, var userId: String, var use
 
     var comments:ArrayList<Pair<Comment,Boolean>> = arrayListOf()
     lateinit var et_comment :EditText
+    lateinit var iv_comment_profile :ImageView
     lateinit var tv_shareComment :TextView
     lateinit var recycleView :RecyclerView
     lateinit var shimmer: ShimmerFrameLayout
@@ -34,12 +38,16 @@ class CommentBottomSheetFragment(var postId: String, var userId: String, var use
         et_comment = view.findViewById(R.id.et_comment)
         tv_shareComment = view.findViewById(R.id.tv_sharecomment)
         shimmer = view.findViewById(R.id.shimmerLayout)
+        iv_comment_profile = view.findViewById(R.id.iv_comment_profile)
+
         val listViewShimmer = view.findViewById<ListView>(R.id.listViewShimmer)
         val items = Array(5) { "Item $it" }
         val adapter = SchimmerAdapter(requireContext(),  items)
         listViewShimmer.adapter = adapter
 
-        setSpecialWordFormatting(et_comment)
+        Glide.with(requireContext()).load(UserSingleton.user!!.userDetails.profilePicture).into(iv_comment_profile)
+
+       // setSpecialWordFormatting(et_comment)
 
 
         CoroutineScope(Dispatchers.Main).launch{

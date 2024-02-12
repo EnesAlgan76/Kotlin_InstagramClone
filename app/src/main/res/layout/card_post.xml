@@ -134,7 +134,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:textColor="@color/black"
-        android:text="beğenme" />
+        android:text="likes" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -165,7 +165,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
-        android:text="Yorumları Gör" />
+        android:text="View Comments" />
 
     <TextView
         android:id="@+id/post_tv_dateago"

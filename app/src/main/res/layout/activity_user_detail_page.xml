@@ -116,7 +116,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Gönderi"
+                    android:text="Post"
                     android:textColor="#000000"
                     app:layout_constraintEnd_toEndOf="@+id/userExplore_tv_posts"
                     app:layout_constraintStart_toStartOf="@+id/userExplore_tv_posts"
@@ -169,7 +169,7 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="24dp"
                         android:backgroundTint="#EEEEEE"
-                        android:text="İstek Gönderildi"
+                        android:text="Follow Request Sended"
                         android:textColor="@color/black"
                         android:textSize="12sp"
                         android:visibility="invisible" />
@@ -248,7 +248,7 @@
                 <ImageView
                     android:id="@+id/imageView_PrivateInfo"
                     android:layout_width="wrap_content"
-                    android:layout_height="200dp"
+                    android:layout_height="275dp"
                     android:layout_gravity="center"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"

@@ -18,6 +18,15 @@
         app:cardBackgroundColor="#9C9C9C"
         app:cardCornerRadius="5dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Comments"
+        style="@style/TextAppearance.Material3.BodyLarge"
+        android:textColor="@color/black"
+        android:layout_marginTop="8dp"
+        />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -26,6 +35,7 @@
             android:id="@+id/rv_comments"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="8dp"
             android:layout_weight="1"
             />
 
@@ -33,6 +43,7 @@
             android:id="@+id/shimmerLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -50,7 +61,6 @@
     </FrameLayout>
 
 
-
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
@@ -58,33 +68,34 @@
         android:layout_margin="8dp"
         android:gravity="center">
 
-        <ImageView
-            android:id="@+id/imageView4"
-            android:layout_width="50dp"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_comment_profile"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_margin="8dp"
-            android:layout_height="50dp"
             tools:srcCompat="@tools:sample/avatars" />
 
         <EditText
             android:id="@+id/et_comment"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:background="@null"
             android:ems="10"
-            android:hint="Yorum ekle..."
+            android:hint="Add comment..."
             android:inputType="textPersonName"
             android:padding="12dp"
-            android:textSize="16dp"
             android:textColor="#202020"
-            android:textColorHint="#3C3C3C" />
+            android:textColorHint="#3C3C3C"
+            android:textSize="16sp" />
 
 
         <TextView
             android:id="@+id/tv_sharecomment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Paylaş"
+            android:layout_marginHorizontal="16dp"
+            android:text="Share"
             android:textColor="#2196F3" />
     </LinearLayout>
 

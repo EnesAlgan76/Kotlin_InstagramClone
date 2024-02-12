@@ -167,21 +167,20 @@ class FirebaseHelper {
 
     }
 
-    suspend fun getComments(postId: String): ArrayList<Pair<Comment,Boolean>> {
-        val comments = commentCollection.whereEqualTo("post_id",postId).get().await()
+    suspend fun getComments(postId: String): ArrayList<Pair<Comment, Boolean>> {
+        val comments = commentCollection.whereEqualTo("post_id", postId).get().await()
         val userDocument = currentUserDocumentRef.get().await()
-        val likedComments = userDocument.get("liked_comments") as? List<String>?: listOf()
+        val likedComments = userDocument.get("liked_comments") as? List<String> ?: listOf()
 
-
-        val commentsList = comments.documents.mapNotNull{ document ->
+        val commentsList = comments.documents.mapNotNull { document ->
             val comment = document.toObject(Comment::class.java)
-            val isLiked=  likedComments.contains(comment!!.commentId)
+            val isLiked = likedComments.contains(comment!!.commentId)
             (comment to isLiked)
-
         }
 
-        return ArrayList(commentsList)
+        val sortedCommentsList = commentsList.sortedByDescending { it.first.time }
 
+        return ArrayList(sortedCommentsList)
     }
 
     suspend fun updateCommentLikeState(commentId: String, currentLikeCount: Int) {

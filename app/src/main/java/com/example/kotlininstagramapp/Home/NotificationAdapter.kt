@@ -97,7 +97,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         fun bind(currentItem: Notification) {
             val timeAgo = formatTimeAgo(currentItem.timestamp)
             val userName :String = currentItem.userName
-            val text ="${userName} seni takip etmek istiyor. ${timeAgo}"
+            val text ="${userName} wants to follow you. ${timeAgo}"
             formatTextView(notificationText,text)
 
             Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
@@ -136,9 +136,9 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
             val userName :String = currentItem.userName
             val timeAgo = formatTimeAgo(currentItem.timestamp)
 
-            val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "videonu" else "fotoğrafını"
+            val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "video" else "photo"
 
-            val text ="${userName +" "+ imageOrVideo} beğendi. ${timeAgo}"
+            val text ="${userName +" liked your "+ imageOrVideo}. ${timeAgo}"
             formatTextView(notificationText,text)
 
             Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
@@ -163,9 +163,9 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
 
             val timeAgo = formatTimeAgo(currentItem.timestamp)
 
-            val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "videona" else "fotoğrafına"
+            val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "video" else "photo"
 
-            val text ="${userName +" "+ imageOrVideo} yorum yaptı. ${timeAgo}"
+            val text ="${userName +" commented on your "+ imageOrVideo}. ${timeAgo}"
             formatTextView(notificationText,text)
 
             Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
