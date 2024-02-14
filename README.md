@@ -1,6 +1,7 @@
 ## Sign Up / Login
 <div style="display: flex; flex-direction: row;">
-    <img src="gifs/register.gif" alt="SignUp" width="200" />
+    <img src="gifs/register.gif" alt="SignUp" height="500" />
+    <img src="gifs/profile.gif" alt="SignUp" height="500" />
 </div>
 
 
