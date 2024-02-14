@@ -17,7 +17,7 @@
 
 
 ## Share Post
-<img src="gifs/share_post.gif" alt="SignUp" height="500" />
+<img src="gifs/share_post2.gif" alt="SignUp" height="500" />
 
 
 ## Share Story
@@ -25,4 +25,4 @@
 
 
 ## View Story
-<img src="gifs/view_story.gif" alt="SignUp" height="500" />
+<img src="gifs/story_view.gif" alt="SignUp" height="500" />
