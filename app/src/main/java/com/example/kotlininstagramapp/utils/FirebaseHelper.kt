@@ -25,10 +25,13 @@ import java.util.UUID
 class FirebaseHelper {
     private val storageReference = FirebaseStorage.getInstance()
     private val db = FirebaseFirestore.getInstance()
-    private val currentUser = FirebaseAuth.getInstance().currentUser
-
-    val currentUserDocumentRef = db.collection("users").document(currentUser!!.uid)
     val commentCollection =db.collection("comments")
+
+    private val currentUser by lazy { FirebaseAuth.getInstance().currentUser }
+
+    val currentUserDocumentRef by lazy {
+        db.collection("users").document(currentUser!!.uid)
+    }
 
 
     suspend fun getAllPosts(): ArrayList<UserPostItem> {
@@ -377,7 +380,7 @@ class FirebaseHelper {
     suspend fun unfollowUser(userId: String) {
         if (currentUser != null) {
             currentUserDocumentRef.collection("follows").document(userId).delete().await()
-            db.collection("users").document(userId).collection("followers").document(currentUser.uid).delete().await()
+            db.collection("users").document(userId).collection("followers").document(currentUser!!.uid).delete().await()
             Log.e("////", "Unfollowed")
         }
     }

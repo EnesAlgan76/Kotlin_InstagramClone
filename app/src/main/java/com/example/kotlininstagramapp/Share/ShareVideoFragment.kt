@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
+import com.iammert.library.cameravideobuttonlib.CameraVideoButton
 import com.otaliastudios.cameraview.*
 import com.otaliastudios.cameraview.controls.Mode
 import org.greenrobot.eventbus.EventBus
@@ -23,7 +24,7 @@ import java.io.File
 class ShareVideoFragment : Fragment() {
     lateinit var cameraView: CameraView
     lateinit var closeIcon: ImageView
-    lateinit var captureButton : View
+    lateinit var videoRecordButton : CameraVideoButton
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_share_video, container, false)
 
@@ -33,35 +34,62 @@ class ShareVideoFragment : Fragment() {
         }
 
         cameraView = view.findViewById(R.id.cameraViewShareVideo )
-        captureButton = view.findViewById(R.id.iv_record)
+        videoRecordButton = view.findViewById(R.id.btn_record)
+
+        videoRecordButton.setVideoDuration(10000)
+        videoRecordButton.enableVideoRecording(true)
+        videoRecordButton.enablePhotoTaking(false)
+
         cameraView.setLifecycleOwner(viewLifecycleOwner)
         cameraView.mode = Mode.VIDEO
 
         var fileName:String = System.currentTimeMillis().toString()+".mp4"
         val fileToUpload = File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DCIM), fileName)
-        captureButton.setOnTouchListener(object  :View.OnTouchListener{
-            override fun onTouch(p0: View?, motion: MotionEvent?): Boolean {
-                if(motion!!.action ==MotionEvent.ACTION_DOWN){
-                    cameraView.takeVideo(fileToUpload)
-                    return true
-                }
-                else if(motion.action ==MotionEvent.ACTION_UP){
-                    cameraView.stopVideo()
-                    return true
-                }
-                return false
+
+        videoRecordButton.actionListener = object : CameraVideoButton.ActionListener{
+            override fun onStartRecord() {
+                Log.v("TEST", "Start recording video")
+                cameraView.takeVideo(fileToUpload)
             }
 
-        })
+            override fun onEndRecord() {
+                cameraView.stopVideo()
+                Log.v("TEST", "Stop recording video")
+            }
+
+            override fun onDurationTooShortError() {
+                Log.v("TEST", "Toast or notify user")
+            }
+
+            override fun onSingleTap() {
+                Log.v("TEST", "Take photo here")
+            }
+        }
+
+
+//        captureButton.setOnTouchListener(object  :View.OnTouchListener{
+//            override fun onTouch(p0: View?, motion: MotionEvent?): Boolean {
+//                if(motion!!.action ==MotionEvent.ACTION_DOWN){
+//                    cameraView.takeVideo(fileToUpload)
+//                    return true
+//                }
+//                else if(motion.action ==MotionEvent.ACTION_UP){
+//                    cameraView.stopVideo()
+//                    return true
+//                }
+//                return false
+//            }
+//
+//        })
 
         cameraView.addCameraListener(object  : CameraListener(){
             override fun onVideoRecordingStart() {
-                Toast.makeText(context, "Video Kaydediliyor", Toast.LENGTH_SHORT).show()
+                println("*** \"Video Kaydediliyor\" ***")
                 super.onVideoRecordingStart()
             }
 
             override fun onVideoTaken(result: VideoResult) {
-                Log.e("****************", "Video Kaydedildi onVideoTaken ")
+                println("*** \"Video Kaydedildi onVideoTaken \" ***")
                 goShareNextFragmet(result.file)
                 super.onVideoTaken(result)
             }

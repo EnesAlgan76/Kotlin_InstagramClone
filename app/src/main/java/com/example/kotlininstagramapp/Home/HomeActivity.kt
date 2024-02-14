@@ -24,12 +24,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
-    private lateinit var bottomNavigationView: BottomNavigationView
+    //private lateinit var bottomNavigationView: BottomNavigationView
     lateinit var binding : ActivityHomeBinding
-    val MYCAMERA_PERMISSION_CODE =1001
+    //val MYCAMERA_PERMISSION_CODE =1001
     var auth = FirebaseAuth.getInstance()
-    var firebaseHelper: FirebaseHelper = FirebaseHelper()
-    var allPosts: ArrayList<UserPostItem> = ArrayList()
+    //var firebaseHelper: FirebaseHelper = FirebaseHelper()
+    //var allPosts: ArrayList<UserPostItem> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
