@@ -11,11 +11,20 @@ import android.util.Log
 import android.widget.Toast
 import com.example.kotlininstagramapp.Home.HomeActivity
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
+import com.example.kotlininstagramapp.api.RetrofitInstance
+import com.example.kotlininstagramapp.api.RetrofitInstance.retrofit
+import com.example.kotlininstagramapp.api.UserApi
+import com.example.kotlininstagramapp.api.UserModel
 import com.example.kotlininstagramapp.databinding.ActivityLoginBinding
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class LoginActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginBinding
@@ -38,7 +47,30 @@ class LoginActivity : AppCompatActivity() {
         binding.btnLogingiris.setOnClickListener {
             if(buttonActive){
                 var fieldList = arrayListOf("telNo", "mail", "userName")
-                searchUserRecursively(binding.etLoginmail.text.toString(), binding.etLoginpassword.text.toString(), fieldList)
+
+                val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val call = userService.getUserById(123)
+                        println("Request URL: ${call.request().url()}") // Log request URL
+                        val response = call.execute()
+                        if (response.isSuccessful) {
+                            println("Response Body: ${response.body()}") // Log successful response body
+                        } else {
+                            println("Error Response: ${response.errorBody()?.string()}") // Log error response body
+                        }
+                    } catch (e: IOException) {
+                        println("IOException: ${e.message}") // Log IOException
+                    } catch (e: HttpException) {
+                        println("HttpException: ${e.message}") // Log HttpException
+                    }
+                }
+
+
+
+
+                // searchUserRecursively(binding.etLoginmail.text.toString(), binding.etLoginpassword.text.toString(), fieldList)
             }
 
         }

@@ -2,6 +2,7 @@ package com.example.kotlininstagramapp.Login
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +13,15 @@ import androidx.fragment.app.Fragment
 import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.api.RetrofitInstance
+import com.example.kotlininstagramapp.api.UserApi
+import com.example.kotlininstagramapp.api.UserModel
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 
@@ -35,8 +42,63 @@ class RegisterFragment :Fragment(){
         kullaniciAdi = view.findViewById(R.id.et_frgregister_kullaniciAdi)
         sifre = view.findViewById(R.id.et_frgregister_sifre)
         btnIleri = view.findViewById(R.id.btn_ileri_frgregister)
-        btnIleri?.setOnClickListener { registerNewUser() }
+        btnIleri?.setOnClickListener { registerNewUserSpring() }
         return view
+    }
+
+
+
+    private fun registerNewUserSpring() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
+                val userName = kullaniciAdi!!.text.trim().toString()
+
+                val call = userService.findUserByUserNameOrEmail(userName,gelenMail)
+                println("Request Url : "+call.request().url())
+
+                val response = call.execute()
+                if (response.isSuccessful) {
+                    if (response.body() == true){
+                        Log.e("--------", "BU MAİL YA DA KULLANICI ADINA KAYITLI ZATEN BİR KULLANICI VAR")
+                    }else{
+                        Log.e("--------", "KAYIT YAPILIYOR ...")
+
+                        val userModel = UserModel(
+                            0,
+                            userName = userName,
+                            password = sifre?.text.toString(),
+                            phoneNumber = gelenTelNo,
+                            email = gelenMail,
+                            fullName = adSoyad?.text.toString(),
+                            profilePicture = "",
+                            biography = "",
+                            followerCount = 0,
+                            postCount = 0,
+                            followingCount = 0
+                        )
+
+                        val createCall = userService.createUser(userModel)
+
+                        val createResponse = createCall.execute()
+
+                        if (createResponse.isSuccessful) {
+                            println("User create body : " + createResponse.body())
+                        } else {
+                            println("Error Body: " + createResponse.errorBody()?.string())
+                        }
+
+
+                    }
+                } else {
+                    println("Error Response: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                println("Exception occurred: ${e.message}")
+                Toast.makeText(context, "Bağlantı Hatası", Toast.LENGTH_SHORT).show()
+                e.printStackTrace()
+            }
+        }
     }
 
 

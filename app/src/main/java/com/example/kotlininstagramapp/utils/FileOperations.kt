@@ -27,7 +27,7 @@ class FileOperations {
               return null
           }
 
-          val imageExtensions = setOf("jpg", "jpeg", "png", "gif", "bmp", "mp4") // Add more image extensions if needed
+          val imageExtensions = setOf("jpg", "jpeg", "png")
           directory.listFiles()?.forEach { file ->
               //println("++>>"+file)
               if (file.isFile &&  imageExtensions.contains(file.extension.lowercase())  ) {

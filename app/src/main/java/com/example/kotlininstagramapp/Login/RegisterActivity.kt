@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.example.kotlininstagramapp.Profile.SettingActivity
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.api.RetrofitInstance
+import com.example.kotlininstagramapp.api.UserApi
 import com.example.kotlininstagramapp.databinding.ActivityProfileBinding
 import com.example.kotlininstagramapp.databinding.ActivityRegisterBinding
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
@@ -85,26 +87,38 @@ class RegisterActivity : AppCompatActivity() {
                     }
                 }
             }else{
-                checkIfValueExists(binding.etRegisterpage.text.trim().toString()){exists->
-                    if(exists){
-                        Toast.makeText(this, "This mail already taken", Toast.LENGTH_SHORT).show()
-                    }else{
-                        binding.registerRoot.visibility= View.GONE
-                        binding.flRegisterpage.visibility = View.VISIBLE
+            //////
+                binding.registerRoot.visibility= View.GONE
+                binding.flRegisterpage.visibility = View.VISIBLE
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fl_registerpage, RegisterFragment())
+                    .addToBackStack("RegisterFragmentMail")
+                    .commit()
 
+                EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(null,binding.etRegisterpage.text.toString()))
+            /////
+
+
+//                checkIfValueExists(binding.etRegisterpage.text.trim().toString()){exists->
+//                    if(exists){
+//                        Toast.makeText(this, "This mail already taken", Toast.LENGTH_SHORT).show()
+//                    }else{
+//                        binding.registerRoot.visibility= View.GONE
+//                        binding.flRegisterpage.visibility = View.VISIBLE
+//
+////                        supportFragmentManager.beginTransaction()
+////                            .replace(R.id.fl_registerpage, MailFragment())
+////                            .addToBackStack("MailFragment")
+////                            .commit()
 //                        supportFragmentManager.beginTransaction()
-//                            .replace(R.id.fl_registerpage, MailFragment())
-//                            .addToBackStack("MailFragment")
+//                            .replace(R.id.fl_registerpage, RegisterFragment())
+//                            .addToBackStack("RegisterFragmentMail")
 //                            .commit()
-                        supportFragmentManager.beginTransaction()
-                            .replace(R.id.fl_registerpage, RegisterFragment())
-                            .addToBackStack("RegisterFragmentMail")
-                            .commit()
-
-
-                        EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(null,binding.etRegisterpage.text.toString()))
-                    }
-                }
+//
+//
+//                        EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(null,binding.etRegisterpage.text.toString()))
+//                    }
+//                }
 
             }
 
