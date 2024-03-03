@@ -22,8 +22,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import retrofit2.await
 
 class RegisterFragment :Fragment(){
     val firebaseAuth = FirebaseAuth.getInstance()
@@ -49,63 +51,85 @@ class RegisterFragment :Fragment(){
 
 
     private fun registerNewUserSpring() {
+        if (!checkFieldsAreFilled()) {
+            showToast("Tüm Alanları Doldurunuz")
+            return
+        }
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
                 val userName = kullaniciAdi!!.text.trim().toString()
 
-                val call = userService.findUserByUserNameOrEmail(userName,gelenMail)
-                println("Request Url : "+call.request().url())
+                val call = userService.checkUserExists(userName, gelenMail, gelenTelNo)
+                println("Request Url : ${call.request().url()}")
 
                 val response = call.execute()
                 if (response.isSuccessful) {
-                    if (response.body() == true){
-                        Log.e("--------", "BU MAİL YA DA KULLANICI ADINA KAYITLI ZATEN BİR KULLANICI VAR")
-                    }else{
-                        Log.e("--------", "KAYIT YAPILIYOR ...")
-
-                        val userModel = UserModel(
-                            0,
-                            userName = userName,
-                            password = sifre?.text.toString(),
-                            phoneNumber = gelenTelNo,
-                            email = gelenMail,
-                            fullName = adSoyad?.text.toString(),
-                            profilePicture = "",
-                            biography = "",
-                            followerCount = 0,
-                            postCount = 0,
-                            followingCount = 0
-                        )
-
-                        val createCall = userService.createUser(userModel)
-
-                        val createResponse = createCall.execute()
-
-                        if (createResponse.isSuccessful) {
-                            println("User create body : " + createResponse.body())
-                        } else {
-                            println("Error Body: " + createResponse.errorBody()?.string())
-                        }
-
-
+                    if (response.body() == true) {
+                        println("Bu kullanıcı adı ya da e-posta ile zaten bir hesap bulunmaktadır.")
+                    } else {
+                        println("Yeni hesap oluşturuluyor...")
+                        createUserSpring(userService, userName)
                     }
                 } else {
-                    println("Error Response: ${response.errorBody()?.string()}")
+                    println("Hata Mesajı: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
-                println("Exception occurred: ${e.message}")
-                Toast.makeText(context, "Bağlantı Hatası", Toast.LENGTH_SHORT).show()
-                e.printStackTrace()
+                println("Hata Oluştu: ${e.message}")
+               // showToast("Bağlantı Hatası")
             }
         }
     }
+
+    private fun createUserSpring(userService: UserApi, userName: String) {
+        if (gelenMail.isEmpty()){gelenMail = gelenTelNo+"@enes.com"}
+
+        firebaseAuth.createUserWithEmailAndPassword(gelenMail,sifre?.text.toString())
+            .addOnCompleteListener {task ->
+                if (task.isSuccessful){
+                    val userID = firebaseAuth.currentUser!!.uid
+                    val userModel = UserModel(
+                        userId =userID ,
+                        userName = userName,
+                        password = sifre?.text.toString(),
+                        phoneNumber = gelenTelNo,
+                        email = gelenMail,
+                        fullName = adSoyad?.text.toString(),
+                        fcmToken = "",
+                        profilePicture = "",
+                        biography = "",
+                        followerCount = 0,
+                        postCount = 0,
+                        followingCount = 0
+                    )
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val createCall = userService.createUser(userModel)
+                        val createResponse = createCall.execute()
+                        if (createResponse.isSuccessful) {
+                            println("Hesap başarıyla oluşturuldu.")
+                            println("User create body : ${createResponse.body()}")
+                        } else {
+                            println("Hata Mesajı : ${createResponse.errorBody()?.string()}")
+                        }
+                    }
+
+
+
+                }
+            }
+
+    }
+
 
 
 
     private fun registerNewUser() {
         if(checkFieldsAreFilled()){
+
             if (gelenMail.isEmpty()){gelenMail = gelenTelNo+"@enes.com"}
+
             val emailQuery = db.collection("users").whereEqualTo("userName",kullaniciAdi!!.text.trim().toString())
             emailQuery.get().addOnCompleteListener { task ->
                 if(task.isSuccessful){
@@ -121,9 +145,6 @@ class RegisterFragment :Fragment(){
             showToast("Tüm Alanları Doldurunuz")
         }
     }
-
-
-
     private fun createFirebaseUser() {
         firebaseAuth.createUserWithEmailAndPassword(gelenMail,sifre?.text.toString())
             .addOnCompleteListener {task ->
@@ -149,6 +170,8 @@ class RegisterFragment :Fragment(){
 
         }
     }
+
+
 
     private fun checkFieldsAreFilled(): Boolean {
         val adSoyadText = adSoyad?.text?.trim().toString()

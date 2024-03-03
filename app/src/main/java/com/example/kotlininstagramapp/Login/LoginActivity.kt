@@ -9,6 +9,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
+import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Home.HomeActivity
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.api.RetrofitInstance
@@ -20,6 +21,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,6 +33,7 @@ class LoginActivity : AppCompatActivity() {
     var buttonActive :Boolean = false
     val firestore = FirebaseFirestore.getInstance()
     val auth = FirebaseAuth.getInstance()
+    val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,40 +48,38 @@ class LoginActivity : AppCompatActivity() {
         binding.etLoginpassword.addTextChangedListener(textWatcher)
 
         binding.btnLogingiris.setOnClickListener {
-            if(buttonActive){
-                var fieldList = arrayListOf("telNo", "mail", "userName")
-
-                val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    try {
-                        val call = userService.getUserById(123)
-                        println("Request URL: ${call.request().url()}") // Log request URL
-                        val response = call.execute()
-                        if (response.isSuccessful) {
-                            println("Response Body: ${response.body()}") // Log successful response body
-                        } else {
-                            println("Error Response: ${response.errorBody()?.string()}") // Log error response body
+            CoroutineScope(Dispatchers.IO).launch {
+                if (buttonActive){
+                    val response= userService.authenticateUser(binding.etLoginmail.text.toString(),binding.etLoginpassword.text.toString()).execute()
+                    if (response.isSuccessful) {
+                        println("Response Body: ${response.body()}")
+                        if (response.body()?.data != null) {
+                            println("Logging ...")
+                            val userDataJson = Gson().toJson(response.body()?.data)
+                            val userModel = Gson().fromJson(userDataJson, UserModel::class.java)
+                            UserSingleton.userModel = userModel
+                            loginUserWithEmail(userModel.password,userModel.email) // Firebase Auth
+                        }else{
+                            println("User not found")
                         }
-                    } catch (e: IOException) {
-                        println("IOException: ${e.message}") // Log IOException
-                    } catch (e: HttpException) {
-                        println("HttpException: ${e.message}") // Log HttpException
+                    } else {
+                        println("Error Response: ${response.errorBody()?.string()}")
                     }
                 }
-
-
-
-
-                // searchUserRecursively(binding.etLoginmail.text.toString(), binding.etLoginpassword.text.toString(), fieldList)
             }
+
+
+            /*if(buttonActive){
+                var fieldList = arrayListOf("telNo", "mail", "userName")
+                searchUserRecursively(binding.etLoginmail.text.toString(), binding.etLoginpassword.text.toString(), fieldList)
+            }*/
 
         }
 
     }
 
 
-    private fun searchUserRecursively(etLoginmail: String, etLoginpassword: String, fieldList: ArrayList<String>) {
+    /*private fun searchUserRecursively(etLoginmail: String, etLoginpassword: String, fieldList: ArrayList<String>) {
         if (fieldList.isEmpty()){
             Toast.makeText(this, "Kullanıcı Bulunamadı", Toast.LENGTH_SHORT).show()
             return
@@ -97,7 +98,7 @@ class LoginActivity : AppCompatActivity() {
             }
 
         }
-    }
+    }*/
 
     private fun loginUserWithEmail(password: String?, mail: String?) {
         if(password!=null && mail!=null){
@@ -116,6 +117,9 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
+
+
+
     private fun retrieveCurrentFcmToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -124,7 +128,21 @@ class LoginActivity : AppCompatActivity() {
             }
             val token = task.result
             Log.d("retrieveCurrentFcmToken", "------>> "+token)
-            FirebaseHelper().saveNewToken(token)
+            //FirebaseHelper().saveNewToken(token)
+            CoroutineScope(Dispatchers.IO).launch {
+
+
+                try {
+                    val response = userService.updateFcmToken(UserSingleton.userModel!!.userId, token).execute()
+
+                    Log.e("TOKEN GÜNCELLENDİ", "body : "+response.body())
+
+                } catch (e: Exception) {
+                    Log.e("TOKEN GÜNCELLENEMEDİ", "Error updating FCM token: ${e.message}")
+                    throw e
+                }
+            }
+
         })
     }
 
@@ -137,6 +155,7 @@ class LoginActivity : AppCompatActivity() {
             if(binding.etLoginmail.length()<6 || binding.etLoginpassword.length() <6){
                 binding.btnLogingiris.setBackgroundColor(Color.parseColor("#FFFFFF"))
                 binding.btnLogingiris.setTextColor(Color.parseColor("#3a97f1"))
+                buttonActive = false
 
             }else{
                 binding.btnLogingiris.setBackgroundColor(Color.parseColor("#3a97f1"))
