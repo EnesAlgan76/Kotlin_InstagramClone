@@ -39,39 +39,50 @@ class RegisterActivity : AppCompatActivity() {
        supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
        super.onBackPressed()
 
-//         bu işlemler sırasıyla bir önceki fragmenti göstercek şekilde ayarlandı.
-//        if ((this.supportFragmentManager.backStackEntryCount) > 1) {
-//            this.supportFragmentManager.popBackStack()
-//        } else {
-//            super.onBackPressed()
-//            binding.registerRoot.visibility= View.VISIBLE
-//        }
+        /* bu işlemler sırasıyla bir önceki fragmenti göstercek şekilde ayarlandı.
+        if ((this.supportFragmentManager.backStackEntryCount) > 1) {
+            this.supportFragmentManager.popBackStack()
+        } else {
+            super.onBackPressed()
+            binding.registerRoot.visibility= View.VISIBLE
+        }*/
 
     }
 
-    //Bu da farklı bir kullanım. varysayalım 3 tane fragment açılmış olsun ve 3 fragment açık iken geri gitmek istediğinde
-    // 2. fragment atlayarak direkt 1. fragmenti göstermek istersen bu yapıyı kullanırsın
-//    override fun onBackPressed() {
-//        if ((supportFragmentManager.backStackEntryCount) > 1) {
-//            // Get the name of the topmost fragment in the back stack
-//            val topFragmentName = supportFragmentManager.getBackStackEntryAt(supportFragmentManager.backStackEntryCount - 1).name
-//
-//            if (topFragmentName == "RegisterFragment") {
-//                // Pop the fifth fragment from the back stack
-//                supportFragmentManager.popBackStack("Göstermek istediğin fragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
-//            } else {
-//                supportFragmentManager.popBackStack()
-//            }
-//        } else {
-//            super.onBackPressed()
-//            binding.registerRoot.visibility = View.VISIBLE
-//        }
-//    }
+        /*
+    Bu da farklı bir kullanım. varysayalım 3 tane fragment açılmış olsun ve 3 fragment açık iken geri gitmek istediğinde
+     2. fragment atlayarak direkt 1. fragmenti göstermek istersen bu yapıyı kullanırsın
+    override fun onBackPressed() {
+        if ((supportFragmentManager.backStackEntryCount) > 1) {
+            // Get the name of the topmost fragment in the back stack
+            val topFragmentName = supportFragmentManager.getBackStackEntryAt(supportFragmentManager.backStackEntryCount - 1).name
+
+            if (topFragmentName == "RegisterFragment") {
+                // Pop the fifth fragment from the back stack
+                supportFragmentManager.popBackStack("Göstermek istediğin fragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            } else {
+                supportFragmentManager.popBackStack()
+            }
+        } else {
+            super.onBackPressed()
+            binding.registerRoot.visibility = View.VISIBLE
+        }
+    }*/
 
     private fun handleIleriButtonClick() {
         binding.btnIleri.setOnClickListener {
             if (binding.etRegisterpage.hint=="Phone"){
-                checkIfValueExists(binding.etRegisterpage.text.trim().toString()+"@enes.com"){exists ->
+
+                binding.registerRoot.visibility= View.GONE
+                binding.flRegisterpage.visibility = View.VISIBLE
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fl_registerpage, RegisterFragment())
+                    .addToBackStack("RegisterFragment")
+                    .commit()
+
+                EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(binding.etRegisterpage.text.toString(),null))
+
+                /*checkIfValueExists(binding.etRegisterpage.text.trim().toString()+"@enes.com"){exists ->
                     if(exists){
                         Toast.makeText(this, "This phone number alyeady registered", Toast.LENGTH_SHORT).show()
                     }else{
@@ -85,40 +96,33 @@ class RegisterActivity : AppCompatActivity() {
 
                         EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(binding.etRegisterpage.text.toString(),null))
                     }
-                }
+                }*/
+
             }else{
-            //////
                 binding.registerRoot.visibility= View.GONE
                 binding.flRegisterpage.visibility = View.VISIBLE
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fl_registerpage, RegisterFragment())
-                    .addToBackStack("RegisterFragmentMail")
+                    .addToBackStack("RegisterFragment")
                     .commit()
 
                 EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(null,binding.etRegisterpage.text.toString()))
-            /////
 
+                /*checkIfValueExists(binding.etRegisterpage.text.trim().toString()){exists->
+                    if(exists){
+                        Toast.makeText(this, "This mail already taken", Toast.LENGTH_SHORT).show()
+                    }else{
+                        binding.registerRoot.visibility= View.GONE
+                        binding.flRegisterpage.visibility = View.VISIBLE
 
-//                checkIfValueExists(binding.etRegisterpage.text.trim().toString()){exists->
-//                    if(exists){
-//                        Toast.makeText(this, "This mail already taken", Toast.LENGTH_SHORT).show()
-//                    }else{
-//                        binding.registerRoot.visibility= View.GONE
-//                        binding.flRegisterpage.visibility = View.VISIBLE
-//
-////                        supportFragmentManager.beginTransaction()
-////                            .replace(R.id.fl_registerpage, MailFragment())
-////                            .addToBackStack("MailFragment")
-////                            .commit()
-//                        supportFragmentManager.beginTransaction()
-//                            .replace(R.id.fl_registerpage, RegisterFragment())
-//                            .addToBackStack("RegisterFragmentMail")
-//                            .commit()
-//
-//
-//                        EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(null,binding.etRegisterpage.text.toString()))
-//                    }
-//                }
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.fl_registerpage, RegisterFragment())
+                            .addToBackStack("RegisterFragmentMail")
+                            .commit()
+
+                        EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(null,binding.etRegisterpage.text.toString()))
+                    }
+                }*/
 
             }
 
