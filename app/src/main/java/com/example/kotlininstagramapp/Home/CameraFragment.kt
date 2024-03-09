@@ -35,9 +35,6 @@ class CameraFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_camera,container,false)
 
-        Log.e("***********","Kamera tetiklendi")
-
-
         cameraView = view.findViewById(R.id.cameraview)
         switchCameraButton = view.findViewById(R.id.iv_switchfrontcamera)
         capture = view.findViewById(R.id.iv_capturecamera)
@@ -101,13 +98,11 @@ class CameraFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.e("------------","camera view RESUME")
         cameraView.open()
     }
 
     override fun onPause() {
-        Log.e("------------","camera view PAUSE")
-        //cameraView.close()
+        cameraView.close()
         super.onPause()
     }
 

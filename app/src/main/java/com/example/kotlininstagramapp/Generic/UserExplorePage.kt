@@ -106,7 +106,7 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
     }
 
     private fun setRecycleView(userPostItems: ArrayList<UserPostItem>) {
-        var adapter = ProfileUserPostsAdapter(context = this, userPostItems)
+        var adapter = ProfileUserPostsAdapter(context = this, listOf())
         binding.userExploreRvProfilePageUserPosts.adapter = adapter
         binding.userExploreRvProfilePageUserPosts.layoutManager = GridLayoutManager(this, 3)
     }

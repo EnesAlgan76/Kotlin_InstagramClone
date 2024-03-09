@@ -75,7 +75,7 @@ class FirebaseHelper {
             dataMap["postId"] = i.id
             val post: Post = Post.fromMap(dataMap)
             val userPostItem = UserPostItem(
-                post.postId,
+                post.postId.toString(),
                 user.userId,
                 post.explanation,
                 user.userName,

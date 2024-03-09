@@ -9,11 +9,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.kotlininstagramapp.Generic.OnSinglePostItemClicked
 import com.example.kotlininstagramapp.Generic.UserSingleton.userModel
 import com.example.kotlininstagramapp.Home.SinglePostListFragment
-import com.example.kotlininstagramapp.Models.UserDetails
+import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.api.UserModel
+import com.example.kotlininstagramapp.api.BaseResponse
+import com.example.kotlininstagramapp.api.FollowApi
+import com.example.kotlininstagramapp.api.PostApi
+import com.example.kotlininstagramapp.api.RetrofitInstance
 import com.example.kotlininstagramapp.databinding.ActivityProfileBinding
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.EImageLoader
@@ -24,13 +27,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
+import retrofit2.Call
+import javax.security.auth.callback.Callback
 
-class ProfileActivity : AppCompatActivity(),OnSinglePostItemClicked{
+class ProfileActivity : AppCompatActivity(){  //,OnSinglePostItemClicked
     lateinit var binding: ActivityProfileBinding
     val db = FirebaseFirestore.getInstance()
     val firebaseAuth = FirebaseAuth.getInstance()
     val userId = firebaseAuth.currentUser!!.uid
-    var userPostItems: ArrayList<UserPostItem> = arrayListOf()
+    var userPostItems: ArrayList<Post> = arrayListOf()
+    val postService = RetrofitInstance.retrofit.create(PostApi::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,16 +70,37 @@ class ProfileActivity : AppCompatActivity(),OnSinglePostItemClicked{
 
     private suspend fun setRecycleView() {
         withContext(Dispatchers.IO){
-            val user = FirebaseHelper().getUserById(userId)
+
+            val response = postService.getAllPosts(userId).execute()
+
+            if (response.isSuccessful){
+                val postList = response.body()?.data as List<Map<String, Any>>
+                if(!postList.isEmpty()){
+                    val postDTOList :List<Post> = postList.map { postMap ->
+                        Post.fromMap(postMap)
+                    }
+                    withContext(Dispatchers.Main){
+                        val adapter = ProfileUserPostsAdapter(context = this@ProfileActivity,postDTOList)
+                        binding.rvProfilePageUserPosts.adapter = adapter
+                        binding.rvProfilePageUserPosts.layoutManager = GridLayoutManager(this@ProfileActivity, 3)
+                    }
+
+                }
+            }
+
+
+            /*val user = FirebaseHelper().getUserById(userId)
             try {
                 userPostItems = FirebaseHelper().fetchUserPosts(user!!)
             }catch (e:Throwable){
                 println("HATAAA ---- >> ${e.message}")
-            }
+            }*/
         }
+
+        /*
         var adapter = ProfileUserPostsAdapter(context = this,userPostItems)
         binding.rvProfilePageUserPosts.adapter = adapter
-        binding.rvProfilePageUserPosts.layoutManager = GridLayoutManager(this, 3)
+        binding.rvProfilePageUserPosts.layoutManager = GridLayoutManager(this, 3)*/
 
 
     }
@@ -143,15 +170,15 @@ class ProfileActivity : AppCompatActivity(),OnSinglePostItemClicked{
         }
     }
 
-    override fun onSingleItemClicked(position: Int) {
-        binding.profileActivityroot.visibility = View.INVISIBLE
-        binding.flActivityProfile.visibility = View.VISIBLE
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fl_activity_profile, SinglePostListFragment(userPostItems, position))
-            .addToBackStack("SinglePostFragment")
-            .commit()
-    }
+//    override fun onSingleItemClicked(position: Int) {
+//        binding.profileActivityroot.visibility = View.INVISIBLE
+//        binding.flActivityProfile.visibility = View.VISIBLE
+//
+//        supportFragmentManager.beginTransaction()
+//            .replace(R.id.fl_activity_profile, SinglePostListFragment(userPostItems, position))
+//            .addToBackStack("SinglePostFragment")
+//            .commit()
+//    }
 
 
 }

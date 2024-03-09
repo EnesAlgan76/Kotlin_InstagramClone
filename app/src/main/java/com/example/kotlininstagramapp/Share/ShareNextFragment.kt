@@ -49,7 +49,7 @@ class ShareNextFragment : Fragment() {
     var mAuth = FirebaseAuth.getInstance()
     var firestore = FirebaseFirestore.getInstance()
     //lateinit var storageReference: StorageReference
-    val postId = UUID.randomUUID().toString()
+    val postId = UUID.randomUUID()
     var  storageReference = FirebaseStorage.getInstance().reference
     val imageRef = storageReference.child("posts/${mAuth.currentUser?.uid}/images/${postId}")
     val videoRef = storageReference.child("posts/${mAuth.currentUser?.uid}/videos/${postId}")
@@ -205,7 +205,7 @@ class ShareNextFragment : Fragment() {
             uploadTask.addOnSuccessListener {
                     GlobalScope.launch {
                         val url = mediaRef.downloadUrl.await().toString()
-                        val post = Post(mAuth.currentUser!!.uid, postId, System.currentTimeMillis().toString(), explanation.text.toString(), url)
+                        val post = Post(mAuth.currentUser!!.uid, 0.5, System.currentTimeMillis().toString(), explanation.text.toString(), url)
                         uploadPostToFirestore2(post)
                     }
             }
@@ -232,7 +232,7 @@ class ShareNextFragment : Fragment() {
             )
 
             userDocRef.set(hashMapOf("userId" to post.userId)).await()
-            userDocRef.collection("posts").document(post.postId).set(postMap).await()
+          //  userDocRef.collection("posts").document(post.postId).set(postMap).await()
             user.update("userDetails.post", FieldValue.increment(1)).addOnSuccessListener {
                 println("Post count updated")
             }

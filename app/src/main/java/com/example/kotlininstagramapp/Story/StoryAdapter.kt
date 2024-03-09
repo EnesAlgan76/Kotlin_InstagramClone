@@ -10,10 +10,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.api.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -92,11 +94,11 @@ class StoryAdapter(private val context: Context, private var data: List<Story>) 
 
         fun bindUserData() {
             CoroutineScope(Dispatchers.IO).launch {
-                val user: User? = FirebaseHelper().getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+                val user: UserModel? = UserSingleton.userModel
                 if (user!=null){
                     withContext(Dispatchers.Main){
                         Glide.with(context)
-                            .load(user.userDetails.profilePicture)
+                            .load(user.profilePicture)
                             .into(iv_storyCurrentUser)
 
                         tv_storyCurrentUser.setText(user.userName)
