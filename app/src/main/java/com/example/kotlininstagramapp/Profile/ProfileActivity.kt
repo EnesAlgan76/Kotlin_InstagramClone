@@ -7,11 +7,13 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.kotlininstagramapp.Generic.OnSinglePostItemClicked
+import com.example.kotlininstagramapp.Generic.UserSingleton.userModel
 import com.example.kotlininstagramapp.Home.SinglePostListFragment
 import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.api.UserModel
 import com.example.kotlininstagramapp.databinding.ActivityProfileBinding
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.EImageLoader
@@ -36,11 +38,28 @@ class ProfileActivity : AppCompatActivity(),OnSinglePostItemClicked{
         setContentView(binding.root)
         BottomNavigationHandler.setupNavigations(this,findViewById(R.id.bottomNavigationView_profile),4)
         handleButtonClicks()
-        setInfos()
+        //setInfos()
+        setInfos2()
         CoroutineScope(Dispatchers.Main).launch {
             setRecycleView()
         }
 
+    }
+
+    private fun setInfos2() {
+        binding.tvUserName.text = userModel?.userName
+        binding.tvFollow.text = userModel?.followingCount.toString()
+        binding.tvFollowers.text  = userModel?.followerCount.toString()
+        binding.tvPosts.text = userModel?.postCount.toString()
+        binding.tvBiograpy.text = userModel?.biography
+        binding.tvName.text = userModel?.fullName
+        try {
+            EImageLoader.setImage(userModel!!.profilePicture,binding.ivProfile,binding.pbActivityProfile)
+        }catch(e : java.lang.Error){
+            Log.e("------------", "Resim Bulunamadı")
+        }
+
+        EventBus.getDefault().postSticky(EventBusDataEvents.KullaniciBilgileriGonder(binding.tvName.text.toString(),binding.tvUserName.text.toString(), userModel!!.biography, userModel!!.profilePicture))
     }
 
     private suspend fun setRecycleView() {
@@ -59,7 +78,7 @@ class ProfileActivity : AppCompatActivity(),OnSinglePostItemClicked{
 
     }
 
-    private fun setInfos() {
+    /*private fun setInfos() {
         if(firebaseAuth.currentUser!=null){
             val userDocRef = db.collection("users").document(userId)
 
@@ -91,7 +110,7 @@ class ProfileActivity : AppCompatActivity(),OnSinglePostItemClicked{
                         "*************************")
             }
         }
-    }
+    }*/
 
 
 

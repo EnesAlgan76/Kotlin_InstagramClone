@@ -15,21 +15,26 @@ import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Login.LoginActivity
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
+import com.example.kotlininstagramapp.api.BaseResponse
+import com.example.kotlininstagramapp.api.RetrofitInstance
+import com.example.kotlininstagramapp.api.UserApi
+import com.example.kotlininstagramapp.api.UserModel
 import com.example.kotlininstagramapp.databinding.ActivityHomeBinding
+import com.example.kotlininstagramapp.utils.ConsolePrinter
 import com.example.kotlininstagramapp.utils.MyPagerAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class HomeActivity : AppCompatActivity() {
-    //private lateinit var bottomNavigationView: BottomNavigationView
     lateinit var binding : ActivityHomeBinding
-    //val MYCAMERA_PERMISSION_CODE =1001
     var auth = FirebaseAuth.getInstance()
-    //var firebaseHelper: FirebaseHelper = FirebaseHelper()
-    //var allPosts: ArrayList<UserPostItem> = ArrayList()
+    val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
+    val currentUser = auth.currentUser
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -39,19 +44,52 @@ class HomeActivity : AppCompatActivity() {
 
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        if (auth.currentUser!=null){
+        if (currentUser!=null){
             Toast.makeText(this, "registered", Toast.LENGTH_SHORT).show()
             CoroutineScope(Dispatchers.IO).launch {
-                UserSingleton.user = FirebaseHelper().getUserById(auth.currentUser!!.uid)
+                val response = userService.getUserById(currentUser.uid).execute()
+                if(response.isSuccessful){
+                    val baseResponse:BaseResponse? = response.body()
+                    if (baseResponse?.data != null) {
+                        ConsolePrinter.printYellow("Kullanıcı Veritabanında Bulundu: "+response.body())
+
+                        val userDataJson = Gson().toJson(response.body()?.data)
+                        val userModel = Gson().fromJson(userDataJson, UserModel::class.java)
+                        UserSingleton.userModel = userModel
+
+                    }else{
+                        ConsolePrinter.printYellow("Kullanıcı Veritabanında Bulunamadı: "+response.body())
+
+                        currentUser.delete()
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    Log.e("---------", "User account deleted.")
+                                }else{
+                                    Log.e("---------", "User account didn't deleted.${task.exception}")
+                                    auth.signOut()
+                                }
+                            }
+                        withContext(Dispatchers.Main){
+                            goToLoginPage()
+                        }
+
+                    }
+
+                }
+               // UserSingleton.user = FirebaseHelper().getUserById(auth.currentUser!!.uid)
             }
             setupHomeViewPager()
         }else{
-            Toast.makeText(this, "unregistered", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
+            goToLoginPage()
         }
 
+    }
+
+    fun goToLoginPage(){
+        Toast.makeText(this, "unregistered", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 
     private fun setupHomeViewPager() {

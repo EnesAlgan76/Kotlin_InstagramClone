@@ -40,7 +40,8 @@ import java.io.IOException
 import java.lang.String.format
 
 class ProfileEditFragment : Fragment() {
-    private var eventuserDetails: UserDetails =UserDetails()
+    private var eventBiografi: String=""
+    private var eventProfilePicture: String=""
     private var eventuserName: String=""
     private var eventuserFullName: String=""
     private lateinit var galleryLauncher: ActivityResultLauncher<Intent>
@@ -94,7 +95,7 @@ class ProfileEditFragment : Fragment() {
                      eventuserName,
                      if (fullName.text.toString() != eventuserFullName) fullName.text.toString() else null,
                      if (userNameEditText.text.toString() != eventuserName) userNameEditText.text.toString() else null,
-                     if (biography.text.toString() != eventuserDetails.biography) biography.text.toString() else null,
+                     if (biography.text.toString() != eventBiografi) biography.text.toString() else null,
                      compressedImageUri,
                  )
 
@@ -104,9 +105,9 @@ class ProfileEditFragment : Fragment() {
 
          fullName.setText(eventuserFullName)
         userNameEditText.setText(eventuserName)
-        biography.setText(eventuserDetails.biography)
+        biography.setText(eventBiografi)
         site.setText("boş")
-        EImageLoader.setImage(eventuserDetails.profilePicture, profilePicture, null)
+        EImageLoader.setImage(eventProfilePicture, profilePicture, null)
     }
 
     fun getPathFromUri(context: Context, uri: Uri): String {
@@ -150,7 +151,8 @@ class ProfileEditFragment : Fragment() {
 
     @Subscribe(sticky = true)
     fun onTelefonGonderReceived(event: EventBusDataEvents.KullaniciBilgileriGonder) {
-        eventuserDetails = event.userDetails
+        eventBiografi = event.biografi
+        eventProfilePicture = event.profilePicture
         eventuserName = event.user_name
         eventuserFullName = event.full_name
     }

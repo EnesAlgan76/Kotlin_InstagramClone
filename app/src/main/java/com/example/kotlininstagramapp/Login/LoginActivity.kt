@@ -60,7 +60,7 @@ class LoginActivity : AppCompatActivity() {
                             UserSingleton.userModel = userModel
                             loginUserWithEmail(userModel.password,userModel.email) // Firebase Auth
                         }else{
-                            println("User not found")
+                            println("User not found${response}")
                         }
                     } else {
                         println("Error Response: ${response.errorBody()?.string()}")
@@ -130,13 +130,9 @@ class LoginActivity : AppCompatActivity() {
             Log.d("retrieveCurrentFcmToken", "------>> "+token)
             //FirebaseHelper().saveNewToken(token)
             CoroutineScope(Dispatchers.IO).launch {
-
-
                 try {
                     val response = userService.updateFcmToken(UserSingleton.userModel!!.userId, token).execute()
-
                     Log.e("TOKEN GÜNCELLENDİ", "body : "+response.body())
-
                 } catch (e: Exception) {
                     Log.e("TOKEN GÜNCELLENEMEDİ", "Error updating FCM token: ${e.message}")
                     throw e

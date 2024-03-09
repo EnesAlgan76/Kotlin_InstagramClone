@@ -13,7 +13,7 @@ import retrofit2.http.Query
 
 interface UserApi {
      @GET("users/user/{userId}")
-     fun getUserById(@Path("userId") userId: Int): Call<UserModel>
+     fun getUserById(@Path("userId") userId: String): Call<BaseResponse>
 
      @POST("users")
      fun createUser(@Body newUser: UserModel): Call<UserModel>
