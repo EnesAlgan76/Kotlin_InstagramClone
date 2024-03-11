@@ -2,7 +2,6 @@ package com.example.kotlininstagramapp.Login
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,17 +14,15 @@ import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.api.RetrofitInstance
 import com.example.kotlininstagramapp.api.UserApi
-import com.example.kotlininstagramapp.api.UserModel
+import com.example.kotlininstagramapp.api.model.UserModel
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-import retrofit2.await
 
 class RegisterFragment :Fragment(){
     val firebaseAuth = FirebaseAuth.getInstance()

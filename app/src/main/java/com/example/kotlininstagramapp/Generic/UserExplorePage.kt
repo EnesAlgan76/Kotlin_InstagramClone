@@ -7,12 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Home.SinglePostListFragment
-import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.Profile.ProfileUserPostsAdapter
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.api.model.UserModel
 import com.example.kotlininstagramapp.databinding.ActivityUserDetailPageBinding
+import com.example.kotlininstagramapp.utils.DatabaseHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,9 +32,9 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
         userId = intent.getStringExtra("USER_ID")
 
         CoroutineScope(Dispatchers.Main).launch{
-
             val user = withContext(Dispatchers.IO){
-                FirebaseHelper().getUserById(userId!!)!!
+               // FirebaseHelper().getUserById(userId!!)!!
+                DatabaseHelper().getUserById(userId!!)!!
             }
             setUserInfos(user)
 
@@ -41,7 +42,7 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
             handleFollowStateUI(isFollowing)
 
             if(isFollowing){
-                showPosts(user)
+               // showPosts(user)
             }else{
                 showPrivateAccountInfo()
             }
@@ -85,24 +86,24 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
         binding.imageViewPrivateInfo.visibility = View.VISIBLE
     }
 
-    private fun showPosts(user: User) {
+    private fun showPosts(user: UserModel) {
         CoroutineScope(Dispatchers.Main).launch {
-            withContext(Dispatchers.IO){
-                userPostItems = FirebaseHelper().fetchUserPosts(user)
-            }
+//            withContext(Dispatchers.IO){
+//                userPostItems = FirebaseHelper().fetchUserPosts(user)
+//            }
             setUserInfos(user)
             setRecycleView(userPostItems)
         }
     }
-    private fun setUserInfos(user: User) {
+    private fun setUserInfos(user: UserModel) {
 
         binding.userExploreTvUserName.setText(user.userName)
-        Glide.with(this).load(user.userDetails.profilePicture).error(R.drawable.icon_profile).placeholder(R.drawable.icon_profile).into(binding.userExploreIvProfile)
-        binding.userExploreTvName.setText(user.userFullName)
-        binding.userExploreTvBiograpy.setText(user.userDetails.biography)
-        binding.userExploreTvFollow.setText(user.userDetails.following.toString())
-        binding.userExploreTvFollowers.setText(user.userDetails.follower.toString())
-        binding.userExploreTvPosts.setText(user.userDetails.post.toString())
+        Glide.with(this).load(user.profilePicture).error(R.drawable.icon_profile).placeholder(R.drawable.icon_profile).into(binding.userExploreIvProfile)
+        binding.userExploreTvName.setText(user.fullName)
+        binding.userExploreTvBiograpy.setText(user.biography)
+        binding.userExploreTvFollow.setText(user.followingCount.toString())
+        binding.userExploreTvFollowers.setText(user.followerCount.toString())
+        binding.userExploreTvPosts.setText(user.postCount.toString())
     }
 
     private fun setRecycleView(userPostItems: ArrayList<UserPostItem>) {

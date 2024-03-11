@@ -56,8 +56,8 @@ class SearchResultsAdapter(context:Context) : RecyclerView.Adapter<SearchResults
 
         fun bind(user: Map<String, String>) {
             userNameTextView.text = user["userName"]
-            fullNameTextView.text = user["userFullName"]
-            Glide.with(mContext).load(user["userProfileImage"]).into(profileImage)
+            fullNameTextView.text = user["fullName"]
+            Glide.with(mContext).load(user["profilePicture"]).into(profileImage)
 
             itemView.setOnClickListener {
                 val userId =  user["userId"]

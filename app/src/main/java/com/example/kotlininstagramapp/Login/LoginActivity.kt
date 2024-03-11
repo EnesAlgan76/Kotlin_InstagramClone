@@ -1,6 +1,5 @@
 package com.example.kotlininstagramapp.Login
 
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -11,11 +10,9 @@ import android.util.Log
 import android.widget.Toast
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Home.HomeActivity
-import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.api.RetrofitInstance
-import com.example.kotlininstagramapp.api.RetrofitInstance.retrofit
 import com.example.kotlininstagramapp.api.UserApi
-import com.example.kotlininstagramapp.api.UserModel
+import com.example.kotlininstagramapp.api.model.UserModel
 import com.example.kotlininstagramapp.databinding.ActivityLoginBinding
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
@@ -25,8 +22,6 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
 class LoginActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginBinding

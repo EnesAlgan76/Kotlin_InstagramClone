@@ -19,20 +19,20 @@ import com.abedelazizshe.lightcompressorlibrary.config.Configuration
 import com.abedelazizshe.lightcompressorlibrary.config.SaveLocation
 import com.abedelazizshe.lightcompressorlibrary.config.SharedStorageConfiguration
 import com.bumptech.glide.Glide
+import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.squareup.picasso.Picasso
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import org.greenrobot.eventbus.EventBus
@@ -166,6 +166,7 @@ class ShareNextFragment : Fragment() {
                     override fun onSuccess(index: Int, size: Long, path: String?) {
                         println("BAŞARILI ---------- > ${path}")
                         CoroutineScope(Dispatchers.IO).launch {
+                            DatabaseHelper().uploadPost(Uri.fromFile(File(path)), false)
                             uploadImageToStorage2(Uri.fromFile(File(path)), image =false)
                         }
                     }
@@ -203,9 +204,17 @@ class ShareNextFragment : Fragment() {
             }
 
             uploadTask.addOnSuccessListener {
-                    GlobalScope.launch {
+                    CoroutineScope(Dispatchers.IO).launch {
                         val url = mediaRef.downloadUrl.await().toString()
-                        val post = Post(mAuth.currentUser!!.uid, 0.5, System.currentTimeMillis().toString(), explanation.text.toString(), url)
+                        val post = Post(
+                            UserSingleton.userModel!!.userId,
+                            0.1,
+                            System.currentTimeMillis().toString(),
+                            explanation.text.toString(),
+                            url)
+                        DatabaseHelper().uploadPost(post, ){
+
+                        }
                         uploadPostToFirestore2(post)
                     }
             }

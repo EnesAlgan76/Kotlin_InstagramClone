@@ -34,5 +34,15 @@ class Post {
     }
 
 
+    fun toMap(): Map<String, String> {
+        return mapOf(
+            "userId" to userId,
+            "creationDate" to date,
+            "explanation" to explanation,
+            "content" to url
+        )
+    }
+
+
 
 }

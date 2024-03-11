@@ -1,7 +1,7 @@
 package com.example.kotlininstagramapp.Generic
 
 import com.example.kotlininstagramapp.Models.User
-import com.example.kotlininstagramapp.api.UserModel
+import com.example.kotlininstagramapp.api.model.UserModel
 
 object UserSingleton {
     var user: User? = null

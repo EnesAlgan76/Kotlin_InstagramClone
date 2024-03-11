@@ -15,7 +15,7 @@ import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Login.LoginActivity
 import com.example.kotlininstagramapp.api.RetrofitInstance
 import com.example.kotlininstagramapp.api.UserApi
-import com.example.kotlininstagramapp.api.UserModel
+import com.example.kotlininstagramapp.api.model.UserModel
 import com.example.kotlininstagramapp.databinding.ActivityHomeBinding
 import com.example.kotlininstagramapp.utils.MyPagerAdapter
 import com.google.firebase.auth.FirebaseAuth

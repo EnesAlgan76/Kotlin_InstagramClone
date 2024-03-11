@@ -6,18 +6,26 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.api.RetrofitInstance
+import com.example.kotlininstagramapp.api.UserApi
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SearchActivity : AppCompatActivity() {
     lateinit var firestore: FirebaseFirestore
     lateinit var adapter: SearchResultsAdapter
+    val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         println("SearchActivity sınıfına gidildi")
@@ -57,7 +65,27 @@ class SearchActivity : AppCompatActivity() {
 
     private fun fetchUsers(searchText: String) {
         println("---------- Sorgu Yapılıyor ------")
-        firestore.collection("users")
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = userService.searchUsersByUsername(searchText).execute()
+            if (response.isSuccessful){
+                var userList = response.body()?.data as List<Map<String, String>>
+                withContext(Dispatchers.Main){
+                    adapter.setUsers(userList)
+                }
+
+            }else{
+                Log.e("---------------------","Response Başarısız")
+            }
+
+        }
+
+
+
+
+
+
+        /*firestore.collection("users")
             .whereGreaterThanOrEqualTo("userName", searchText)
             .whereLessThan("userName", searchText + "\uf8ff")
             .orderBy("userName", Query.Direction.ASCENDING)
@@ -80,7 +108,7 @@ class SearchActivity : AppCompatActivity() {
                     }
                     adapter.setUsers(users)
                 }
-            }
+            }*/
     }
 
 }
