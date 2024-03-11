@@ -7,7 +7,6 @@ import com.example.kotlininstagramapp.api.PostApi
 import com.example.kotlininstagramapp.api.RetrofitInstance
 import com.example.kotlininstagramapp.api.UserApi
 import com.example.kotlininstagramapp.api.model.UserModel
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +37,7 @@ class DatabaseHelper {
         compressedMediaUri: Uri,
         image: Boolean,
         explanation: String,
-        onSuccess: () -> Unit,
+        onSuccess: (message :String) -> Unit,
         onProgress: (progress: Int) -> Unit,
         onFailed: (errorMessage: String) -> Unit
     ) {
@@ -69,30 +68,25 @@ class DatabaseHelper {
                     try {
                         val url = mediaRef.downloadUrl.await().toString()
                         val post = Post(
-                            UserSingleton.userModel!!.userId,
+                            currentUserId!!,
                             0.1,
                             System.currentTimeMillis().toString(),
                             explanation,
                             url
                         )
 
-                        postService.createPost(post.toMap()).await()
-                        //val userDocRef = firestore.collection("userPosts").document(post.userId)
-                        //val user = firestore.collection("users").document(post.userId)
+                        val result= postService.createPost(post.toMap()).await()
+                        if (result.status){
+                            val incrementResponse = userService.incrementPostCount(currentUserId).await()
+                            if (incrementResponse.status){
+                                onSuccess(result.message+ ", "+ incrementResponse.message)
+                            }else{
+                                onFailed("backend error: "+incrementResponse.message)
+                            }
+                        }else{
+                            onFailed("backend error: "+result.message)
+                        }
 
-//                        val postMap = hashMapOf(
-//                            "date" to post.date,
-//                            "explanation" to post.explanation,
-//                            "url" to post.url,
-//                            "likeCount" to "0"
-//                        )
-
-                        //userDocRef.set(hashMapOf("userId" to post.userId)).await()
-                        //user.update("userDetails.post", FieldValue.increment(1)).addOnSuccessListener {
-                        //    println("Post count updated")
-                        //}
-
-                        onSuccess()
                     } catch (e: Exception) {
                         onFailed(e.message ?: "Unknown error occurred")
                     }

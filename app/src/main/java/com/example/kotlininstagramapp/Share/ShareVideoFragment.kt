@@ -122,25 +122,25 @@ class ShareVideoFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.e("------------","video view RESUME")
+       // Log.e("------------","video view RESUME")
         cameraView.open()
     }
 
     override fun onStop() {
         cameraView.close()
-        Log.e("------------","video view onStop")
+      //  Log.e("------------","video view onStop")
         super.onStop()
     }
 
     override fun onPause() {
-        Log.e("------------","video view PAUSE")
+      //  Log.e("------------","video view PAUSE")
         cameraView.close()
         super.onPause()
     }
 
     override fun onDestroy() {
         cameraView.destroy()
-        Log.e("------------","video view onDestroy")
+      //  Log.e("------------","video view onDestroy")
         super.onDestroy()
     }
 

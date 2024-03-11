@@ -14,7 +14,7 @@ interface PostApi {
 
 
 
-    @POST
+    @POST("/posts")
     fun createPost(@Body user: Map<String,String>) : Call<BaseResponse>
 
 

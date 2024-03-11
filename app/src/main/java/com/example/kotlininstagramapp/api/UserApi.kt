@@ -36,9 +36,15 @@ interface UserApi {
           @Query("newFcmToken") newFcmToken: String
      ): Call<BaseResponse>
 
+     @PUT("users/incrementPostCount")
+     fun incrementPostCount(@Query("userId") userId: String) : Call<BaseResponse>
+
 
      @GET("users/searchUsersByUsername/{searchText}")
      fun searchUsersByUsername(@Path(value = "searchText") searchText: String) : Call<BaseResponse>
+
+
+
 
 
 }

@@ -12,7 +12,7 @@ data class UserModel(
     val fcmToken: String,
     val followerCount: Int,
     val followingCount: Int,
-    val postCount: Int
+    var postCount: Int
 ) {
     companion object {
         fun fromMap(map: Map<String, Any>): UserModel {

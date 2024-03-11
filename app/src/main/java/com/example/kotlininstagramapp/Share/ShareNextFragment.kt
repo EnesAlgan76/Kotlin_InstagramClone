@@ -90,30 +90,33 @@ class ShareNextFragment : Fragment() {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     if (gelenDosya!!.extension == "mp4") {
-
                         processVideo()
-
-
-//                        val input = gelenDosya!!
-//                        val output: File
-//                        val outputFileName = System.currentTimeMillis().toString()+".mp4"
-//                        val outputDirectory = input.parentFile
-//                        output = File(outputDirectory, outputFileName)
-//                        val command4 = "-i ${input.absolutePath} -c:v h264 -crf 23 -preset medium ${output.absolutePath}"
-//                        try {
-//                            FFmpegKit.execute(command4)
-//                        }catch (e:Throwable){
-//                            Log.e("SIKIŞTIRMA hATASI", e.message.toString())
-//                        }
-
-                      //  uploadImageToStorage2(Uri.fromFile(output), image =false)
-
-
                     }
                     else{
                         val compressedImageFile = Compressor.compress(requireContext(), gelenDosya!!) { quality(80) }
                         val compressedImageUri = Uri.fromFile(compressedImageFile)
-                        uploadImageToStorage2(compressedImageUri, image =true)
+                        DatabaseHelper().uploadPost(
+                            compressedImageUri,
+                            true,
+                            explanation.text.toString(),
+                            onProgress = {
+                                Log.e("","Progress ____>>> "+it)
+                                shareProgressDialog.tvProgress.text = "Yükleniyor : %${it}"
+                            },
+                            onSuccess = {
+                                shareProgressDialog.dismiss()
+                                requireActivity().finish()
+                                UserSingleton.userModel!!.postCount +=1
+                                Log.e("SUCCESS",it)
+                            },
+
+                            onFailed = {
+                                Log.e("FAİL",it)
+                            }
+                        )
+
+
+                       // uploadImageToStorage2(compressedImageUri, image =true)
                     }
 
                 } catch (e: Exception) {
@@ -166,8 +169,28 @@ class ShareNextFragment : Fragment() {
                     override fun onSuccess(index: Int, size: Long, path: String?) {
                         println("BAŞARILI ---------- > ${path}")
                         CoroutineScope(Dispatchers.IO).launch {
-                            DatabaseHelper().uploadPost(Uri.fromFile(File(path)), false)
-                            uploadImageToStorage2(Uri.fromFile(File(path)), image =false)
+
+                            DatabaseHelper().uploadPost(
+                                Uri.fromFile(File(path)),
+                                false,
+                                explanation.text.toString(),
+
+                                onProgress = {
+                                    Log.e("","Progress ____>>> "+it)
+                                    shareProgressDialog.tvProgress.text = "Yükleniyor : %${it}"
+                                },
+                                onSuccess = {
+                                    shareProgressDialog.dismiss()
+                                    requireActivity().finish()
+                                    UserSingleton.userModel!!.postCount +=1
+                                    Log.e("SUCCESS",it)
+                                },
+
+                                onFailed = {
+                                    Log.e("FAİL",it)
+                                }
+                            )
+                           // uploadImageToStorage2(Uri.fromFile(File(path)), image =false)
                         }
                     }
 
@@ -184,7 +207,7 @@ class ShareNextFragment : Fragment() {
     }
 
 
-    private suspend fun uploadImageToStorage2(compressedMediaUri: Uri, image: Boolean) {
+    /*private suspend fun uploadImageToStorage2(compressedMediaUri: Uri, image: Boolean) {
         try {
             var mediaRef :StorageReference
             if (image){
@@ -224,10 +247,9 @@ class ShareNextFragment : Fragment() {
             shareProgressDialog.dismiss()
             e.printStackTrace()
         }
-    }
+    }*/
 
-
-
+    /*
     private suspend fun uploadPostToFirestore2(post: Post) {
         try {
             val userDocRef = firestore.collection("userPosts").document(post.userId)
@@ -252,7 +274,7 @@ class ShareNextFragment : Fragment() {
             // Handle any exceptions
             e.printStackTrace()
         }
-    }
+    }*/
 
 
 
