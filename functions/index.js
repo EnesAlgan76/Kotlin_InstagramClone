@@ -2,25 +2,22 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-
-
-
-exports.takipIstegiBildirimiGonder = functions.firestore
-    .document('users/{userId}/notifications/{notificationId}')
+exports.bildirimGonder = functions.firestore
+    .document('notifications/{notificationId}')
     .onCreate(async (snapshot, context) => {
 
-        const bilidirimSahibiId = context.params.userId
+        const notificationId = context.params.notificationId;
 
-        console.log('NEW notification detected: ', bilidirimSahibiId);
+        console.log('NEW notification detected with ID: ', notificationId);
 
         const notificationData = snapshot.data();
-        const userId = context.params.userId;
 
         const type = notificationData.type;
-        const userName = notificationData.user_name; // Assuming user name is stored in 'user_name'
+        const userName = notificationData.userName;
+        const fcmToken = notificationData.fcmToken;
+
         console.log('NEW notification type detected:', type);
 
-        // Assign suitable text based on the notification type
         let title, messageText;
         switch (type) {
             case 'post_like':
@@ -41,23 +38,15 @@ exports.takipIstegiBildirimiGonder = functions.firestore
         }
 
         try {
-            const userSnapshot = await admin.firestore().collection('users').doc(userId).get();
-            const userData = userSnapshot.data();
-
-            const fcmToken = userData.fcmToken;
-
-            console.log('FCM TOKEN ---- >> ', fcmToken);
-
-            // Send notification
             const message = {
                 notification: {
                     title: title,
-                    body: messageText, // Use the dynamically generated message
+                    body: messageText,
                 },
                 token: fcmToken,
                 data: {
-                        click_action: 'NOTIFICATION_CLICK',
-                    },
+                    click_action: 'NOTIFICATION_CLICK',
+                },
             };
 
             await admin.messaging().send(message);
@@ -66,4 +55,3 @@ exports.takipIstegiBildirimiGonder = functions.firestore
             console.error('Error sending notification:', error);
         }
     });
-

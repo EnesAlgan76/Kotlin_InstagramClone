@@ -38,7 +38,10 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
             }
             setUserInfos(user)
 
-            val isFollowing =  withContext(Dispatchers.IO){FirebaseHelper().isUserFollowing(userId?:"")}
+            val isFollowing =  withContext(Dispatchers.IO){
+                //FirebaseHelper().isUserFollowing(userId?:"")
+                DatabaseHelper().isUserFollowing(userId!!)
+            }
             handleFollowStateUI(isFollowing)
 
             if(isFollowing){
@@ -55,9 +58,12 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
             if (userId != null) {
                 CoroutineScope(Dispatchers.Main).launch {
                     withContext(Dispatchers.IO){
-                        FirebaseHelper().sendFollowRequest(userId!!)
+                        //FirebaseHelper().sendFollowRequest(userId!!)
+                        DatabaseHelper().sendFollowRequest(userId!!)
                     }
-                    val isFollowed = FirebaseHelper().isUserFollowing(userId?:"") // gizli hesap değilse anında takip edilir. gizli ise isek gönderildi yazısı göster
+                   // val isFollowed = FirebaseHelper().isUserFollowing(userId?:"") // gizli hesap değilse anında takip edilir. gizli ise isek gönderildi yazısı göster
+                    val isFollowed = DatabaseHelper().isUserFollowing(userId!!)
+
                     handleFollowStateUI(isFollowed)
 
                     if(!isFollowed){

@@ -33,9 +33,9 @@ class ProfileUserPostsAdapter(private val context: Context, private val posts: L
         val userPost = posts[position]
         val isVideo = userPost.url.contains("videos")
         holder.bindData(userPost, isVideo)
-//        holder.itemView.setOnClickListener {
-//            (context as OnSinglePostItemClicked).onSingleItemClicked(position)
-//        }
+        holder.itemView.setOnClickListener {
+            (context as OnSinglePostItemClicked).onSingleItemClicked(position)
+        }
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

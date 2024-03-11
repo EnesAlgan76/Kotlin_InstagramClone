@@ -1,12 +1,18 @@
 package com.example.kotlininstagramapp.utils
 
 import android.net.Uri
+import android.util.Log
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Models.Post
+import com.example.kotlininstagramapp.api.BaseResponse
+import com.example.kotlininstagramapp.api.FollowApi
 import com.example.kotlininstagramapp.api.PostApi
 import com.example.kotlininstagramapp.api.RetrofitInstance
 import com.example.kotlininstagramapp.api.UserApi
 import com.example.kotlininstagramapp.api.model.UserModel
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +26,7 @@ class DatabaseHelper {
 
     val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
     val postService = RetrofitInstance.retrofit.create(PostApi::class.java)
+    val followService = RetrofitInstance.retrofit.create(FollowApi::class.java)
     suspend fun getUserById(userId: String): UserModel? {
         var userData: Map<String, Any>? = null
         try {
@@ -97,5 +104,43 @@ class DatabaseHelper {
         }
     }
 
+    suspend fun isUserFollowing(userId: String): Boolean {
+        val response :BaseResponse = followService.checkFollowStatus(UserSingleton.userModel!!.userId,userId).await()
+        if (response.status){
+            return response.data as Boolean
+        }else{
+            Log.e("isUserFollowing", response.message)
+            return false
+        }
+    }
+
+    suspend fun sendFollowRequest(userId: String) {
+        val fcmToken = getFCMToken(userId)
+        if(fcmToken!=null){
+            val db = FirebaseFirestore.getInstance()
+            val newNotificationDoc =  db.collection("notifications").document()
+            val currentTimestamp = FieldValue.serverTimestamp()
+            val currentUser = UserSingleton.userModel
+            val notification = mapOf(
+                "fcmToken" to fcmToken,
+                "userName" to currentUser!!.userName,
+                "type" to "follow_request",
+                "timestamp" to currentTimestamp
+            )
+            newNotificationDoc.set(notification)
+        }else{
+            Log.e("SUCCESS","*** Bildirim Gönderildi ***")
+        }
+
+    }
+
+    suspend fun getFCMToken(userId: String): String? {
+        val response = userService.getFCMToken(userId).await()
+        if (response.status){
+            return response.data as String
+        }else{
+            return null;
+        }
+    }
 
 }

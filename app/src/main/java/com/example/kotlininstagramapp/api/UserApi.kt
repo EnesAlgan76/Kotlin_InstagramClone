@@ -44,7 +44,8 @@ interface UserApi {
      fun searchUsersByUsername(@Path(value = "searchText") searchText: String) : Call<BaseResponse>
 
 
-
+     @GET("users/getFCMToken")
+     fun getFCMToken(@Query("userId") userId: String): Call<BaseResponse>
 
 
 }
