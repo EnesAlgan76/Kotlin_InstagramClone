@@ -3,16 +3,16 @@ package com.example.kotlininstagramapp.utils
 import android.net.Uri
 import android.util.Log
 import com.example.kotlininstagramapp.Generic.UserSingleton
+import com.example.kotlininstagramapp.Models.Notification
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.api.BaseResponse
 import com.example.kotlininstagramapp.api.FollowApi
+import com.example.kotlininstagramapp.api.NotificationApi
 import com.example.kotlininstagramapp.api.PostApi
 import com.example.kotlininstagramapp.api.RetrofitInstance
 import com.example.kotlininstagramapp.api.UserApi
 import com.example.kotlininstagramapp.api.model.UserModel
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +27,7 @@ class DatabaseHelper {
     val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
     val postService = RetrofitInstance.retrofit.create(PostApi::class.java)
     val followService = RetrofitInstance.retrofit.create(FollowApi::class.java)
+    val notificationService = RetrofitInstance.retrofit.create(NotificationApi::class.java)
     suspend fun getUserById(userId: String): UserModel? {
         var userData: Map<String, Any>? = null
         try {
@@ -117,9 +118,11 @@ class DatabaseHelper {
     suspend fun sendFollowRequest(userId: String) {
         val fcmToken = getFCMToken(userId)
         if(fcmToken!=null){
+
+            // Those are for trigger firebase messaging by firebase functions
             val db = FirebaseFirestore.getInstance()
             val newNotificationDoc =  db.collection("notifications").document()
-            val currentTimestamp = FieldValue.serverTimestamp()
+            val currentTimestamp = System.currentTimeMillis()
             val currentUser = UserSingleton.userModel
             val notification = mapOf(
                 "fcmToken" to fcmToken,
@@ -127,12 +130,31 @@ class DatabaseHelper {
                 "type" to "follow_request",
                 "timestamp" to currentTimestamp
             )
-            newNotificationDoc.set(notification)
+            newNotificationDoc.set(notification).await()
+
+
+            // This for save to main database to show notification in notification page
+            val notificationForSpring2 = mapOf(
+                "userId" to userId,
+                "postPreview" to "This is a sample post preview.",
+                "type" to "follow_request",
+                "time" to currentTimestamp.toString()
+            )
+            val response = notificationService.addNotification(notificationForSpring2).await()
+            if (response.status){
+                Log.e("sendFollowRequest SUCCESS", response.message)
+            }else{
+                Log.e("sendFollowRequest FAIL", response.message)
+            }
+
         }else{
-            Log.e("SUCCESS","*** Bildirim Gönderildi ***")
+            Log.e("FAIL","FCM Token is NULL")
         }
 
     }
+
+
+
 
     suspend fun getFCMToken(userId: String): String? {
         val response = userService.getFCMToken(userId).await()
@@ -140,6 +162,18 @@ class DatabaseHelper {
             return response.data as String
         }else{
             return null;
+        }
+    }
+
+    suspend fun getNotifications() :List<Notification> {
+        val response  = notificationService.getAllUserNotifications(UserSingleton.userModel!!.userId).await()
+        if (response.status){
+            val notificationList =  response.data as List<Map<String, String>>
+            Log.e("Spring getAllUserNotifications: ", response.message)
+            return notificationList.map {Notification.fromMap(it)}
+        }else{
+            Log.e("Spring getAllUserNotifications: ", response.message)
+            return listOf()
         }
     }
 

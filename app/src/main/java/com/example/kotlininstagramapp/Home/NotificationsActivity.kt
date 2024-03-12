@@ -8,6 +8,7 @@ import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.ActivityNotificationsBinding
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
+import com.example.kotlininstagramapp.utils.DatabaseHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +24,10 @@ class NotificationsActivity : AppCompatActivity() {
 
 
         CoroutineScope(Dispatchers.Main).launch {
-            val notificationList = withContext(Dispatchers.IO){FirebaseHelper().getNotifications()}
+            val notificationList = withContext(Dispatchers.IO){
+              // FirebaseHelper().getNotifications()
+                DatabaseHelper().getNotifications()
+            }
             val adapter = NotificationAdapter(mContext, notificationList)
             binding.notificationList.adapter = adapter
         }

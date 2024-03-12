@@ -24,7 +24,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.abs
 
 class NotificationAdapter(var mContext : Context, private val notificationList: List<Notification>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -95,7 +94,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         val followingCard: CardView = itemView.findViewById(R.id.notification_following)
 
         fun bind(currentItem: Notification) {
-            val timeAgo = formatTimeAgo(currentItem.timestamp)
+            val timeAgo = currentItem.time
             val userName :String = currentItem.userName
             val text ="${userName} wants to follow you. ${timeAgo}"
             formatTextView(notificationText,text)
@@ -109,7 +108,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
                     deleteCard.visibility = View.INVISIBLE
                     withContext(Dispatchers.IO){
                         FirebaseHelper().acceptFollowRequest(currentItem.userId)
-                        FirebaseHelper().deleteFollowRequestNotification(currentItem.id)
+                      //  FirebaseHelper().deleteFollowRequestNotification(currentItem.id)
                     }
 
                 }
@@ -117,7 +116,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
             }
 
             deleteCard.setOnClickListener {
-                FirebaseHelper().deleteFollowRequestNotification(currentItem.id)
+               // FirebaseHelper().deleteFollowRequestNotification(currentItem.id)
             }
 
 
@@ -134,7 +133,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
 
         fun bind(currentItem: Notification) {
             val userName :String = currentItem.userName
-            val timeAgo = formatTimeAgo(currentItem.timestamp)
+            val timeAgo = currentItem.time
 
             val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "video" else "photo"
 
@@ -161,7 +160,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         fun bind(currentItem: Notification) {
             val userName :String = currentItem.userName
 
-            val timeAgo = formatTimeAgo(currentItem.timestamp)
+            val timeAgo = currentItem.time
 
             val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "video" else "photo"
 
