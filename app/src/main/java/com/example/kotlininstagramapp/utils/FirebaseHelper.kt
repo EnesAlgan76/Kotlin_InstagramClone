@@ -246,7 +246,7 @@ class FirebaseHelper {
         }
     }
 
-    suspend fun acceptFollowRequest(userId: String){
+    suspend fun acceptFollowRequest(userId: String, notificationId: Double){
         val currentuser = currentUser
         val userDocumentRef = db.collection("users").document(userId)
         if(currentuser != null){

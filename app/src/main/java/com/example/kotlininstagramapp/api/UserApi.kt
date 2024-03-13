@@ -48,4 +48,12 @@ interface UserApi {
      fun getFCMToken(@Query("userId") userId: String): Call<BaseResponse>
 
 
+     @PUT("users/incrementFollowerCount")
+     fun incrementFollowerCount(@Query("userId") userId: String) : Call<BaseResponse>
+
+
+     @PUT("users/incrementFollowCount")
+     fun incrementFollowCount(@Query("userId") userId: String) : Call<BaseResponse>
+
+
 }

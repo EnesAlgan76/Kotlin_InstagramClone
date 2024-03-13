@@ -11,6 +11,7 @@ import com.example.kotlininstagramapp.api.NotificationApi
 import com.example.kotlininstagramapp.api.PostApi
 import com.example.kotlininstagramapp.api.RetrofitInstance
 import com.example.kotlininstagramapp.api.UserApi
+import com.example.kotlininstagramapp.api.model.NotificationModel
 import com.example.kotlininstagramapp.api.model.UserModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -134,13 +135,19 @@ class DatabaseHelper {
 
 
             // This for save to main database to show notification in notification page
-            val notificationForSpring2 = mapOf(
-                "userId" to userId,
-                "postPreview" to "This is a sample post preview.",
-                "type" to "follow_request",
-                "time" to currentTimestamp.toString()
+
+            val notificationModel = NotificationModel(
+                    1.0,
+                    userId,
+                "follow_request",
+                currentTimestamp.toString(),
+                "null",
+                currentUser.userId,
+                currentUser.profilePicture,
+                currentUser.userName
             )
-            val response = notificationService.addNotification(notificationForSpring2).await()
+
+            val response = notificationService.addNotification(notificationModel).await()
             if (response.status){
                 Log.e("sendFollowRequest SUCCESS", response.message)
             }else{
@@ -165,16 +172,56 @@ class DatabaseHelper {
         }
     }
 
-    suspend fun getNotifications() :List<Notification> {
+    suspend fun getNotifications() :List<NotificationModel> {
         val response  = notificationService.getAllUserNotifications(UserSingleton.userModel!!.userId).await()
         if (response.status){
             val notificationList =  response.data as List<Map<String, String>>
             Log.e("Spring getAllUserNotifications: ", response.message)
-            return notificationList.map {Notification.fromMap(it)}
+            return notificationList.map {NotificationModel.fromMap(it)}
         }else{
             Log.e("Spring getAllUserNotifications: ", response.message)
             return listOf()
         }
+    }
+
+    suspend fun acceptFollowRequest(follower: String, notificationId: Double) {
+        val response = followService.followUser(follower,UserSingleton.userModel!!.userId).await()
+        if(response.status){
+            Log.e("SPRING followUser: ",response.message)
+            try {
+                deleteNotification(notificationId.toInt())
+            } catch (e: Exception) {
+                Log.e("SPRING deleteNotification ERROR: ",e.toString())
+            }
+
+            try {
+                incrementFollowCount(follower)
+            } catch (e: Exception) {
+                Log.e("SPRING incrementFollowCount ERROR: ",e.toString())
+            }
+
+            try {
+                incrementFollowerCount(UserSingleton.userModel!!.userId)
+            } catch (e: Exception) {
+                Log.e("SPRING incrementFollowerCount ERROR: ",e.toString())
+            }
+
+        }else Log.e("SPRING followUser: ",response.message)
+    }
+
+    suspend fun incrementFollowerCount(userId: String) {
+        val response = userService.incrementFollowerCount(userId).await()
+        Log.e("SPRING incrementFollowerCount", response.message)
+    }
+
+    suspend fun incrementFollowCount(userId: String) {
+        val response = userService.incrementFollowCount(userId).await()
+        Log.e("SPRING incrementFollowCount", response.message)
+    }
+
+    suspend fun deleteNotification(notificationId: Int) {
+        val response = notificationService.deleteNotification(notificationId).await()
+        Log.e("SPRING deleteNotification", response.message)
     }
 
 }

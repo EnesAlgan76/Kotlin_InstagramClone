@@ -8,6 +8,7 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,13 +20,15 @@ import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Notification
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.api.model.NotificationModel
+import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class NotificationAdapter(var mContext : Context, private val notificationList: List<Notification>) :
+class NotificationAdapter(var mContext : Context, private val notificationList: List<NotificationModel>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -93,13 +96,13 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         val deleteCard: CardView = itemView.findViewById(R.id.notification_delete)
         val followingCard: CardView = itemView.findViewById(R.id.notification_following)
 
-        fun bind(currentItem: Notification) {
+        fun bind(currentItem: NotificationModel) {
             val timeAgo = currentItem.time
-            val userName :String = currentItem.userName
+            val userName :String = currentItem.fromUserName
             val text ="${userName} wants to follow you. ${timeAgo}"
             formatTextView(notificationText,text)
 
-            Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
+            Glide.with(mContext).load(currentItem.fromUserProfilePicture).into(profileImage)
 
             confirmCard.setOnClickListener {
                 CoroutineScope(Dispatchers.Main).launch{
@@ -107,7 +110,8 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
                     confirmCard.visibility = View.INVISIBLE
                     deleteCard.visibility = View.INVISIBLE
                     withContext(Dispatchers.IO){
-                        FirebaseHelper().acceptFollowRequest(currentItem.userId)
+                       // FirebaseHelper().acceptFollowRequest(currentItem.userId, currentItem.id)
+                        DatabaseHelper().acceptFollowRequest(currentItem.fromUserId, currentItem.id)
                       //  FirebaseHelper().deleteFollowRequestNotification(currentItem.id)
                     }
 
@@ -117,6 +121,14 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
 
             deleteCard.setOnClickListener {
                // FirebaseHelper().deleteFollowRequestNotification(currentItem.id)
+                CoroutineScope(Dispatchers.IO).launch{
+                    try {
+                        DatabaseHelper().deleteNotification(currentItem.id.toInt())
+                    } catch (e: Exception) {
+                        Log.e("SPRING deleteNotification ERROR: ",e.toString())
+                    }
+                }
+
             }
 
 
@@ -131,8 +143,8 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         val preview: ImageView = itemView.findViewById(R.id.notification_like_preview)
         val notificationText: TextView = itemView.findViewById(R.id.notification_like_text)
 
-        fun bind(currentItem: Notification) {
-            val userName :String = currentItem.userName
+        fun bind(currentItem: NotificationModel) {
+            val userName :String = currentItem.fromUserName
             val timeAgo = currentItem.time
 
             val imageOrVideo :String  = if(currentItem.postPreview!!.contains("video")) "video" else "photo"
@@ -140,7 +152,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
             val text ="${userName +" liked your "+ imageOrVideo}. ${timeAgo}"
             formatTextView(notificationText,text)
 
-            Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
+            Glide.with(mContext).load(currentItem.fromUserProfilePicture).into(profileImage)
 
             Glide.with(mContext).load(currentItem.postPreview).into(preview)
 
@@ -157,8 +169,8 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
         val preview: ImageView = itemView.findViewById(R.id.notification_comment_preview)
         val notificationText: TextView = itemView.findViewById(R.id.notification_comment_text)
 
-        fun bind(currentItem: Notification) {
-            val userName :String = currentItem.userName
+        fun bind(currentItem: NotificationModel) {
+            val userName :String = currentItem.fromUserName
 
             val timeAgo = currentItem.time
 
@@ -167,7 +179,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
             val text ="${userName +" commented on your "+ imageOrVideo}. ${timeAgo}"
             formatTextView(notificationText,text)
 
-            Glide.with(mContext).load(currentItem.profileImage).into(profileImage)
+            Glide.with(mContext).load(currentItem.fromUserProfilePicture).into(profileImage)
 
             Glide.with(mContext).load(currentItem.postPreview).into(preview)
 
