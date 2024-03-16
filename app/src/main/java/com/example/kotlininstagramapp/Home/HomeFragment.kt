@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.api.model.HomePagePostItem
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
+import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +29,7 @@ class HomeFragment : Fragment() {
     lateinit var iv_notifications:  ImageView
     lateinit var iv_redPoint:  ImageView
     var allPosts: ArrayList<UserPostItem>  = ArrayList()
+    var allPosts2: ArrayList<HomePagePostItem>  = ArrayList()
     var auth = FirebaseAuth.getInstance()
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_home,container,false)
@@ -80,11 +83,12 @@ class HomeFragment : Fragment() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 withContext(Dispatchers.IO) {
-                    allPosts = FirebaseHelper().getAllPosts()
+                   // allPosts = FirebaseHelper().getAllPosts()
+                    allPosts2 = DatabaseHelper().getHomePagePosts()
                 }
                 // Invalid data to replace story view at index 0
-                allPosts.add(0,UserPostItem("","","","","","","","",""))
-                val adapter=PostsAdapter(allPosts,requireContext(), requireActivity().supportFragmentManager,recyclerView)
+                allPosts2.add(0,HomePagePostItem(0.5,"","","","","",0.0,"",""))
+                val adapter=PostsAdapter(allPosts2,requireContext(), requireActivity().supportFragmentManager,recyclerView)
                 recyclerView.adapter=adapter
             } catch (e: Exception) {
                 println("Error fetching posts: ${e.message}")

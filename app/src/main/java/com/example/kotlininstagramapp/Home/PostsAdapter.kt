@@ -22,6 +22,7 @@ import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.Story.StoryAdapter
+import com.example.kotlininstagramapp.api.model.HomePagePostItem
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.TextHighlighter
 import com.google.firebase.auth.FirebaseAuth
@@ -37,7 +38,7 @@ import java.util.concurrent.TimeUnit
 
 
 class PostsAdapter(
-    private var posts: ArrayList<UserPostItem>,
+    private var posts: ArrayList<HomePagePostItem>,
     private val mContext: Context,
     private val fragmentManager: FragmentManager,
     private val recyclerView: RecyclerView,
@@ -59,7 +60,7 @@ class PostsAdapter(
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                 val firstVisibleItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
                 if (firstVisibleItemPosition !=-1){
-                    if(posts[firstVisibleItemPosition].userPostUrl.contains("videos")){
+                    if(posts[firstVisibleItemPosition].content.contains("videos")){
                         handler.removeCallbacksAndMessages(null)
                         handler.post {
                             val holderTop = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition-1) as? PostViewHolder
@@ -122,11 +123,11 @@ class PostsAdapter(
                 post_tvusername.text = userPostItem.userName
                 post_tvdescription.text = userPostItem.postDescription
                 TextHighlighter.highlightWordsTextView(post_tvdescription)
-                post_tv_dateago.text = getTimeAgo(userPostItem.yuklenmeTarihi.toLong())
+                post_tv_dateago.text = getTimeAgo(userPostItem.creationDate.toLong())
                 post_tv_likecount.text = "${userPostItem.likeCount} beğenme"
 
                 showComment.setOnClickListener {
-                    val bottomSheetFragment = CommentBottomSheetFragment(userPostItem.postId, userPostItem.userId, userPostItem.userPostUrl)
+                    val bottomSheetFragment = CommentBottomSheetFragment(userPostItem.postId, userPostItem.userId, userPostItem.content)
 
                     bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
                 }
@@ -138,11 +139,11 @@ class PostsAdapter(
                     mContext.startActivity(intent)
                 }
 
-                updateLikeButton(holder, userPostItem)
-                setLikeClickListener(holder, userPostItem, position)
+               // updateLikeButton(holder, userPostItem)
+               // setLikeClickListener(holder, userPostItem, position)
             }
 
-            Glide.with(mContext).load(userPostItem.profilePicture).placeholder(defaultImage).error(defaultImage).into(holder.post_profileimage)
+            Glide.with(mContext).load(userPostItem.userProfileImage).placeholder(defaultImage).error(defaultImage).into(holder.post_profileimage)
 
             loadMedias(holder, userPostItem)
         }
@@ -153,15 +154,15 @@ class PostsAdapter(
 
     override fun getItemCount(): Int = posts.size
 
-    private fun loadMedias(holder: PostViewHolder, userPostItem: UserPostItem) {
-        if(userPostItem.userPostUrl.contains("videos")){
+    private fun loadMedias(holder: PostViewHolder, userPostItem: HomePagePostItem) {
+        if(userPostItem.content.contains("videos")){
             Glide.with(mContext)
-                .load(userPostItem.userPostUrl)
+                .load(userPostItem.content)
                 .into(holder.post_iv_postimage)
 
             holder.post_vv_postvideo.visibility = View.VISIBLE
             val videoView = holder.post_vv_postvideo
-            videoView.setVideoURI(Uri.parse(userPostItem.userPostUrl))
+            videoView.setVideoURI(Uri.parse(userPostItem.content))
 
             videoView.setOnPreparedListener { mediaPlayer ->
                 holder.post_iv_postimage.visibility = View.GONE
@@ -172,7 +173,7 @@ class PostsAdapter(
             holder.post_vv_postvideo.visibility = View.GONE
             holder.post_iv_postimage.visibility = View.VISIBLE
             Glide.with(mContext)
-                .load(userPostItem.userPostUrl)
+                .load(userPostItem.content)
                 .into(holder.post_iv_postimage)
         }
 
@@ -213,7 +214,7 @@ class PostsAdapter(
                         FirebaseHelper().deleteLikeNotification(userPostItem.userId, userPostItem.userPostUrl)
                     } else {   // ilk defa begenilecek
                         withContext(Dispatchers.Main) {
-                            tempPost.likeCount = (tempPost.likeCount.toInt() + 1).toString()
+                            tempPost.likeCount = (tempPost.likeCount + 1)
                             posts[position] = tempPost
                             notifyItemChanged(position)
                         }

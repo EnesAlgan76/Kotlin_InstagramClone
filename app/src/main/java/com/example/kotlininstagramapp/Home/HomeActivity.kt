@@ -66,7 +66,7 @@ class HomeActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 handleConnectionError(e.toString())
             }
-            userData?.let { handleUserResponse(it) } ?: handleUserNotFound()
+            userData?.let { handleUserResponse(it) } //?: handleUserNotFound()
         }
     }
 

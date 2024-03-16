@@ -2,15 +2,18 @@ package com.example.kotlininstagramapp.utils
 
 import android.net.Uri
 import android.util.Log
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Models.Notification
 import com.example.kotlininstagramapp.Models.Post
+import com.example.kotlininstagramapp.Profile.ProfileUserPostsAdapter
 import com.example.kotlininstagramapp.api.BaseResponse
 import com.example.kotlininstagramapp.api.FollowApi
 import com.example.kotlininstagramapp.api.NotificationApi
 import com.example.kotlininstagramapp.api.PostApi
 import com.example.kotlininstagramapp.api.RetrofitInstance
 import com.example.kotlininstagramapp.api.UserApi
+import com.example.kotlininstagramapp.api.model.HomePagePostItem
 import com.example.kotlininstagramapp.api.model.NotificationModel
 import com.example.kotlininstagramapp.api.model.UserModel
 import com.google.firebase.firestore.FirebaseFirestore
@@ -20,6 +23,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.await
 import java.util.UUID
 
@@ -222,6 +229,66 @@ class DatabaseHelper {
     suspend fun deleteNotification(notificationId: Int) {
         val response = notificationService.deleteNotification(notificationId).await()
         Log.e("SPRING deleteNotification", response.message)
+    }
+
+    fun fetchUserPosts(userId: String): List<Post> {
+        val response = postService.getAllPosts(userId).execute()
+
+        return if (response.isSuccessful){
+            Log.e("SPRING fetchUserPosts",response.body()!!.message)
+            val postList = response.body()?.data as List<Map<String, Any>>
+            if(!postList.isEmpty()){
+
+                val postDTOList :List<Post> = postList.map { postMap ->
+                    Post.fromMap(postMap)
+                }
+                postDTOList
+
+            }else listOf();
+        }else{
+            Log.e("SPRING","fetchUserPosts response unseccesful"+response.message())
+            listOf();
+        }
+    }
+
+    suspend fun getHomePagePosts(): ArrayList<HomePagePostItem> {
+        val userId = UserSingleton.userModel!!.userId
+        var postList : ArrayList<HomePagePostItem> = arrayListOf()
+
+        try {
+            // Get followed user ids
+            val followedUserIdsResponse = withContext(Dispatchers.IO) {
+                followService.getFollowedUserIds(userId).execute()
+            }
+
+            println("*************** >>>"+followedUserIdsResponse)
+            if (followedUserIdsResponse.isSuccessful) {
+                val followedUserIds = followedUserIdsResponse.body()?.data as List<String>
+
+
+                // Get posts of followed users
+                followedUserIds.firstOrNull()?.let { firstFollowedUserId ->
+                    val userPostsResponse = withContext(Dispatchers.IO) {
+                        postService.getUserPostsHomePage(firstFollowedUserId).execute()
+                    }
+                    if (userPostsResponse.isSuccessful) {
+                        val userPosts = userPostsResponse.body()?.data as List<Map<String,Any>>
+                        val userPostItems:List<HomePagePostItem>  =  userPosts.map { HomePagePostItem.fromMap(it) }
+                        postList.addAll(userPostItems)
+                    } else {
+                        println("Failed to fetch user posts: ${userPostsResponse.message()}")
+                    }
+                } ?: run {
+                    println("No followed users found.")
+                }
+            } else {
+                println("Failed to fetch followed user ids: ${followedUserIdsResponse.message()}")
+            }
+        } catch (e: Exception) {
+            println("Error: ${e}")
+        }
+
+        return postList
     }
 
 }

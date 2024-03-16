@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Home.SinglePostListFragment
+import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.Profile.ProfileUserPostsAdapter
@@ -24,7 +25,7 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
     lateinit var followStateButton : Button
     private var userId: String? = null
     lateinit var binding : ActivityUserDetailPageBinding
-    lateinit var userPostItems: ArrayList<UserPostItem>
+    lateinit var userPostItems: List<Post>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +46,7 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
             handleFollowStateUI(isFollowing)
 
             if(isFollowing){
-               // showPosts(user)
+                showPosts(user)
             }else{
                 showPrivateAccountInfo()
             }
@@ -94,10 +95,10 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
 
     private fun showPosts(user: UserModel) {
         CoroutineScope(Dispatchers.Main).launch {
-//            withContext(Dispatchers.IO){
-//                userPostItems = FirebaseHelper().fetchUserPosts(user)
-//            }
-            setUserInfos(user)
+            withContext(Dispatchers.IO){
+                userPostItems = DatabaseHelper().fetchUserPosts(user.userId)
+            }
+            //setUserInfos(user)
             setRecycleView(userPostItems)
         }
     }
@@ -112,8 +113,8 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
         binding.userExploreTvPosts.setText(user.postCount.toString())
     }
 
-    private fun setRecycleView(userPostItems: ArrayList<UserPostItem>) {
-        var adapter = ProfileUserPostsAdapter(context = this, listOf())
+    private fun setRecycleView(userPostItems: List<Post>) {
+        var adapter = ProfileUserPostsAdapter(context = this, userPostItems)
         binding.userExploreRvProfilePageUserPosts.adapter = adapter
         binding.userExploreRvProfilePageUserPosts.layoutManager = GridLayoutManager(this, 3)
     }
@@ -131,7 +132,7 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
     override fun onSingleItemClicked(position:Int) {
         binding.userExploreScrollView2.visibility = View.INVISIBLE
         binding.userExploreFlActivityProfile.visibility = View.VISIBLE
-        supportFragmentManager.beginTransaction().replace(R.id.userExplore_fl_activity_profile, SinglePostListFragment(userPostItems,position)).commit()
+      //  supportFragmentManager.beginTransaction().replace(R.id.userExplore_fl_activity_profile, SinglePostListFragment(userPostItems,position)).commit()
 
     }
 
