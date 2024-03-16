@@ -15,7 +15,7 @@ The backend of this Instagram clone application is developed separately with Spr
 - `Spring-Backend-Integrated`: This branch contains the backend integrated with **Spring Java**.
 
 ## Spring Integration (AWS Deployment)
-This branch integrates the backend with Spring Java, leveraging AWS services for database hosting and deployment.
+This branch integrates the backend with Spring Java, AWS services for database hosting and deployment.
 
 ### Technologies Used
 
@@ -33,7 +33,7 @@ This branch integrates the backend with Spring Java, leveraging AWS services for
 
 
 ## Firebase Integration
-This branch integrates the backend with Firebase, providing a scalable and efficient solution for the Instagram Clone application.
+This branch integrates the backend with Firebase.
  
 ### Technologies Used
 - **Firebase Firestore**: Used as the database.
