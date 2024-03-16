@@ -1,24 +1,53 @@
 # Kotlin_InstagramClone
 
 Instagram Clone created with Kotlin and Firebase.
+
+## Backend Project
+
+The backend of this Instagram clone application is developed separately with Spring Boot + AWS. You can find the backend project on GitHub:
+
+[Java Spring Backend Project](https://github.com/EnesAlgan76/SpringBackend_InstagramClone)
+
+
+⚠️ **Attention: Please note that there are two branches in this repository**
+
+- `CompletedApp(Firebase)`: This branch contains the backend integrated with **Firebase**.
+- `Spring-Backend-Integrated`: This branch contains the backend integrated with **Spring Java**.
+
+## Spring Integration (AWS Deployment)
+This branch integrates the backend with Spring Java, leveraging AWS services for database hosting and deployment.
+
+### Technologies Used
+
+- **Spring Boot**: Backend framework for building scalable and efficient Java applications.
+- **MySQL**: Database used for storing user data, posts, comments, and more.
+- **Amazon RDS**: Managed relational database service used for hosting the MySQL database.
+- **Amazon Elastic Beanstalk**: Service used for deploying and managing the Spring Boot application.
+- **Retrofit**: In Android used for making network requests to external APIs.
+- **Kotlin Coroutine**: Utilized for handling asynchronous tasks.
+- **Firebase**: Storage, Messaging, Cloud Functions
+
+### AWS Deployment Scheme
+
+<img src="https://github.com/EnesAlgan76/SpringBackend_InstagramClone/blob/master/images/overview.jpg" alt="AWS Deployment Scheme" height="400">
+
+
+## Firebase Integration
+This branch integrates the backend with Firebase, providing a scalable and efficient solution for the Instagram Clone application.
  
-## Some of the technologies used
-
-**Firebase Firestore**: Used as the database.
-
-**Firebase Storage**: Utilized for storing image and video files.
-
-**Firebase Authentication**: Employed for user authentication.
-
-**Firebase Messaging**: Used for sending real-time notifications.
-
-**Firebase Functions**: Used for managing backend logic.
-
-**Kotlin Coroutine**: Utilized for handling asynchronous tasks.
+### Technologies Used
+- **Firebase Firestore**: Used as the database.
+- **Firebase Storage**: Utilized for storing image and video files.
+- **Firebase Authentication**: Employed for user authentication.
+- **Firebase Messaging**: Used for sending real-time notifications.
+- **Firebase Functions**: Used for managing backend logic.
+- **Kotlin Coroutine**: Utilized for handling asynchronous tasks.
 
 
-## Note
-This repository is still under development and I will continue to add more features to it. The backend of this application is currently built with Firebase. However, I am actively working on integrating the backend with **Spring Java** for improved scalability and performance.
+
+
+
+
 
 # Features
 
