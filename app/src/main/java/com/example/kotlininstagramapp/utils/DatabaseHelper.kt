@@ -4,12 +4,12 @@ import android.net.Uri
 import android.util.Log
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Models.Post
-import com.example.kotlininstagramapp.api.BaseResponse
-import com.example.kotlininstagramapp.api.FollowApi
-import com.example.kotlininstagramapp.api.NotificationApi
-import com.example.kotlininstagramapp.api.PostApi
-import com.example.kotlininstagramapp.api.RetrofitInstance
-import com.example.kotlininstagramapp.Services.UserApi
+import com.example.kotlininstagramapp.data.api.BaseResponse
+import com.example.kotlininstagramapp.data.api.FollowApi
+import com.example.kotlininstagramapp.data.api.NotificationApi
+import com.example.kotlininstagramapp.data.api.PostApi
+import com.example.kotlininstagramapp.data.api.RetrofitInstance
+import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.data.model.HomePagePostItem
 import com.example.kotlininstagramapp.data.model.NotificationModel
 import com.example.kotlininstagramapp.data.model.UserModel
@@ -108,7 +108,7 @@ class DatabaseHelper {
     }
 
     suspend fun isUserFollowing(userId: String): Boolean {
-        val response :BaseResponse = followService.checkFollowStatus(UserSingleton.userModel!!.userId,userId).await()
+        val response : BaseResponse = followService.checkFollowStatus(UserSingleton.userModel!!.userId,userId).await()
         if (response.status){
             return response.data as Boolean
         }else{

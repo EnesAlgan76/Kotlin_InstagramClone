@@ -1,4 +1,4 @@
-package com.example.kotlininstagramapp.api
+package com.example.kotlininstagramapp.data.api
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

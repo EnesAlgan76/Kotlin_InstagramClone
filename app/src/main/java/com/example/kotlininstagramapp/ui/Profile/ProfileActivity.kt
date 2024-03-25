@@ -13,10 +13,10 @@ import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.api.BaseResponse
-import com.example.kotlininstagramapp.api.FollowApi
-import com.example.kotlininstagramapp.api.PostApi
-import com.example.kotlininstagramapp.api.RetrofitInstance
+import com.example.kotlininstagramapp.data.api.BaseResponse
+import com.example.kotlininstagramapp.data.api.FollowApi
+import com.example.kotlininstagramapp.data.api.PostApi
+import com.example.kotlininstagramapp.data.api.RetrofitInstance
 import com.example.kotlininstagramapp.databinding.ActivityProfileBinding
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.EImageLoader

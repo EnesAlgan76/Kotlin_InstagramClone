@@ -12,8 +12,8 @@ import androidx.fragment.app.Fragment
 import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.api.RetrofitInstance
-import com.example.kotlininstagramapp.Services.UserApi
+import com.example.kotlininstagramapp.data.api.RetrofitInstance
+import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.data.model.UserModel
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.auth.FirebaseAuth

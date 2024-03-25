@@ -10,8 +10,8 @@ import android.util.Log
 import android.widget.Toast
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Home.HomeActivity
-import com.example.kotlininstagramapp.api.RetrofitInstance
-import com.example.kotlininstagramapp.Services.UserApi
+import com.example.kotlininstagramapp.data.api.RetrofitInstance
+import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.data.model.UserModel
 import com.example.kotlininstagramapp.databinding.ActivityLoginBinding
 import com.google.android.gms.tasks.OnCompleteListener
@@ -19,16 +19,21 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.activity.viewModels
 
-class LoginActivity : AppCompatActivity() {
+
+@AndroidEntryPoint
+class LoginActivity : AppCompatActivity(), LoginCallback {
     lateinit var binding: ActivityLoginBinding
     var buttonActive :Boolean = false
     val firestore = FirebaseFirestore.getInstance()
     val auth = FirebaseAuth.getInstance()
     val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,9 +48,18 @@ class LoginActivity : AppCompatActivity() {
         binding.etLoginpassword.addTextChangedListener(textWatcher)
 
         binding.btnLogingiris.setOnClickListener {
+            if (buttonActive){
+                val email = binding.etLoginmail.text.toString()
+                val password = binding.etLoginpassword.text.toString()
+                viewModel.loginUser(binding.etLoginmail.text.toString(), binding.etLoginpassword.text.toString(), this)
+            }
+
+        }
+
+       /* binding.btnLogingiris.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
                 if (buttonActive){
-                    val response= userService.authenticateUser(binding.etLoginmail.text.toString(),binding.etLoginpassword.text.toString()).execute()
+                    val response= userService.checkUserExists(binding.etLoginmail.text.toString(),binding.etLoginpassword.text.toString()).execute()
                     if (response.isSuccessful) {
                         println("Response Body: ${response.body()}")
                         if (response.body()?.data != null) {
@@ -69,10 +83,9 @@ class LoginActivity : AppCompatActivity() {
                 searchUserRecursively(binding.etLoginmail.text.toString(), binding.etLoginpassword.text.toString(), fieldList)
             }*/
 
-        }
+        }*/
 
     }
-
 
     /*private fun searchUserRecursively(etLoginmail: String, etLoginpassword: String, fieldList: ArrayList<String>) {
         if (fieldList.isEmpty()){
@@ -95,7 +108,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }*/
 
-    private fun loginUserWithEmail(password: String?, mail: String?) {
+   /* private fun loginUserWithEmail(password: String?, mail: String?) {
         if(password!=null && mail!=null){
             auth.signInWithEmailAndPassword(mail,password)
                 .addOnSuccessListener {
@@ -110,7 +123,7 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
-    }
+    }*/
 
 
 
@@ -163,5 +176,17 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onLoginSuccess() {
+        showToast("Giriş Başarılı")
+        startActivity(Intent(this, HomeActivity()::class.java))
+        retrieveCurrentFcmToken()
+        finish()
+    }
+
+    override fun onLoginFailure(message: String) {
+        showToast("Şifre Yanlış ${message}")
+        //Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

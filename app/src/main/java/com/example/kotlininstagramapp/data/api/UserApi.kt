@@ -1,5 +1,4 @@
-package com.example.kotlininstagramapp.Services
-import com.example.kotlininstagramapp.api.BaseResponse
+package com.example.kotlininstagramapp.data.api
 import com.example.kotlininstagramapp.data.model.UserModel
 import retrofit2.Call
 import retrofit2.http.Body
@@ -25,7 +24,7 @@ interface UserApi {
      ): Call<Boolean>
 
      @GET("users/authenticateUser")
-     fun authenticateUser(
+     fun checkUserExists(
           @Query("userNameOrTelOrMail") userNameOrTelOrMail: String,
           @Query("password") password: String,
      ): Call<BaseResponse>

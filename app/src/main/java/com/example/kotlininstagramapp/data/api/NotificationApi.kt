@@ -1,4 +1,4 @@
-package com.example.kotlininstagramapp.api
+package com.example.kotlininstagramapp.data.api
 
 import com.example.kotlininstagramapp.data.model.NotificationModel
 import retrofit2.Call

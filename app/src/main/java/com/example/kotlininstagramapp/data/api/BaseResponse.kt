@@ -1,4 +1,4 @@
-package com.example.kotlininstagramapp.api
+package com.example.kotlininstagramapp.data.api
 
 data class BaseResponse(
     var status: Boolean = false,
