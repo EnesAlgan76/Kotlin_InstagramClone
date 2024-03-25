@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.api.model.HomePagePostItem
+import com.example.kotlininstagramapp.data.model.HomePagePostItem
 import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -87,7 +87,7 @@ class HomeFragment : Fragment() {
                     allPosts2 = DatabaseHelper().getHomePagePosts()
                 }
                 // Invalid data to replace story view at index 0
-                allPosts2.add(0,HomePagePostItem(0.5,"","","","","",0.0,"",""))
+                allPosts2.add(0, HomePagePostItem(0.5,"","","","","",0.0,"",""))
                 val adapter=PostsAdapter(allPosts2,requireContext(), requireActivity().supportFragmentManager,recyclerView)
                 recyclerView.adapter=adapter
             } catch (e: Exception) {

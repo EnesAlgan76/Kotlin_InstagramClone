@@ -10,9 +10,9 @@ import com.example.kotlininstagramapp.api.NotificationApi
 import com.example.kotlininstagramapp.api.PostApi
 import com.example.kotlininstagramapp.api.RetrofitInstance
 import com.example.kotlininstagramapp.Services.UserApi
-import com.example.kotlininstagramapp.api.model.HomePagePostItem
-import com.example.kotlininstagramapp.api.model.NotificationModel
-import com.example.kotlininstagramapp.api.model.UserModel
+import com.example.kotlininstagramapp.data.model.HomePagePostItem
+import com.example.kotlininstagramapp.data.model.NotificationModel
+import com.example.kotlininstagramapp.data.model.UserModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -178,7 +178,7 @@ class DatabaseHelper {
         if (response.status){
             val notificationList =  response.data as List<Map<String, String>>
             Log.e("Spring getAllUserNotifications: ", response.message)
-            return notificationList.map {NotificationModel.fromMap(it)}
+            return notificationList.map { NotificationModel.fromMap(it)}
         }else{
             Log.e("Spring getAllUserNotifications: ", response.message)
             return listOf()

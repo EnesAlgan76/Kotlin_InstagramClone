@@ -14,7 +14,7 @@ import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.api.RetrofitInstance
 import com.example.kotlininstagramapp.Services.UserApi
-import com.example.kotlininstagramapp.api.model.UserModel
+import com.example.kotlininstagramapp.data.model.UserModel
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

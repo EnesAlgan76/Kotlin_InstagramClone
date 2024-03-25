@@ -1,4 +1,4 @@
-package com.example.kotlininstagramapp.api.model
+package com.example.kotlininstagramapp.data.model
 
 data class UserModel(
     val userId: String,

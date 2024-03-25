@@ -12,7 +12,7 @@ import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Home.HomeActivity
 import com.example.kotlininstagramapp.api.RetrofitInstance
 import com.example.kotlininstagramapp.Services.UserApi
-import com.example.kotlininstagramapp.api.model.UserModel
+import com.example.kotlininstagramapp.data.model.UserModel
 import com.example.kotlininstagramapp.databinding.ActivityLoginBinding
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth

@@ -1,4 +1,4 @@
-package com.example.kotlininstagramapp.api.model
+package com.example.kotlininstagramapp.data.model
 
 data class NotificationModel(
     val id: Double,

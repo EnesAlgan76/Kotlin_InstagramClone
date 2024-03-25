@@ -1,6 +1,6 @@
 package com.example.kotlininstagramapp.api
 
-import com.example.kotlininstagramapp.api.model.NotificationModel
+import com.example.kotlininstagramapp.data.model.NotificationModel
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE

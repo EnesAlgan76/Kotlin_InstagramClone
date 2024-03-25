@@ -22,7 +22,7 @@ import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.ui.Story.StoryAdapter
-import com.example.kotlininstagramapp.api.model.HomePagePostItem
+import com.example.kotlininstagramapp.data.model.HomePagePostItem
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.TextHighlighter
 import com.google.firebase.auth.FirebaseAuth
@@ -43,7 +43,7 @@ class PostsAdapter(
     private val fragmentManager: FragmentManager,
     private val recyclerView: RecyclerView,
 
-) :RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+    ) :RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     private val defaultImage = R.drawable.icon_profile
     private val handler = Handler(Looper.getMainLooper())
 

@@ -6,13 +6,10 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
-import com.example.kotlininstagramapp.Home.SinglePostListFragment
 import com.example.kotlininstagramapp.Models.Post
-import com.example.kotlininstagramapp.Models.UserPostItem
-import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.ui.Profile.ProfileUserPostsAdapter
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.api.model.UserModel
+import com.example.kotlininstagramapp.data.model.UserModel
 import com.example.kotlininstagramapp.databinding.ActivityUserDetailPageBinding
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import kotlinx.coroutines.CoroutineScope

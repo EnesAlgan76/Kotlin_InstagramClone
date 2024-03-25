@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.api.model.UserModel
+import com.example.kotlininstagramapp.data.model.UserModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

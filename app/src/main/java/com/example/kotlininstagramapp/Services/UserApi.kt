@@ -1,6 +1,6 @@
 package com.example.kotlininstagramapp.Services
 import com.example.kotlininstagramapp.api.BaseResponse
-import com.example.kotlininstagramapp.api.model.UserModel
+import com.example.kotlininstagramapp.data.model.UserModel
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET

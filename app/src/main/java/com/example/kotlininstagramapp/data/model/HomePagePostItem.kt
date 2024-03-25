@@ -1,4 +1,4 @@
-package com.example.kotlininstagramapp.api.model
+package com.example.kotlininstagramapp.data.model
 
 class HomePagePostItem(
     val postId: Double,

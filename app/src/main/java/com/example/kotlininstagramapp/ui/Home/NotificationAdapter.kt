@@ -17,10 +17,8 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.kotlininstagramapp.Models.Notification
-import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.api.model.NotificationModel
+import com.example.kotlininstagramapp.data.model.NotificationModel
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.CoroutineScope
