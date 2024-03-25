@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Share.ShareCameraFragment">
+    tools:context=".ui.Share.ShareCameraFragment">
     <com.otaliastudios.cameraview.CameraView
         android:id="@+id/cameraViewShareCamera"
         android:layout_width="match_parent"

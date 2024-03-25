@@ -2,17 +2,14 @@ package com.example.kotlininstagramapp.utils
 
 import android.net.Uri
 import android.util.Log
-import androidx.recyclerview.widget.GridLayoutManager
 import com.example.kotlininstagramapp.Generic.UserSingleton
-import com.example.kotlininstagramapp.Models.Notification
 import com.example.kotlininstagramapp.Models.Post
-import com.example.kotlininstagramapp.Profile.ProfileUserPostsAdapter
 import com.example.kotlininstagramapp.api.BaseResponse
 import com.example.kotlininstagramapp.api.FollowApi
 import com.example.kotlininstagramapp.api.NotificationApi
 import com.example.kotlininstagramapp.api.PostApi
 import com.example.kotlininstagramapp.api.RetrofitInstance
-import com.example.kotlininstagramapp.api.UserApi
+import com.example.kotlininstagramapp.Services.UserApi
 import com.example.kotlininstagramapp.api.model.HomePagePostItem
 import com.example.kotlininstagramapp.api.model.NotificationModel
 import com.example.kotlininstagramapp.api.model.UserModel
@@ -24,9 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.await
 import java.util.UUID
 

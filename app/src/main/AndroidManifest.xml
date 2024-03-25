@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <application
+        android:name="com.example.to_doapp.di.EnesApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
         android:usesCleartextTraffic="true"
@@ -33,10 +34,10 @@
         android:theme="@style/Theme.KotlinInstagramApp"
         tools:targetApi="31">
         <activity
-            android:name=".Story.StoryReviewActivity"
+            android:name=".ui.Story.StoryReviewActivity"
             android:exported="false" />
         <activity
-            android:name=".Story.StoryActivity"
+            android:name=".ui.Story.StoryActivity"
             android:exported="false" />
 
         <meta-data
@@ -61,13 +62,13 @@
             android:name=".Generic.UserExplorePage"
             android:exported="false" />
         <activity
-            android:name=".Login.LoginActivity"
+            android:name=".ui.Login.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".Login.RegisterActivity"
+            android:name=".ui.Login.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".Profile.SettingActivity"
+            android:name=".ui.Profile.SettingActivity"
             android:exported="false" />
         <activity
             android:name=".Home.HomeActivity"
@@ -79,16 +80,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Share.ShareActivity"
+            android:name=".ui.Share.ShareActivity"
             android:exported="false" />
         <activity
-            android:name=".Share.Search.SearchActivity"
+            android:name=".ui.Search.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".Reels.ReelsActivity"
+            android:name=".ui.Reels.ReelsActivity"
             android:exported="false" />
         <activity
-            android:name=".Profile.ProfileActivity"
+            android:name=".ui.Profile.ProfileActivity"
             android:exported="false" />
     </application>
 

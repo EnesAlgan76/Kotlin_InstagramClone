@@ -5,7 +5,7 @@
     android:id="@+id/cslyt"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Profile.SettingActivity">
+    tools:context=".ui.Profile.SettingActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/profileSettingsRoot"

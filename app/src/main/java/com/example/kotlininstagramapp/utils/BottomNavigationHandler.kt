@@ -6,11 +6,11 @@ import android.content.Intent
 import android.util.Log
 import android.view.MenuItem
 import com.example.kotlininstagramapp.Home.HomeActivity
-import com.example.kotlininstagramapp.Profile.ProfileActivity
+import com.example.kotlininstagramapp.ui.Profile.ProfileActivity
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.Reels.ReelsActivity
-import com.example.kotlininstagramapp.Share.Search.SearchActivity
-import com.example.kotlininstagramapp.Share.ShareActivity
+import com.example.kotlininstagramapp.ui.Reels.ReelsActivity
+import com.example.kotlininstagramapp.ui.Search.SearchActivity
+import com.example.kotlininstagramapp.ui.Share.ShareActivity
 import com.google.android.material.navigation.NavigationBarView
 class BottomNavigationHandler {
     companion object{

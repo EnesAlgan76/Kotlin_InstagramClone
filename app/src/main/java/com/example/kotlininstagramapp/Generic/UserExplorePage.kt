@@ -10,7 +10,7 @@ import com.example.kotlininstagramapp.Home.SinglePostListFragment
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
-import com.example.kotlininstagramapp.Profile.ProfileUserPostsAdapter
+import com.example.kotlininstagramapp.ui.Profile.ProfileUserPostsAdapter
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.api.model.UserModel
 import com.example.kotlininstagramapp.databinding.ActivityUserDetailPageBinding
