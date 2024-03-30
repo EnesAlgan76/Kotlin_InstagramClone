@@ -27,11 +27,10 @@ import androidx.activity.viewModels
 
 
 @AndroidEntryPoint
-class LoginActivity : AppCompatActivity(), LoginCallback {
+class LoginActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginBinding
     var buttonActive :Boolean = false
     val firestore = FirebaseFirestore.getInstance()
-    val auth = FirebaseAuth.getInstance()
     val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
     private val viewModel: LoginViewModel by viewModels()
 
@@ -51,80 +50,33 @@ class LoginActivity : AppCompatActivity(), LoginCallback {
             if (buttonActive){
                 val email = binding.etLoginmail.text.toString()
                 val password = binding.etLoginpassword.text.toString()
-                viewModel.loginUser(binding.etLoginmail.text.toString(), binding.etLoginpassword.text.toString(), this)
+                viewModel.loginUser(email, password)
             }
 
         }
 
-       /* binding.btnLogingiris.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                if (buttonActive){
-                    val response= userService.checkUserExists(binding.etLoginmail.text.toString(),binding.etLoginpassword.text.toString()).execute()
-                    if (response.isSuccessful) {
-                        println("Response Body: ${response.body()}")
-                        if (response.body()?.data != null) {
-                            println("Logging ...")
-                            val userDataJson = Gson().toJson(response.body()?.data)
-                            val userModel = Gson().fromJson(userDataJson, UserModel::class.java)
-                            UserSingleton.userModel = userModel
-                            loginUserWithEmail(userModel.password,userModel.email) // Firebase Auth
-                        }else{
-                            println("User not found${response}")
-                        }
-                    } else {
-                        println("Error Response: ${response.errorBody()?.string()}")
-                    }
-                }
-            }
-
-
-            /*if(buttonActive){
-                var fieldList = arrayListOf("telNo", "mail", "userName")
-                searchUserRecursively(binding.etLoginmail.text.toString(), binding.etLoginpassword.text.toString(), fieldList)
-            }*/
-
-        }*/
-
+        observeLoginState()
     }
 
-    /*private fun searchUserRecursively(etLoginmail: String, etLoginpassword: String, fieldList: ArrayList<String>) {
-        if (fieldList.isEmpty()){
-            Toast.makeText(this, "Kullanıcı Bulunamadı", Toast.LENGTH_SHORT).show()
-            return
-        }
-        var field = fieldList.first()
-        val userQuery =firestore.collection("users").whereEqualTo(field,etLoginmail)
 
-        userQuery.get().addOnSuccessListener {documents ->
-            if(!documents.isEmpty){
-                val doc= documents.documents.get(0)
-                val mail = doc.getString("mail")
-                loginUserWithEmail(etLoginpassword,mail)
-            }else{
-                fieldList.removeFirst()
-                searchUserRecursively(etLoginmail,etLoginpassword,fieldList)
-            }
 
-        }
-    }*/
-
-   /* private fun loginUserWithEmail(password: String?, mail: String?) {
-        if(password!=null && mail!=null){
-            auth.signInWithEmailAndPassword(mail,password)
-                .addOnSuccessListener {
-                    showToast("GİRİŞ BAŞARILI")
-                    startActivity(Intent(this,HomeActivity()::class.java))
+    private fun observeLoginState() {
+        viewModel.loginState.observe(this) { state ->
+            when (state) {
+                is LoginState.Loading -> println("Login İşlemi Devam Ediyor ...")
+                is LoginState.Success -> {
+                    showToast("Giriş Başarılı")
+                    startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
                     retrieveCurrentFcmToken()
                     finish()
-            }
-                .addOnFailureListener { exception->
-                    showToast("Şifre Yanlış")
-                    Toast.makeText(this, exception.message, Toast.LENGTH_SHORT).show()
                 }
+
+                is LoginState.Error -> {
+                    showToast("Hata. ${state.errorMessage}")
+                }
+            }
         }
-
-    }*/
-
+    }
 
 
 
@@ -176,17 +128,5 @@ class LoginActivity : AppCompatActivity(), LoginCallback {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onLoginSuccess() {
-        showToast("Giriş Başarılı")
-        startActivity(Intent(this, HomeActivity()::class.java))
-        retrieveCurrentFcmToken()
-        finish()
-    }
-
-    override fun onLoginFailure(message: String) {
-        showToast("Şifre Yanlış ${message}")
-        //Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

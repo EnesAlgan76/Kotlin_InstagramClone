@@ -24,7 +24,7 @@ interface UserApi {
      ): Call<Boolean>
 
      @GET("users/authenticateUser")
-     fun checkUserExists(
+     fun authenticateUser(
           @Query("userNameOrTelOrMail") userNameOrTelOrMail: String,
           @Query("password") password: String,
      ): Call<BaseResponse>

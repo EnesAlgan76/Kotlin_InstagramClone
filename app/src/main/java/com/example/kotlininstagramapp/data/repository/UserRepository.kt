@@ -1,45 +1,26 @@
 package com.example.kotlininstagramapp.data.repository
 
-import android.content.Intent
-import android.widget.Toast
-import com.example.kotlininstagramapp.Generic.UserSingleton
-import com.example.kotlininstagramapp.Home.HomeActivity
 import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.data.model.UserModel
-import com.example.kotlininstagramapp.ui.Login.LoginCallback
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import retrofit2.await
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(private val userService: UserApi)  {
 
     private val auth = FirebaseAuth.getInstance()
-//    suspend fun checkUserExists(email: String, password: String): UserModel? {
-//        val response = userService.checkUserExists(email, password).execute()
-//        if (response.isSuccessful) {
-//            println("Response Body: ${response.body()}")
-//            if (response.body()?.data != null) {
-//                val userDataJson = Gson().toJson(response.body()?.data)
-//                val userModel = Gson().fromJson(userDataJson, UserModel::class.java)
-//                UserSingleton.userModel = userModel
-//                return  userModel
-//            }else{
-//                return null
-//            }
-//        } else {
-//            return null
-//        }
-//    }
 
-    suspend fun checkUserExists(email: String, password: String): UserModel? {
+    suspend fun authenticateUser(email: String, password: String): UserModel? {
         return try {
-            val response = userService.checkUserExists(email, password).await()
-            println("Response Body: ${response}")
+            val response = userService.authenticateUser(email, password).await()
             response.data?.let { userData ->
                 val userDataJson = Gson().toJson(response.data)
                 val userModel = Gson().fromJson(userDataJson, UserModel::class.java)
-                UserSingleton.userModel = userModel
                 userModel
             }
         } catch (e: Exception) {
@@ -47,23 +28,61 @@ class UserRepository @Inject constructor(private val userService: UserApi)  {
         }
     }
 
-
-    fun loginUserWithEmail(mail: String?,password: String?, callback: LoginCallback) {
-        if(password!=null && mail!=null){
-            println(mail)
-            println(password)
-            auth.signInWithEmailAndPassword(mail,password)
-                .addOnSuccessListener {
-                    callback.onLoginSuccess()
-                }
-                .addOnFailureListener { exception ->
-                    println(exception.message)
-                    callback.onLoginFailure(exception.message ?: "An error occurred")
-                }
+    suspend fun loginUserWithEmail(email: String, password: String) {
+        auth.signInWithEmailAndPassword(email, password).await()
+    }
 
 
-        }
+    suspend fun checkUserExists(userName: String, email: String, phoneNumber: String) :Boolean{
+        val isExists = userService.checkUserExists(userName, email, phoneNumber).await()
+        return isExists
 
     }
+
+    suspend fun registerUser(userName: String,fullName:String, email: String, phoneNumber: String, password: String) {
+        var fakeMail =email
+        if (email.isEmpty()){fakeMail = phoneNumber+"@enes.com"}
+
+        println(fakeMail+ password)
+
+        auth.createUserWithEmailAndPassword(fakeMail,password)
+            .addOnCompleteListener {task ->
+                if (task.isSuccessful){
+                    val userID = auth.currentUser!!.uid
+                    val userModel = UserModel(
+                        userId =userID ,
+                        userName = userName,
+                        password = password,
+                        phoneNumber = phoneNumber,
+                        email = fakeMail,
+                        fullName = fullName,
+                        fcmToken = "",
+                        profilePicture = "",
+                        biography = "",
+                        followerCount = 0,
+                        postCount = 0,
+                        followingCount = 0
+                    )
+
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val createCall = userService.createUser(userModel)
+                        val createResponse = createCall.execute()
+                        if (createResponse.isSuccessful) {
+                            println("Hesap başarıyla oluşturuldu.")
+                            println("User create body : ${createResponse.body()}")
+                        } else {
+                            println("Hata Mesajı : ${createResponse.errorBody()?.string()}")
+                        }
+                    }
+
+
+
+                }
+            }
+
+
+    }
+
 
 }

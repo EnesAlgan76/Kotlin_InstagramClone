@@ -12,8 +12,11 @@ import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.ActivityRegisterBinding
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.AndroidEntryPoint
 import org.greenrobot.eventbus.EventBus
 
+
+@AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
     lateinit var binding: ActivityRegisterBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,21 +78,6 @@ class RegisterActivity : AppCompatActivity() {
 
                 EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(binding.etRegisterpage.text.toString(),null))
 
-                /*checkIfValueExists(binding.etRegisterpage.text.trim().toString()+"@enes.com"){exists ->
-                    if(exists){
-                        Toast.makeText(this, "This phone number alyeady registered", Toast.LENGTH_SHORT).show()
-                    }else{
-                        binding.registerRoot.visibility= View.GONE
-                        binding.flRegisterpage.visibility = View.VISIBLE
-
-                        supportFragmentManager.beginTransaction()
-                            .replace(R.id.fl_registerpage, TelFragment())
-                            .addToBackStack("TelFragment")
-                            .commit()
-
-                        EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(binding.etRegisterpage.text.toString(),null))
-                    }
-                }*/
 
             }else{
                 binding.registerRoot.visibility= View.GONE
@@ -101,21 +89,7 @@ class RegisterActivity : AppCompatActivity() {
 
                 EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(null,binding.etRegisterpage.text.toString()))
 
-                /*checkIfValueExists(binding.etRegisterpage.text.trim().toString()){exists->
-                    if(exists){
-                        Toast.makeText(this, "This mail already taken", Toast.LENGTH_SHORT).show()
-                    }else{
-                        binding.registerRoot.visibility= View.GONE
-                        binding.flRegisterpage.visibility = View.VISIBLE
 
-                        supportFragmentManager.beginTransaction()
-                            .replace(R.id.fl_registerpage, RegisterFragment())
-                            .addToBackStack("RegisterFragmentMail")
-                            .commit()
-
-                        EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(null,binding.etRegisterpage.text.toString()))
-                    }
-                }*/
 
             }
 
@@ -123,21 +97,6 @@ class RegisterActivity : AppCompatActivity() {
     }
 
 
-
-    private fun checkIfValueExists(value: String, callback: (Boolean)->Unit){
-        val db = FirebaseFirestore.getInstance()
-        val emailQuery = db.collection("users").whereEqualTo("mail",value)
-        emailQuery.get().addOnCompleteListener { task ->
-            if(task.isSuccessful){
-                val querySnapshot = task.result
-                val exists = !querySnapshot.isEmpty
-                callback(exists)
-            }else{
-                Toast.makeText(this, "Connection Error", Toast.LENGTH_SHORT).show()
-                callback(true)
-            }
-        }
-    }
 
 
 
