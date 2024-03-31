@@ -19,6 +19,8 @@ This branch integrates the backend with Spring Java, AWS services for database h
 
 ### Technologies Used
 
+- **Android Architecture Components**: Used for implementing the MVVM architecture pattern, including LiveData and ViewModel.
+- **Hilt**:Dependency injection framework for Android.
 - **Spring Boot**: Backend framework for building scalable and efficient Java applications.
 - **MySQL**: Database used for storing user data, posts, comments, and more.
 - **Amazon RDS**: Managed relational database service used for hosting the MySQL database.
