@@ -1,62 +1,70 @@
 package com.example.kotlininstagramapp.ui.Login
 
-import android.content.Intent
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.example.kotlininstagramapp.Generic.UserSingleton
-import com.example.kotlininstagramapp.Home.HomeActivity
 import com.example.kotlininstagramapp.data.api.RetrofitInstance
 import com.example.kotlininstagramapp.data.api.UserApi
-import com.example.kotlininstagramapp.data.model.UserModel
-import com.example.kotlininstagramapp.databinding.ActivityLoginBinding
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.activity.viewModels
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.databinding.FragmentLoginBinding
 
 
 @AndroidEntryPoint
-class LoginActivity : AppCompatActivity() {
-    lateinit var binding: ActivityLoginBinding
-    var buttonActive :Boolean = false
-    val firestore = FirebaseFirestore.getInstance()
-    val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
+class LoginFragment : Fragment() {
+
+    private lateinit var binding: FragmentLoginBinding
+    private var buttonActive: Boolean = false
+    private val firestore = FirebaseFirestore.getInstance()
+    private val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
     private val viewModel: LoginViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        binding = FragmentLoginBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.tvRegiserlogin.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
+            // Navigate to RegisterActivity or RegisterFragment
+            findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
 
         binding.etLoginmail.addTextChangedListener(textWatcher)
         binding.etLoginpassword.addTextChangedListener(textWatcher)
 
         binding.btnLogingiris.setOnClickListener {
-            if (buttonActive){
+            if (buttonActive) {
                 val email = binding.etLoginmail.text.toString()
                 val password = binding.etLoginpassword.text.toString()
                 viewModel.loginUser(email, password)
             }
-
         }
 
         observeLoginState()
     }
+
 
 
 
@@ -66,9 +74,9 @@ class LoginActivity : AppCompatActivity() {
                 is LoginState.Loading -> println("Login İşlemi Devam Ediyor ...")
                 is LoginState.Success -> {
                     showToast("Giriş Başarılı")
-                    startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+                    //startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
                     retrieveCurrentFcmToken()
-                    finish()
+                  //  finish()
                 }
 
                 is LoginState.Error -> {
@@ -127,6 +135,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
+
+

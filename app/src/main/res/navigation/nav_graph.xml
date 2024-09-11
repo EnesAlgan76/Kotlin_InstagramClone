@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:startDestination="@id/checkAuthFragment">
+
+    <fragment
+        android:id="@+id/checkAuthFragment"
+        android:name="com.example.kotlininstagramapp.CheckAuthFragment"
+        android:label="Home">
+        <action
+            android:id="@+id/action_homeFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_checkAuthFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.kotlininstagramapp.ui.Login.LoginFragment"
+        android:label="Login" >
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.kotlininstagramapp.ui.Login.RegisterFragment"
+        android:label="RegisterFragment" >
+        <action
+            android:id="@+id/action_registerFragment_to_registerNextFragment"
+            app:destination="@id/registerNextFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerNextFragment"
+        android:name="com.example.kotlininstagramapp.ui.Login.RegisterNextFragment"
+        android:label="RegisterNextFragment" >
+        <argument
+            android:name="hint"
+            app:argType="string" />
+        <argument
+            android:name="input"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.kotlininstagramapp.Home.HomeFragment"
+        android:label="HomeFragment">
+    </fragment>
+
+
+
+
+
+</navigation>

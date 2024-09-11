@@ -12,7 +12,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.kotlininstagramapp.Generic.UserSingleton
-import com.example.kotlininstagramapp.ui.Login.LoginActivity
 import com.example.kotlininstagramapp.data.api.RetrofitInstance
 import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.data.model.UserModel
@@ -105,7 +104,7 @@ class HomeActivity : AppCompatActivity() {
 
     fun goToLoginPage(){
        // Toast.makeText(this, "unregistered", Toast.LENGTH_SHORT).show()
-        val intent = Intent(this, LoginActivity::class.java)
+       // val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }

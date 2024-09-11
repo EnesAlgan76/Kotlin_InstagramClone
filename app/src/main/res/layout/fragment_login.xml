@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.Login.LoginActivity">
+    tools:context=".ui.Login.LoginFragment">
 
     <ImageView
         android:id="@+id/imageView2"
@@ -19,13 +19,12 @@
 
     <EditText
         android:id="@+id/et_loginmail"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="57dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/shape_textfield"
-        android:ems="10"
         android:hint="Phone, email or username"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,23 +32,21 @@
 
     <EditText
         android:id="@+id/et_loginpassword"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="25dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/shape_textfield"
-        android:ems="10"
         android:hint="Password"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_loginmail" />
 
     <Button
         android:id="@+id/btn_logingiris"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="70dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="20dp"
@@ -59,7 +56,6 @@
         android:textAllCaps="false"
         android:textColor="#2196F3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_loginpassword" />
 

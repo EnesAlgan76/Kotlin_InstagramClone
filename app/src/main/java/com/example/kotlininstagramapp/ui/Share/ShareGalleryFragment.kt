@@ -1,8 +1,5 @@
 package com.example.kotlininstagramapp.ui.Share
 
-import GalleryGridAdapter
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -11,21 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.kotlininstagramapp.ui.Login.RegisterFragment
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.databinding.ActivityShareBinding
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.FileOperations
-import com.squareup.picasso.Picasso
-import id.zelory.compressor.Compressor
-import id.zelory.compressor.constraint.quality
 import kotlinx.coroutines.*
 import org.greenrobot.eventbus.EventBus
 import java.io.File

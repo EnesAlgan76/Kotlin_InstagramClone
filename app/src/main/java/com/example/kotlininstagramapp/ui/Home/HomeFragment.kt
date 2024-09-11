@@ -43,7 +43,7 @@ class HomeFragment : Fragment() {
         BottomNavigationHandler.setupNavigations(requireContext(),bottomNavigationView,4)
 
         iv_directMessage.setOnClickListener {
-            (activity as HomeActivity).binding.viewPager.setCurrentItem(2)
+           // (activity as HomeActivity).binding.viewPager.setCurrentItem(2)
         }
 
         iv_notifications.setOnClickListener {

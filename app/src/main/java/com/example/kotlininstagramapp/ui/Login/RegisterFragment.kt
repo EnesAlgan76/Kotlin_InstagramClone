@@ -1,109 +1,93 @@
 package com.example.kotlininstagramapp.ui.Login
 
-import android.content.Context
-import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import com.example.kotlininstagramapp.Home.HomeActivity
+import androidx.navigation.fragment.findNavController
+import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.FragmentRegisterBinding
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
-import dagger.hilt.android.AndroidEntryPoint
 import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
 
+class RegisterFragment : Fragment() {
 
-@AndroidEntryPoint
-class RegisterFragment :Fragment(){
-
-    private var gelenTelNo: String = ""
-    private var gelenMail: String = ""
-
-    private val viewModel: RegisterViewModel by viewModels()
     private lateinit var binding: FragmentRegisterBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FragmentRegisterBinding.inflate(inflater, container, false)
-
-
-        binding.btnIleriFrgregister.setOnClickListener {
-            val userName = binding.etFrgregisterAdsoyad.text.trim().toString()
-            val password = binding.etFrgregisterSifre.text.trim().toString()
-            val fullName = binding.etFrgregisterAdsoyad.text.trim().toString()
-
-            if (!checkFieldsAreFilled()) {
-                showToast("Tüm Alanları Doldurunuz")
-            }else {
-                println(userName+"---"+password+"---"+fullName)
-                viewModel.registerUser(userName,fullName, gelenMail,gelenTelNo,password)
-            }
-
-            observeLoginState()
-        }
-
-
         return binding.root
     }
 
-    private fun observeLoginState() {
-        viewModel.registerState.observe(requireActivity()) { state ->
-            when (state) {
-                is RegisterState.Loading -> println("Register İşlem Devam Ediyor ...")
-                is RegisterState.Success -> {
-                    showToast("Kayıt Başarılı")
-                    startActivity(Intent(requireContext(), LoginActivity::class.java))
-                }
-
-                is RegisterState.Error -> {
-                    showToast("Hata. ${state.errorMessage}")
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        handleEmailTelClick()
+        handleIleriButtonClick()
+        binding.tvLogin.setOnClickListener {
+            // Navigate to LoginFragment or LoginActivity if needed
         }
     }
 
-
-
-
-
-
-
-
-
-    private fun checkFieldsAreFilled(): Boolean {
-        val adSoyadText = binding.etFrgregisterAdsoyad.text?.trim().toString()
-        val kullaniciAdiText = binding.etFrgregisterKullaniciAdi.text?.trim().toString()
-        val sifreText = binding.etFrgregisterSifre.text?.trim().toString()
-
-        return !(adSoyadText.isEmpty() || kullaniciAdiText.isEmpty() || sifreText.isEmpty())
+    override fun onDestroyView() {
+        super.onDestroyView()
+      //  _binding = null
     }
 
+    private fun handleIleriButtonClick() {
+        binding.btnIleri.setOnClickListener {
+            findNavController().navigate(R.id.action_registerFragment_to_registerNextFragment)
 
-    override fun onAttach(context: Context) {
-        EventBus.getDefault().register(this)
-        super.onAttach(context)
+            val action = RegisterFragmentDirections.actionRegisterFragmentToRegisterNextFragment(
+                binding.etRegisterpage.text.toString(),
+                binding.etRegisterpage.hint.toString()
+            )
+            findNavController().navigate(action)
+
+           /* if (binding.etRegisterpage.hint == "Phone") {
+                binding.registerRoot.visibility = View.GONE
+                binding.flRegisterpage.visibility = View.VISIBLE
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fl_registerpage, RegisterNextFragment())
+                    .addToBackStack("RegisterFragment")
+                    .commit()
+
+                EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(binding.etRegisterpage.text.toString(), null))
+            } else {
+                binding.registerRoot.visibility = View.GONE
+                binding.flRegisterpage.visibility = View.VISIBLE
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fl_registerpage, RegisterNextFragment())
+                    .addToBackStack("RegisterFragment")
+                    .commit()
+
+                EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(null, binding.etRegisterpage.text.toString()))
+            }*/
+        }
     }
 
+    private fun handleEmailTelClick() {
+        binding.tvTel.setOnClickListener {
+            binding.viewTel.setBackgroundColor(Color.BLACK)
+            binding.viewMail.setBackgroundColor(Color.parseColor("#DFDFDF"))
+            binding.etRegisterpage.apply {
+                inputType = InputType.TYPE_CLASS_PHONE
+                hint = "Phone"
+            }
+        }
 
-    override fun onDetach() {
-        EventBus.getDefault().unregister(this)
-        super.onDetach()
+        binding.tvEposta.setOnClickListener {
+            binding.viewTel.setBackgroundColor(Color.parseColor("#DFDFDF"))
+            binding.viewMail.setBackgroundColor(Color.BLACK)
+            binding.etRegisterpage.apply {
+                inputType = InputType.TYPE_CLASS_TEXT
+                hint = "Email"
+            }
+        }
     }
-
-    @Subscribe(sticky = true)
-    fun onTelefonGonderReceived2(event : EventBusDataEvents.KayitBilgileriGonder){
-        gelenTelNo = event.telNo?:""
-        gelenMail = event.mail?:""
-
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-    }
-
-
-
 }

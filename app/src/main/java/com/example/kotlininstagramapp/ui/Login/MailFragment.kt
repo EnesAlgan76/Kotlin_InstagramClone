@@ -27,7 +27,7 @@ class MailFragment : Fragment() {
 
         button.setOnClickListener {
             requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.fl_registerpage, RegisterFragment())
+                .replace(R.id.fl_registerpage, RegisterNextFragment())
                 .addToBackStack("RegisterFragmentMail")
                 .commit()
 
