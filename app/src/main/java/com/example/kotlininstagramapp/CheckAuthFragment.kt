@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.data.api.UserApi
@@ -30,14 +29,17 @@ class CheckAuthFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentCheckAuthBinding.inflate(layoutInflater)
-        setupCurrentUser()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            setupCurrentUser()
+        }
         return binding.root
 
 
     }
 
 
-    private fun setupCurrentUser() {
+    private suspend fun setupCurrentUser() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             fetchUserFromDatabase(currentUser.uid)
@@ -46,14 +48,17 @@ class CheckAuthFragment : Fragment() {
         }
     }
 
-    private fun fetchUserFromDatabase(userId: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+    private suspend fun fetchUserFromDatabase(userId: String) {
+
             var userData: Any? = null
             try {
                 val response = userService.getUserById(userId).execute()
                 if (response.isSuccessful) {
                     Log.e("Spring Response", response.body().toString())
                     userData = response.body()?.data
+                    if(userData==null){
+                        goToLoginPage()
+                    }
                 } else {
                     handleConnectionError("Response unsuccesful")
                 }
@@ -61,7 +66,7 @@ class CheckAuthFragment : Fragment() {
                 handleConnectionError(e.toString())
             }
             userData?.let { handleUserResponse(it) } //?: handleUserNotFound()
-        }
+
     }
 
 
@@ -74,12 +79,17 @@ class CheckAuthFragment : Fragment() {
 
     }
 
-    fun goToLoginPage(){
-        findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
+    suspend fun goToLoginPage(){
+        withContext(Dispatchers.Main){
+            findNavController().navigate(R.id.action_chechAuthFragment_to_loginFragment)
+        }
+
     }
 
-    private fun handleConnectionError(e: String) {
-        Toast.makeText(requireContext(), "Bağlantı Hatası", Toast.LENGTH_SHORT).show()
+    private suspend fun handleConnectionError(e: String) {
+        withContext(Dispatchers.Main){
+            Toast.makeText(requireContext(), "Bağlantı Hatası", Toast.LENGTH_SHORT).show()
+        }
         Log.e("Hata",e)
         goToLoginPage()
     }

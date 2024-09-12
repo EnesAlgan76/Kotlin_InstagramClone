@@ -8,11 +8,15 @@
         android:name="com.example.kotlininstagramapp.CheckAuthFragment"
         android:label="Home">
         <action
-            android:id="@+id/action_homeFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            android:id="@+id/action_chechAuthFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/checkAuthFragment"
+            app:popUpToInclusive="true"/>
         <action
             android:id="@+id/action_checkAuthFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/checkAuthFragment"
+            app:popUpToInclusive="true"/>
 
     </fragment>
 
@@ -23,6 +27,11 @@
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"
+            app:destination="@id/homeFragment" />
     </fragment>
 
     <fragment
@@ -38,6 +47,9 @@
         android:id="@+id/registerNextFragment"
         android:name="com.example.kotlininstagramapp.ui.Login.RegisterNextFragment"
         android:label="RegisterNextFragment" >
+        <action
+            android:id="@+id/action_registerNextFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
         <argument
             android:name="hint"
             app:argType="string" />
@@ -51,9 +63,6 @@
         android:name="com.example.kotlininstagramapp.Home.HomeFragment"
         android:label="HomeFragment">
     </fragment>
-
-
-
 
 
 </navigation>

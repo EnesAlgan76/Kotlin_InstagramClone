@@ -6,6 +6,7 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.kotlininstagramapp.R
@@ -41,33 +42,23 @@ class RegisterFragment : Fragment() {
 
     private fun handleIleriButtonClick() {
         binding.btnIleri.setOnClickListener {
-            findNavController().navigate(R.id.action_registerFragment_to_registerNextFragment)
+           // findNavController().navigate(R.id.action_registerFragment_to_registerNextFragment)
+            val hintText = binding.etRegisterpage.hint.toString()
+            val inputText = binding.etRegisterpage.text.toString()
 
-            val action = RegisterFragmentDirections.actionRegisterFragmentToRegisterNextFragment(
-                binding.etRegisterpage.text.toString(),
-                binding.etRegisterpage.hint.toString()
-            )
-            findNavController().navigate(action)
+            val isValid = when (hintText) {
+                "Phone" -> isValidTurkishPhone(inputText)
+                "Email" -> isValidEmail(inputText)
+                else -> false
+            }
 
-           /* if (binding.etRegisterpage.hint == "Phone") {
-                binding.registerRoot.visibility = View.GONE
-                binding.flRegisterpage.visibility = View.VISIBLE
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.fl_registerpage, RegisterNextFragment())
-                    .addToBackStack("RegisterFragment")
-                    .commit()
-
-                EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(binding.etRegisterpage.text.toString(), null))
+            if (isValid) {
+                val action = RegisterFragmentDirections.actionRegisterFragmentToRegisterNextFragment(hintText, inputText)
+                findNavController().navigate(action)
             } else {
-                binding.registerRoot.visibility = View.GONE
-                binding.flRegisterpage.visibility = View.VISIBLE
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.fl_registerpage, RegisterNextFragment())
-                    .addToBackStack("RegisterFragment")
-                    .commit()
-
-                EventBus.getDefault().postSticky(EventBusDataEvents.KayitBilgileriGonder(null, binding.etRegisterpage.text.toString()))
-            }*/
+                // Show error message
+                Toast.makeText(context, "Please enter a valid $hintText.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -89,5 +80,13 @@ class RegisterFragment : Fragment() {
                 hint = "Email"
             }
         }
+    }
+
+    fun isValidTurkishPhone(phone: String): Boolean {
+        return phone.matches(Regex("^[5][0-9]{9}\$"))
+    }
+
+    fun isValidEmail(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 }

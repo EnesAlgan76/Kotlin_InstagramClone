@@ -1,8 +1,10 @@
 package com.example.kotlininstagramapp.data.repository
 
+import android.util.Log
 import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.data.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,8 +30,25 @@ class UserRepository @Inject constructor(private val userService: UserApi)  {
         }
     }
 
-    suspend fun loginUserWithEmail(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password).await()
+
+    suspend fun loginUserWithFirebase(email: String, password: String): FirebaseUser? {
+        return try {
+            val authResult = auth.signInWithEmailAndPassword(email, password).await()
+            authResult.user // Return the FirebaseUser if login is successful
+        } catch (e: Exception) {
+            Log.e("Firebase Auth", "Failed to login with Firebase: ${e.message}")
+            null
+        }
+    }
+
+    fun deleteUserFromFirebase(user: FirebaseUser) {
+        user.delete().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("Firebase Auth", "User deleted from Firebase Auth successfully.")
+            } else {
+                Log.e("Firebase Auth", "Failed to delete user from Firebase: ${task.exception?.message}")
+            }
+        }
     }
 
 
@@ -39,7 +58,7 @@ class UserRepository @Inject constructor(private val userService: UserApi)  {
 
     }
 
-    suspend fun registerUser(userName: String,fullName:String, email: String, phoneNumber: String, password: String) {
+    fun registerUser(userName: String,fullName:String, email: String, phoneNumber: String, password: String) {
         var fakeMail =email
         if (email.isEmpty()){fakeMail = phoneNumber+"@enes.com"}
 
@@ -74,6 +93,7 @@ class UserRepository @Inject constructor(private val userService: UserApi)  {
                         } else {
                             println("Hata Mesajı : ${createResponse.errorBody()?.string()}")
                         }
+                        auth.signOut()
                     }
 
 
@@ -82,6 +102,19 @@ class UserRepository @Inject constructor(private val userService: UserApi)  {
             }
 
 
+    }
+
+    suspend fun deleteUserFromDatabase(userId: String) {
+        try {
+            val response = userService.deleteUserById(userId).await() // Delete user by userId
+            if (response.status) {
+                Log.d("UserRepository", "User deleted successfully from database.")
+            } else {
+                Log.e("UserRepository", "Failed to delete user from database: ${response.message}")
+            }
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Error deleting user from database: ${e.message}")
+        }
     }
 
 

@@ -8,8 +8,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.kotlininstagramapp.databinding.FragmentRegisterBinding
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
+import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.FragmentRegisterNextBinding
+import com.example.kotlininstagramapp.ui.dialogs.NSCircleProgress
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import dagger.hilt.android.AndroidEntryPoint
 import org.greenrobot.eventbus.EventBus
@@ -34,34 +37,39 @@ class RegisterNextFragment :Fragment(){
 
 
         binding.btnIleriFrgregister.setOnClickListener {
-            val userName = binding.etFrgregisterAdsoyad.text.trim().toString()
+            val userName = binding.etFrgregisterKullaniciAdi.text.trim().toString()
             val password = binding.etFrgregisterSifre.text.trim().toString()
             val fullName = binding.etFrgregisterAdsoyad.text.trim().toString()
 
-            if (!checkFieldsAreFilled()) {
-                showToast("Tüm Alanları Doldurunuz")
-            }else {
-                println(userName+"---"+password+"---"+fullName)
-                viewModel.registerUser(userName,fullName, if(hint=="Mail") hint else "",if(hint=="Tel") hint else "",password)
+            if (checkFieldsAreFilled()) {
+                val email = if (hint == "Email") input else ""
+                val phoneNumber = if (hint == "Phone") input else ""
+
+                viewModel.registerUser(userName, fullName, email, phoneNumber, password)
+            } else {
+                showToast("Tüm alanları doldurunuz")
             }
 
-            observeLoginState()
+            observeRegisterState()
         }
 
 
         return binding.root
     }
 
-    private fun observeLoginState() {
+    private fun observeRegisterState() {
+        val nsdialog = NSCircleProgress(requireContext())
         viewModel.registerState.observe(requireActivity()) { state ->
             when (state) {
-                is RegisterState.Loading -> println("Register İşlem Devam Ediyor ...")
+                is RegisterState.Loading -> nsdialog.showProgress()
                 is RegisterState.Success -> {
-                    showToast("Kayıt Başarılı")
+                    nsdialog.hideProgress()
+                    backToLogin()
                     //startActivity(Intent(requireContext(), LoginActivity::class.java))
                 }
 
                 is RegisterState.Error -> {
+                    nsdialog.hideProgress()
                     showToast("Hata. ${state.errorMessage}")
                 }
             }
@@ -70,10 +78,15 @@ class RegisterNextFragment :Fragment(){
 
 
 
-
-
-
-
+    private fun backToLogin() {
+        findNavController().navigate(
+            R.id.action_registerNextFragment_to_loginFragment,
+            null,
+            NavOptions.Builder()
+                .setPopUpTo(R.id.loginFragment, true) // Clears back stack up to LoginFragment
+                .build()
+        )
+    }
 
 
     private fun checkFieldsAreFilled(): Boolean {

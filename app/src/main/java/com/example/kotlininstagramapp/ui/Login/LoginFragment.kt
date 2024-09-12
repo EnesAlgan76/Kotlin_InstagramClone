@@ -23,6 +23,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.FragmentLoginBinding
+import com.example.kotlininstagramapp.ui.dialogs.NSCircleProgress
 
 
 @AndroidEntryPoint
@@ -69,17 +70,19 @@ class LoginFragment : Fragment() {
 
 
     private fun observeLoginState() {
-        viewModel.loginState.observe(this) { state ->
+        val nsdialog = NSCircleProgress(requireContext())
+        viewModel.loginState.observe(requireActivity()) { state ->
             when (state) {
-                is LoginState.Loading -> println("Login İşlemi Devam Ediyor ...")
+                is LoginState.Loading -> nsdialog.showProgress()
                 is LoginState.Success -> {
-                    showToast("Giriş Başarılı")
-                    //startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+                    nsdialog.hideProgress()
+                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                     retrieveCurrentFcmToken()
                   //  finish()
                 }
 
                 is LoginState.Error -> {
+                    nsdialog.hideProgress()
                     showToast("Hata. ${state.errorMessage}")
                 }
             }
