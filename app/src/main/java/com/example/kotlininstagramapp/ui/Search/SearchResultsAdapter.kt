@@ -11,8 +11,6 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserExplorePage
-import com.example.kotlininstagramapp.Models.UserDetails
-import com.example.kotlininstagramapp.ui.Profile.ProfileActivity
 import com.example.kotlininstagramapp.R
 import com.google.firebase.auth.FirebaseAuth
 
@@ -62,8 +60,8 @@ class SearchResultsAdapter(context:Context) : RecyclerView.Adapter<SearchResults
             itemView.setOnClickListener {
                 val userId =  user["userId"]
                 if(userId == currentUser!!.uid){
-                    val intent = Intent(itemView.context, ProfileActivity::class.java)
-                    itemView.context.startActivity(intent)
+                    //val intent = Intent(itemView.context, ProfileActivity::class.java)
+                   // itemView.context.startActivity(intent)
                 }else{
                     val intent = Intent(itemView.context, UserExplorePage::class.java)
                     intent.putExtra("USER_ID",userId)

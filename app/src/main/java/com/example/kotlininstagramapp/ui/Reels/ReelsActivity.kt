@@ -2,8 +2,6 @@ package com.example.kotlininstagramapp.ui.Reels
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.kotlininstagramapp.Home.HomeFragment
-import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.example.kotlininstagramapp.R
 
 class ReelsActivity : AppCompatActivity() {

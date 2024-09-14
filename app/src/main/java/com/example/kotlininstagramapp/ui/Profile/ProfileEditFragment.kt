@@ -14,9 +14,11 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
@@ -52,7 +54,6 @@ class ProfileEditFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_edit_profile, container, false)
-
         firebaseHelper = FirebaseHelper()
         initViews(view)
         setupGalleryLauncher()
@@ -71,7 +72,7 @@ class ProfileEditFragment : Fragment() {
 
          closeButton.setOnClickListener {
              parentFragmentManager.popBackStack()
-             (requireActivity() as ProfileActivity).toggleProfileRootVisibility(true);
+            // (requireActivity() as ProfileActivity).toggleProfileRootVisibility(true);
          }
 
 
@@ -157,4 +158,6 @@ class ProfileEditFragment : Fragment() {
         eventuserName = event.user_name
         eventuserFullName = event.full_name
     }
+
+
 }

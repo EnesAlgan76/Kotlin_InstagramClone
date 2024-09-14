@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserExplorePage
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
-import com.example.kotlininstagramapp.ui.Profile.ProfileActivity
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.ui.Search.SearchResultsAdapter
 import com.example.kotlininstagramapp.utils.EventBusDataEvents

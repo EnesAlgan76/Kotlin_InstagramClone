@@ -7,7 +7,6 @@ import com.example.kotlininstagramapp.Models.Notification
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.ActivityNotificationsBinding
-import com.example.kotlininstagramapp.utils.BottomNavigationHandler
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +19,7 @@ class NotificationsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNotificationsBinding.inflate(layoutInflater)
-        BottomNavigationHandler.setupNavigations(this,binding.bottomNavigationView,0)
+      //  BottomNavigationHandler.setupNavigations(this,binding.bottomNavigationView,0)
 
 
         CoroutineScope(Dispatchers.Main).launch {

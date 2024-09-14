@@ -1,5 +1,6 @@
 package com.example.kotlininstagramapp.ui.Login
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
@@ -76,6 +77,11 @@ class LoginFragment : Fragment() {
                 is LoginState.Loading -> nsdialog.showProgress()
                 is LoginState.Success -> {
                     nsdialog.hideProgress()
+
+                   //val intent = Intent(requireContext(), HomeActivity::class.java)
+                   //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                   //startActivity(intent)
+
                     findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                     retrieveCurrentFcmToken()
                   //  finish()

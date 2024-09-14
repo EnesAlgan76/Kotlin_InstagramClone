@@ -34,17 +34,22 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ui.Home.HomeActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.Story.StoryReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Home.HomeActivity"
             android:exported="false" />
         <activity
             android:name=".ui.Story.StoryActivity"
@@ -72,23 +77,13 @@
             android:name=".Generic.UserExplorePage"
             android:exported="false" />
         <activity
-            android:name=".ui.Login.LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.Login.RegisterActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.Profile.SettingActivity"
             android:exported="false" />
         <activity
             android:name=".Home.HomeActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".ui.Share.ShareActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.Search.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".ui.Reels.ReelsActivity"
