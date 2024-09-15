@@ -1,54 +1,52 @@
 package com.example.kotlininstagramapp.utils
 
-import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
-import com.example.kotlininstagramapp.Home.HomeFragment
-import com.example.kotlininstagramapp.MainActivity
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.ui.Profile.ProfileFragment
-import com.example.kotlininstagramapp.ui.Search.SearchFragment
-import com.example.kotlininstagramapp.ui.Share.ShareFragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.ns.ui.NSBottomNavView
+import com.example.ns.ui.MenuItem
 
 class BottomNavHandler {
-    companion object{
-        fun setupBottomNavBar(bottomNavView: BottomNavigationView, activity: FragmentActivity, navController: NavController){
-            bottomNavView.setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.menu_item_home -> {
-                         if (navController.currentDestination?.id != R.id.homeFragment) {
-                             navController.navigate(R.id.homeFragment)
-                         }
-                        true
+    companion object {
+        fun setupBottomNavBar(bottomNavView: NSBottomNavView, navController: NavController){
+            val menuItems = listOf(
+                MenuItem(id = 1,  selectedIconRes = R.drawable.home, unselectedIconRes = R.drawable.icon_home),
+                MenuItem(id = 2,  selectedIconRes = R.drawable.icon_search, unselectedIconRes = R.drawable.icon_search),
+                MenuItem(id = 3,  selectedIconRes = R.drawable.user, unselectedIconRes = R.drawable.icon_profile)
+            )
+
+            bottomNavView.setMenu(menuItems)
+            bottomNavView.onItemSelectedListener = { menuItem ->
+                // Handle menu item selection
+                when (menuItem.id) {
+                    1 -> {
+                        if (navController.currentDestination?.id != R.id.homeFragment) {
+                            navController.navigate(R.id.homeFragment)
+                        }
                     }
-                    R.id.menu_item_search -> {
+                    2 -> {
                         if (navController.currentDestination?.id != R.id.searchFragment) {
                             navController.navigate(R.id.searchFragment)
                         }
-                        true
                     }
-                    R.id.menu_item_add -> {
-                        //if(currentFragment !is ShareFragment)
-                         //   openFragment(ShareFragment())
-                        // if (navController.currentDestination?.id != R.id.shareFragment) {
-                        //     navController.navigate(R.id.shareFragment)
-                        // }
-                        true
-                    }
-                    R.id.menu_item_profile -> {
-                        //if(currentFragment !is ProfileFragment)
-                        //    openFragment(ProfileFragment())
+                    3 -> {
                         if (navController.currentDestination?.id != R.id.profileFragment) {
                             navController.navigate(R.id.profileFragment)
                         }
-                        true
                     }
-                    else -> false
                 }
             }
+
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                when (destination.id) {
+                    R.id.homeFragment -> bottomNavView.setSelectedItem(1)
+                    R.id.searchFragment -> bottomNavView.setSelectedItem(2)
+                    R.id.shareFragment -> bottomNavView.setSelectedItem(3)
+                   // R.id.profileFragment -> bottomNavView.selectedItemId = R.id.nav_profile
+                   // else -> bottomNavView.selectedItemId = R.id.nav_home
+                }
+            }
+
+
         }
     }
 }

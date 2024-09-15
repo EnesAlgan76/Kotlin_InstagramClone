@@ -47,8 +47,6 @@ class ProfileFragment : Fragment() {
         CoroutineScope(Dispatchers.Main).launch {
             setRecycleView()
         }
-        BottomNavHandler.setupBottomNavBar(binding.bottomNavigationView,requireActivity(),findNavController())
-        binding.bottomNavigationView.menu.findItem(R.id.menu_item_profile).isChecked = true
     }
 
     private fun setInfos() {

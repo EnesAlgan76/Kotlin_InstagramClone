@@ -86,6 +86,14 @@
             android:id="@+id/action_profileFragment_to_settingFragment"
             app:destination="@id/settingFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/shareFragment"
+        android:name="com.example.kotlininstagramapp.ui.Share.ShareFragment"
+        android:label="ShareFragment" />
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="com.example.kotlininstagramapp.Home.NotificationsFragment"
+        android:label="NotificationsFragment" />
 
 
 </navigation>

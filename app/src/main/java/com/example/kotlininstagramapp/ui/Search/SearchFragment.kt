@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,37 +18,38 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.api.RetrofitInstance
 import com.example.kotlininstagramapp.data.api.UserApi
+import com.example.kotlininstagramapp.databinding.FragmentSearchBinding
 import com.example.kotlininstagramapp.utils.BottomNavHandler
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 class SearchFragment : Fragment() {
     lateinit var firestore: FirebaseFirestore
-    lateinit var adapter: SearchResultsAdapter
+    lateinit var searchResultAdapter: SearchResultsAdapter
+    lateinit var binding: FragmentSearchBinding
     val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_search, container, false)
 
-
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
         firestore = FirebaseFirestore.getInstance()
-        val searchBox = view.findViewById<EditText>(R.id.searchBox)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.rv_search)
-        val bottomNavigationView = view.findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        BottomNavHandler.setupBottomNavBar(bottomNavigationView,requireActivity(),findNavController())
-        bottomNavigationView.menu.findItem(R.id.menu_item_search).isChecked = true
 
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = SearchResultsAdapter(requireContext())
-        recyclerView.adapter = adapter
+        searchResultAdapter= SearchResultsAdapter(requireContext())
+        binding.rvSearch.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = searchResultAdapter
+        }
+
+
 
         val handler = Handler(Looper.getMainLooper())
 
-        searchBox.addTextChangedListener(object : TextWatcher {
+        binding.searchBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
@@ -57,7 +59,7 @@ class SearchFragment : Fragment() {
                 if (searchText.isNotEmpty()) {
                     handler.postDelayed({ fetchUsers(searchText) }, 800)
                 } else {
-                    adapter.clear()
+                    searchResultAdapter.clear()
                 }
             }
 
@@ -66,7 +68,7 @@ class SearchFragment : Fragment() {
             }
         })
 
-        return view
+        return binding.root
     }
 
     private fun fetchUsers(searchText: String) {
@@ -77,7 +79,7 @@ class SearchFragment : Fragment() {
             if (response.isSuccessful) {
                 val userList = response.body()?.data as List<Map<String, String>>
                 withContext(Dispatchers.Main) {
-                    adapter.setUsers(userList)
+                    searchResultAdapter.setUsers(userList)
                 }
 
             } else {

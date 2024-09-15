@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import com.example.kotlininstagramapp.Home.NotificationsActivity
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -55,12 +54,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val clickAction = data["click_action"];
 
         if (clickAction == "NOTIFICATION_CLICK") {
-            val intent = Intent(this, NotificationsActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            val pendingIntent =
-                PendingIntent.getActivity(this, 0, intent,
-                    PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
-            notificationBuilder.setContentIntent(pendingIntent)
+           // val intent = Intent(this, NotificationsActivity::class.java)
+           // intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+           // val pendingIntent =
+           //     PendingIntent.getActivity(this, 0, intent,
+           //         PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+           // notificationBuilder.setContentIntent(pendingIntent)
         }
 
 

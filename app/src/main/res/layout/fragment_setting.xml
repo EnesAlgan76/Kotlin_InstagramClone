@@ -146,17 +146,6 @@
             app:layout_constraintStart_toStartOf="@+id/tv_deleteSearchData"
             app:layout_constraintTop_toBottomOf="@+id/tv_deleteSearchData" />
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottomNavigationView_profile_settings"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="#FFFFFF"
-            app:itemIconTint="@drawable/bottom_navigation_selector"
-            app:labelVisibilityMode="unlabeled"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:menu="@menu/bottomnavigation_menu" />
 
         <Switch
             android:id="@+id/switch1"
