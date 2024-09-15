@@ -8,6 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.kotlininstagramapp.MainActivity
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.model.HomePagePostItem
@@ -15,6 +16,7 @@ import com.example.kotlininstagramapp.databinding.FragmentHomeBinding
 import com.example.kotlininstagramapp.utils.BottomNavHandler
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.example.ns.ui.NSBottomNavView
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,10 +53,17 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
+
+
+    companion object{var isBottomNavInitialized =false}
     private fun setupBottomNavigation() {
-        val bottomNavigationView = requireActivity().findViewById<NSBottomNavView>(R.id.bottomNavigationView)
-        bottomNavigationView.visibility = View.VISIBLE
-        BottomNavHandler.setupBottomNavBar(bottomNavigationView, findNavController())
+        if(!isBottomNavInitialized){
+            isBottomNavInitialized = true
+            val bottomNavigationView = requireActivity().findViewById<NSBottomNavView>(R.id.bottomNavigationView)
+            bottomNavigationView.visibility = View.VISIBLE
+            BottomNavHandler.setupBottomNavBar(bottomNavigationView, findNavController())
+        }
+
 
     }
 
@@ -79,7 +88,7 @@ class HomeFragment : Fragment() {
 
 
 
-    private fun setupClickListeners() {
+    /*private fun setupClickListeners() {
         binding.ivDirectMessage.setOnClickListener {
             // Handle direct message click
         }
@@ -89,7 +98,7 @@ class HomeFragment : Fragment() {
             removeNotificationRedPoint()
             updateUiOnNotificationStatusChange()
         }
-    }
+    }*/
 
 
 
@@ -97,19 +106,23 @@ class HomeFragment : Fragment() {
 
 
     private fun updateUiOnNotificationStatusChange() {
-        FirebaseHelper().listenForNotificationsAndChanges { callback ->
-            if (callback) {
+        FirebaseHelper().listenForNotificationsAndChanges { newNotification ->
+            if (newNotification) {
                 showNotificationRedPoint()
+            }else{
+                removeNotificationRedPoint()
             }
         }
     }
 
     private fun showNotificationRedPoint() {
-        binding.ivRedPoint.visibility = View.VISIBLE
+        val bottomNavigationView = (activity as MainActivity).findViewById<NSBottomNavView>(R.id.bottomNavigationView)
+        bottomNavigationView.updateMenuItemIcon(3,R.drawable.bell_notified,R.drawable.bell_notified)
     }
 
     private fun removeNotificationRedPoint() {
-        binding.ivRedPoint.visibility = View.INVISIBLE
+        val bottomNavigationView = (activity as MainActivity).findViewById<NSBottomNavView>(R.id.bottomNavigationView)
+        bottomNavigationView.updateMenuItemIcon(3,R.drawable.bell_active,R.drawable.bell)
     }
 
    /* override fun onBackPressed() {
@@ -123,5 +136,7 @@ class HomeFragment : Fragment() {
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }*/
+
+
 }
 

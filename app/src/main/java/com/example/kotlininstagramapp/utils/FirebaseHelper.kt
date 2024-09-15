@@ -268,30 +268,45 @@ class FirebaseHelper {
     }
 
 
-    private var listener: ListenerRegistration? = null
 
     fun listenForNotificationsAndChanges(callback: (Boolean) -> Unit) {
-        var isNewDocument = false
+        val documentRef =db.collection("notifications").document(currentUser!!.uid)
 
-        listener = db.collection("users")
-            .document(currentUser!!.uid)
-            .collection("notifications")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .limit(1)
-            .addSnapshotListener { snapshot, e ->
-                snapshot?.documentChanges?.forEach { doc ->
-                    if (doc.type == DocumentChange.Type.ADDED) {
-                        if (isNewDocument) {
-                            callback.invoke(true)
-                            println("New notification received: ${snapshot.documents.size} ${snapshot.documents}")
-                            listener?.remove()
-                        } else {
-                            isNewDocument = true
-                        }
-                    }
+         documentRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists()) {
+                val data = snapshot.data
+                if(data?.get("newNotification") as Boolean){
+                    callback.invoke(true)
+                }else{
+                    callback.invoke(false)
                 }
             }
+        }
+
     }
+
+    fun markNotificationsAsRead() {
+        val documentRef = db.collection("notifications").document(currentUser!!.uid)
+        documentRef.set(mapOf("newNotification" to false))
+    }
+
+    fun setNotificationAsNew(userId: String) {
+        val documentRef = db.collection("notifications").document(userId)
+
+        documentRef.set(mapOf("newNotification" to true))
+            .addOnSuccessListener {
+                // Handle successful update, if needed
+            }
+            .addOnFailureListener { e ->
+                // Handle failure, if needed
+                Log.e("Firestore", "Error updating notification status", e)
+            }
+    }
+
+
 
     suspend fun getNotifications():List<Notification> {
         var notificationList = mutableListOf<Notification>()

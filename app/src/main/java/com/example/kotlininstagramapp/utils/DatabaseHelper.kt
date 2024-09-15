@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Models.Post
+import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.data.api.BaseResponse
 import com.example.kotlininstagramapp.data.api.FollowApi
 import com.example.kotlininstagramapp.data.api.NotificationApi
@@ -30,6 +31,7 @@ class DatabaseHelper {
     val postService = RetrofitInstance.retrofit.create(PostApi::class.java)
     val followService = RetrofitInstance.retrofit.create(FollowApi::class.java)
     val notificationService = RetrofitInstance.retrofit.create(NotificationApi::class.java)
+    val firebaseHelper =FirebaseHelper()
     suspend fun getUserById(userId: String): UserModel? {
         var userData: Map<String, Any>? = null
         try {
@@ -120,22 +122,9 @@ class DatabaseHelper {
     suspend fun sendFollowRequest(userId: String) {
         val fcmToken = getFCMToken(userId)
         if(fcmToken!=null){
-
-            // Those are for trigger firebase messaging by firebase functions
-            val db = FirebaseFirestore.getInstance()
-            val newNotificationDoc =  db.collection("notifications").document()
             val currentTimestamp = System.currentTimeMillis()
-            val currentUser = UserSingleton.userModel
-            val notification = mapOf(
-                "fcmToken" to fcmToken,
-                "userName" to currentUser!!.userName,
-                "type" to "follow_request",
-                "timestamp" to currentTimestamp
-            )
-            newNotificationDoc.set(notification).await()
+            val currentUser = UserSingleton.userModel!!
 
-
-            // This for save to main database to show notification in notification page
 
             val notificationModel = NotificationModel(
                     1.0,
@@ -151,6 +140,7 @@ class DatabaseHelper {
             val response = notificationService.addNotification(notificationModel).await()
             if (response.status){
                 Log.e("sendFollowRequest SUCCESS", response.message)
+                firebaseHelper.setNotificationAsNew(userId)
             }else{
                 Log.e("sendFollowRequest FAIL", response.message)
             }

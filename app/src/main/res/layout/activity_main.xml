@@ -24,6 +24,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:labelVisibilityMode="unlabeled"
+        app:iconSize="24dp"
         android:visibility="gone"/>
 
 
