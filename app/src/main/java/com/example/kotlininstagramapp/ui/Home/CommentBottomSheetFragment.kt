@@ -45,7 +45,8 @@ class CommentBottomSheetFragment(var postId: Double, var userId: String, var use
         val adapter = SchimmerAdapter(requireContext(),  items)
         listViewShimmer.adapter = adapter
 
-        Glide.with(requireContext()).load(UserSingleton.user!!.userDetails.profilePicture).into(iv_comment_profile)
+      //  Glide.with(requireContext()).load(UserSingleton.user!!.userDetails.profilePicture).into(iv_comment_profile)
+        Glide.with(requireContext()).load(UserSingleton.user?.userDetails?.profilePicture).placeholder(R.drawable.profile).error(R.drawable.profile).into(iv_comment_profile)
 
        // setSpecialWordFormatting(et_comment)
 

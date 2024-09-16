@@ -7,6 +7,7 @@ import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.data.api.BaseResponse
 import com.example.kotlininstagramapp.data.api.FollowApi
+import com.example.kotlininstagramapp.data.api.LikesApi
 import com.example.kotlininstagramapp.data.api.NotificationApi
 import com.example.kotlininstagramapp.data.api.PostApi
 import com.example.kotlininstagramapp.data.api.RetrofitInstance
@@ -31,7 +32,9 @@ class DatabaseHelper {
     val postService = RetrofitInstance.retrofit.create(PostApi::class.java)
     val followService = RetrofitInstance.retrofit.create(FollowApi::class.java)
     val notificationService = RetrofitInstance.retrofit.create(NotificationApi::class.java)
+    val likesService = RetrofitInstance.retrofit.create(LikesApi::class.java)
     val firebaseHelper =FirebaseHelper()
+
     suspend fun getUserById(userId: String): UserModel? {
         var userData: Map<String, Any>? = null
         try {
@@ -120,35 +123,32 @@ class DatabaseHelper {
     }
 
     suspend fun sendFollowRequest(userId: String) {
-        val fcmToken = getFCMToken(userId)
-        if(fcmToken!=null){
-            val currentTimestamp = System.currentTimeMillis()
-            val currentUser = UserSingleton.userModel!!
+        addNotification(userId,"follow_request",null)
+    }
 
+    suspend fun addNotification(toUserId: String, type: String, postPreview:String?){
+        //val fcmToken = getFCMToken(userId)
+        val currentUser = UserSingleton.userModel!!
+        val currentTimestamp = System.currentTimeMillis()
 
-            val notificationModel = NotificationModel(
-                    1.0,
-                    userId,
-                "follow_request",
-                currentTimestamp.toString(),
-                "null",
-                currentUser.userId,
-                currentUser.profilePicture,
-                currentUser.userName
-            )
+        val notificationModel = NotificationModel(
+            1.0,
+            toUserId,
+            type,
+            currentTimestamp.toString(),
+            postPreview,
+            currentUser.userId,
+            currentUser.profilePicture,
+            currentUser.userName
+        )
 
-            val response = notificationService.addNotification(notificationModel).await()
-            if (response.status){
-                Log.e("sendFollowRequest SUCCESS", response.message)
-                firebaseHelper.setNotificationAsNew(userId)
-            }else{
-                Log.e("sendFollowRequest FAIL", response.message)
-            }
-
+        val response = notificationService.addNotification(notificationModel).await()
+        if (response.status){
+            Log.e("send ${type} Request SUCCESS", response.message)
+            firebaseHelper.setNotificationAsNew(toUserId)
         }else{
-            Log.e("FAIL","FCM Token is NULL")
+            Log.e("send ${type} Request FAIL", response.message)
         }
-
     }
 
 
@@ -163,17 +163,20 @@ class DatabaseHelper {
         }
     }
 
-    suspend fun getNotifications() :List<NotificationModel> {
-        val response  = notificationService.getAllUserNotifications(UserSingleton.userModel!!.userId).await()
-        if (response.status){
-            val notificationList =  response.data as List<Map<String, String>>
+    suspend fun getNotifications(): List<NotificationModel> {
+        val response = notificationService.getAllUserNotifications(UserSingleton.userModel!!.userId).await()
+        if (response.status) {
+            val notificationList = response.data as List<Map<String, String>>
             Log.e("Spring getAllUserNotifications: ", response.message)
-            return notificationList.map { NotificationModel.fromMap(it)}
-        }else{
+
+            return notificationList.map { NotificationModel.fromMap(it) }
+                .distinctBy { it.fromUserName to it.type to it.postPreview }
+        } else {
             Log.e("Spring getAllUserNotifications: ", response.message)
             return listOf()
         }
     }
+
 
     suspend fun acceptFollowRequest(follower: String, notificationId: Double) {
         val response = followService.followUser(follower,UserSingleton.userModel!!.userId).await()
@@ -273,6 +276,47 @@ class DatabaseHelper {
         }
 
         return postList
+    }
+
+    suspend fun isPostLiked( postId: Int) :Boolean{
+
+        try {
+            val currentUserId = UserSingleton.userModel?.userId
+            currentUserId?.let {
+                val response:BaseResponse = likesService.checkLikeStatus(currentUserId,postId).await()
+                return response.data as Boolean
+            }
+        }catch (e:Throwable){
+            Log.e( "isPostLiked", "isPostLiked ERROR : ${e.message}")
+            return false
+        }
+        return false
+    }
+
+    suspend fun likePost(postId: Int){
+        val currentUserId = UserSingleton.userModel?.userId
+        try {
+            currentUserId?.let {
+                val response:BaseResponse = likesService.likePost(currentUserId,postId).await()
+                Log.e("likePost",response.toString())
+            }
+        }catch (e:Throwable){
+            Log.e("likePost","error : ${e.message}")
+        }
+
+    }
+
+
+    suspend fun unlikePost(postId: Int){
+        val currentUserId = UserSingleton.userModel?.userId
+        try {
+            currentUserId?.let {
+                val response = likesService.unlikePost(currentUserId,postId).await()
+                Log.e("unlikePost",response.toString())
+            }
+        }catch (e:Throwable){
+            Log.e("unlikePost","error : ${e.message}")
+        }
     }
 
 }

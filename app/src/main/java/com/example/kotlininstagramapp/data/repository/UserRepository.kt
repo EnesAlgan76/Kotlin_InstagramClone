@@ -6,9 +6,6 @@ import com.example.kotlininstagramapp.data.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import retrofit2.await
 import javax.inject.Inject
@@ -58,51 +55,47 @@ class UserRepository @Inject constructor(private val userService: UserApi)  {
 
     }
 
-    fun registerUser(userName: String,fullName:String, email: String, phoneNumber: String, password: String) {
-        var fakeMail =email
-        if (email.isEmpty()){fakeMail = phoneNumber+"@enes.com"}
+    suspend fun registerUser(
+        userName: String,
+        fullName: String,
+        email: String,
+        phoneNumber: String,
+        password: String,
+        onError: (String?) -> Unit
+    ) {
+        try {
+            val fakeEmail = if (email.isEmpty()) "$phoneNumber@enes.com" else email
 
-        println(fakeMail+ password)
+            // Create user with email and password asynchronously
+            val authResult = auth.createUserWithEmailAndPassword(fakeEmail, password).await()
+            val userID = authResult.user?.uid ?: throw Exception("Failed to retrieve user ID")
 
-        auth.createUserWithEmailAndPassword(fakeMail,password)
-            .addOnCompleteListener {task ->
-                if (task.isSuccessful){
-                    val userID = auth.currentUser!!.uid
-                    val userModel = UserModel(
-                        userId =userID ,
-                        userName = userName,
-                        password = password,
-                        phoneNumber = phoneNumber,
-                        email = fakeMail,
-                        fullName = fullName,
-                        fcmToken = "",
-                        profilePicture = "",
-                        biography = "",
-                        followerCount = 0,
-                        postCount = 0,
-                        followingCount = 0
-                    )
+            val userModel = UserModel(
+                userId = userID,
+                userName = userName,
+                password = password,
+                phoneNumber = phoneNumber,
+                email = fakeEmail,
+                fullName = fullName,
+                fcmToken = "",
+                profilePicture = "",
+                biography = "",
+                followerCount = 0,
+                postCount = 0,
+                followingCount = 0
+            )
 
-
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val createCall = userService.createUser(userModel)
-                        val createResponse = createCall.execute()
-                        if (createResponse.isSuccessful) {
-                            println("Hesap başarıyla oluşturuldu.")
-                            println("User create body : ${createResponse.body()}")
-                        } else {
-                            println("Hata Mesajı : ${createResponse.errorBody()?.string()}")
-                        }
-                        auth.signOut()
-                    }
-
-
-
-                }
-            }
-
-
+            // Perform network call to create user asynchronously
+            userService.createUser(userModel).await()
+            auth.signOut()
+            onError(null)
+        } catch (e: Exception) {
+            onError("Registration failed: ${e.message}")
+            Log.e("RegisterUser", e.toString()) // Add a tag for better log identification
+        }
     }
+
+
 
     suspend fun deleteUserFromDatabase(userId: String) {
         try {

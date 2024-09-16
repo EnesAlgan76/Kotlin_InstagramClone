@@ -65,6 +65,7 @@ class RegisterNextFragment :Fragment(){
                 is RegisterState.Success -> {
                     nsdialog.hideProgress()
                     backToLogin()
+                    showToast("Kayıt Başarılı!")
                     //startActivity(Intent(requireContext(), LoginActivity::class.java))
                 }
 

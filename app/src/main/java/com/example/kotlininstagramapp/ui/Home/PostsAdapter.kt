@@ -23,29 +23,27 @@ import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.ui.Story.StoryAdapter
 import com.example.kotlininstagramapp.data.model.HomePagePostItem
+import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.TextHighlighter
+import com.example.ns.ui.NSLikeButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import java.util.concurrent.TimeUnit
 
-
-class PostsAdapter(
-    private var posts: ArrayList<HomePagePostItem>,
-    private val mContext: Context,
-    private val fragmentManager: FragmentManager,
-    private val recyclerView: RecyclerView,
-
-    ) :RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+class PostsAdapter(private var posts: ArrayList<HomePagePostItem>, private val mContext: Context, private val fragmentManager: FragmentManager, private val recyclerView: RecyclerView) :RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     private val defaultImage = R.drawable.icon_profile
     private val handler = Handler(Looper.getMainLooper())
+    private var likeId:Int? = null
 
     private val VIEW_TYPE_HORIZONTAL_LIST = 1
     private val VIEW_TYPE_VERTICAL_ITEM = 2
@@ -139,8 +137,10 @@ class PostsAdapter(
                     mContext.startActivity(intent)
                 }
 
-               // updateLikeButton(holder, userPostItem)
+                setupLikeButton(holder, userPostItem)
                // setLikeClickListener(holder, userPostItem, position)
+                verticalViewHolder.setLikeButtonListener(userPostItem)
+
             }
 
             Glide.with(mContext).load(userPostItem.userProfileImage).placeholder(defaultImage).error(defaultImage).into(holder.post_profileimage)
@@ -151,6 +151,7 @@ class PostsAdapter(
 
 
     }
+
 
     override fun getItemCount(): Int = posts.size
 
@@ -179,15 +180,30 @@ class PostsAdapter(
 
     }
 
-    private fun updateLikeButton(holder: PostViewHolder, userPostItem: UserPostItem) {
+    private fun setupLikeButton(holder: PostViewHolder, userPostItem: HomePagePostItem) {
+        var debounceJob: Job? = null
         CoroutineScope(Dispatchers.Main).launch {
             val isLiked = withContext(Dispatchers.IO) {
-                FirebaseHelper().isPostLiked(userPostItem.postId)
+                DatabaseHelper().isPostLiked(userPostItem.postId.toInt())
             }
-            holder.post_ivlike.setImageResource(
-                if (isLiked) R.drawable.heart_red else R.drawable.heart
-            )
+            holder.post_ivlike.setLiked(isLiked)
+            holder.post_ivlike.onLikeStateChange { newLikeState->
+                debounceJob?.cancel()
+                debounceJob= CoroutineScope(Dispatchers.IO).launch{
+                   delay(3000)
+                   if (newLikeState){
+                       DatabaseHelper().likePost(userPostItem.postId.toInt())
+                       DatabaseHelper().addNotification(userPostItem.userId,"post_like",userPostItem.content)
+                   }else{
+                       DatabaseHelper().unlikePost(userPostItem.postId.toInt())
+                   }
+                }
+            }
         }
+    }
+
+    private fun setLikeButtonListener() {
+
     }
 
     private fun setLikeClickListener(holder: PostViewHolder, userPostItem: UserPostItem, position: Int) {
@@ -232,6 +248,7 @@ class PostsAdapter(
     }
 
     inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
         val fullNameTextView: TextView = itemView.findViewById(R.id.post_tv_fullname)
         val post_tv_dateago: TextView = itemView.findViewById(R.id.post_tv_dateago)
         val post_profileimage: CircleImageView = itemView.findViewById(R.id.post_profileimage)
@@ -240,8 +257,15 @@ class PostsAdapter(
         val post_tvusername: TextView = itemView.findViewById(R.id.post_tvusername)
         val post_tvdescription: TextView = itemView.findViewById(R.id.post_tvdescription)
         val showComment: TextView = itemView.findViewById(R.id.tv_showcomments)
-        val post_ivlike: ImageView = itemView.findViewById(R.id.post_ivlike)
+        val post_ivlike: NSLikeButton = itemView.findViewById(R.id.post_ivlike)
         val post_tv_likecount: TextView = itemView.findViewById(R.id.post_tv_likecount)
+
+        fun setLikeButtonListener(userPostItem: HomePagePostItem) {
+            post_ivlike.onLikeStateChange { likeState ->
+
+            }
+        }
+
     }
 
     inner class StoriesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

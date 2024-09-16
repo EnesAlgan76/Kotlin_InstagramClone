@@ -30,8 +30,13 @@ class RegisterViewModel @Inject constructor(private val userRepository: UserRepo
                 if (userExists) {
                     _registerState.value = RegisterState.Error("Bu kullanıcı adı ya da e-posta ile zaten bir hesap bulunmaktadır.")
                 } else {
-                    userRepository.registerUser(userName, fullName, email, phoneNumber, password)
-                    _registerState.value = RegisterState.Success
+                    userRepository.registerUser(userName, fullName, email, phoneNumber, password) { errorMessage ->
+                        if (errorMessage == null) {
+                            _registerState.value = RegisterState.Success
+                        } else {
+                            _registerState.value = RegisterState.Error(errorMessage)
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 _registerState.value = RegisterState.Error(e.message ?: "Bir hata oluştu")

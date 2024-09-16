@@ -94,8 +94,9 @@ class StoryAdapter(private val context: Context, private var data: List<Story>) 
                 val user: UserModel? = UserSingleton.userModel
                 if (user!=null){
                     withContext(Dispatchers.Main){
+
                         Glide.with(context)
-                            .load(user.profilePicture)
+                            .load(user.profilePicture).placeholder(R.drawable.profile)
                             .into(iv_storyCurrentUser)
 
                         tv_storyCurrentUser.setText(user.userName)

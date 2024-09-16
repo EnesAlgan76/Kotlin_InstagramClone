@@ -90,12 +90,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <ImageView
+        <com.example.ns.ui.NSLikeButton
             android:id="@+id/post_ivlike"
             android:layout_margin="8dp"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            app:srcCompat="@drawable/heart"
+            app:unlikedImage="@drawable/heart"
+            app:likedImage="@drawable/heart_red"
             android:layout_weight="0" />
 
         <ImageView

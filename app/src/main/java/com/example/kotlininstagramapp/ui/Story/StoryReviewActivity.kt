@@ -30,6 +30,7 @@ class StoryReviewActivity : AppCompatActivity() {
 
         Glide.with(this).load(UserSingleton.user!!.userDetails.profilePicture).into(binding.ivProfileStoryPreview)
 
+
         binding.ivSendStory.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
                 FirebaseHelper().uploadStory(this@StoryReviewActivity, gelenDosya, onUploadedSuccesfully = {

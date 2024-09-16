@@ -12,8 +12,6 @@ interface PostApi {
     @GET("posts/allposts/{userId}")
     fun getAllPosts(@Path("userId") userId : String): Call<BaseResponse>
 
-
-
     @POST("/posts")
     fun createPost(@Body user: Map<String,String>) : Call<BaseResponse>
 
