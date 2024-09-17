@@ -6,26 +6,37 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.MainActivity
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.model.HomePagePostItem
 import com.example.kotlininstagramapp.databinding.FragmentHomeBinding
+import com.example.kotlininstagramapp.ui.Home.PostViewModel
+import com.example.kotlininstagramapp.ui.Login.LoginViewModel
 import com.example.kotlininstagramapp.utils.BottomNavHandler
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.example.ns.ui.NSBottomNavView
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
     lateinit var binding: FragmentHomeBinding
-    var allPosts2: ArrayList<HomePagePostItem>  = ArrayList()
+    var allPosts2: ArrayList<HomePagePostItem>  = arrayListOf(HomePagePostItem(0.5,"","","","",0.0,0.0,"",""))
+    //story kısmı için fake data
+    private var currentPage = 0
+    private var isLastPage = false
+    private var isLoading = false
+    private val postViewModel: PostViewModel by viewModels()
+    private lateinit var postAdapter: PostsAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
@@ -67,22 +78,61 @@ class HomeFragment : Fragment() {
 
     }
 
+    private fun loadMorePosts() {
+        isLoading = true
+        postViewModel.getHomePagePosts(currentPage).observe(viewLifecycleOwner) { posts ->
+            if (posts.isNotEmpty()) {
+                postAdapter.addPosts(posts)
+                currentPage++
+            } else {
+                isLastPage = true
+            }
+            isLoading = false
+        }
+    }
+
 
     private fun setupRecyclerView() {
-        binding.rvHomeFragmentPosts.layoutManager = LinearLayoutManager(requireContext(),
-            LinearLayoutManager.VERTICAL,false)
-        CoroutineScope(Dispatchers.Main).launch {
+        binding.rvHomeFragmentPosts.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL,false)
+        postAdapter= PostsAdapter(allPosts2,requireContext(), requireActivity().supportFragmentManager,binding.rvHomeFragmentPosts)
+        binding.rvHomeFragmentPosts.adapter=postAdapter
+
+        loadMorePosts()
+
+        binding.rvHomeFragmentPosts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val visibleItemCount = layoutManager.childCount
+                val totalItemCount = layoutManager.itemCount
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                // Check if we need to load more data
+                if (!isLoading && !isLastPage) {
+                    if (
+                        visibleItemCount + firstVisibleItemPosition >= totalItemCount &&
+                        firstVisibleItemPosition >= 0 &&
+                        totalItemCount >= 5) {
+                        loadMorePosts()
+                    }
+                }
+            }
+        })
+
+
+        /*CoroutineScope(Dispatchers.Main).launch {
             try {
                 withContext(Dispatchers.IO) {
                     allPosts2 = DatabaseHelper().getHomePagePosts()
                 }
-                allPosts2.add(0, HomePagePostItem(0.5,"","","","","",0.0,"",""))
-                val adapter= PostsAdapter(allPosts2,requireContext(), requireActivity().supportFragmentManager,binding.rvHomeFragmentPosts)
-                binding.rvHomeFragmentPosts.adapter=adapter
+                allPosts2.add(0, HomePagePostItem(0.5,"","","","",0.0,0.0,"",""))
+
+                binding.rvHomeFragmentPosts.adapter=postAdapter
             } catch (e: Exception) {
                 println("Error fetching posts: ${e.message}")
             }
-        }
+        }*/
 
     }
 

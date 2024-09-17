@@ -12,7 +12,6 @@ import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import id.zelory.compressor.Compressor
@@ -80,8 +79,8 @@ class FirebaseHelper {
                 post.explanation,
                 user.userName,
                 user.userFullName,
-                post.url,
-                post.date,
+                post.content,
+                post.creationDate.toString(),
                 user.userDetails.profilePicture,
                 likeCount
             )

@@ -85,12 +85,12 @@ class DatabaseHelper {
                         val post = Post(
                             currentUserId!!,
                             0.1,
-                            System.currentTimeMillis().toString(),
+                            System.currentTimeMillis(),
                             explanation,
                             url
                         )
 
-                        val result= postService.createPost(post.toMap()).await()
+                        val result= postService.createPost(post).await()
                         if (result.status){
                             val incrementResponse = userService.incrementPostCount(currentUserId).await()
                             if (incrementResponse.status){
@@ -240,42 +240,42 @@ class DatabaseHelper {
 
     suspend fun getHomePagePosts(): ArrayList<HomePagePostItem> {
         val userId = UserSingleton.userModel!!.userId
-        var postList : ArrayList<HomePagePostItem> = arrayListOf()
 
-        try {
-            // Get followed user ids
-            val followedUserIdsResponse = withContext(Dispatchers.IO) {
-                followService.getFollowedUserIds(userId).execute()
-            }
-
-            println("*************** >>>"+followedUserIdsResponse)
-            if (followedUserIdsResponse.isSuccessful) {
-                val followedUserIds = followedUserIdsResponse.body()?.data as List<String>
+        val postss = postService.getPagedPostsFromFollowedUsers(userId,0,5).await()
+        val userPosts = postss.data as List<Map<String,Any>>
+        val list  =  userPosts.map { HomePagePostItem.fromMap(it) }
+        return ArrayList(list)
 
 
-                // Get posts of followed users
-                followedUserIds.firstOrNull()?.let { firstFollowedUserId ->
-                    val userPostsResponse = withContext(Dispatchers.IO) {
-                        postService.getUserPostsHomePage(firstFollowedUserId).execute()
-                    }
-                    if (userPostsResponse.isSuccessful) {
-                        val userPosts = userPostsResponse.body()?.data as List<Map<String,Any>>
-                        val userPostItems:List<HomePagePostItem>  =  userPosts.map { HomePagePostItem.fromMap(it) }
-                        postList.addAll(userPostItems)
-                    } else {
-                        println("Failed to fetch user posts: ${userPostsResponse.message()}")
-                    }
-                } ?: run {
-                    println("No followed users found.")
-                }
-            } else {
-                println("Failed to fetch followed user ids: ${followedUserIdsResponse.message()}")
-            }
-        } catch (e: Exception) {
-            println("Error: ${e}")
+        // Get followed user ids
+        /*val followedUserIdsResponse = withContext(Dispatchers.IO) {
+            followService.getFollowedUserIds(userId).execute()
         }
 
-        return postList
+        println("*************** >>>"+followedUserIdsResponse)
+        if (followedUserIdsResponse.isSuccessful) {
+            val followedUserIds = followedUserIdsResponse.body()?.data as List<String>
+
+
+            // Get posts of followed users
+            followedUserIds.firstOrNull()?.let { firstFollowedUserId ->
+                val userPostsResponse = withContext(Dispatchers.IO) {
+                    postService.getUserPostsHomePage(firstFollowedUserId).execute()
+                }
+                if (userPostsResponse.isSuccessful) {
+                    val userPosts = userPostsResponse.body()?.data as List<Map<String,Any>>
+                    val userPostItems:List<HomePagePostItem>  =  userPosts.map { HomePagePostItem.fromMap(it) }
+                    postList.addAll(userPostItems)
+                } else {
+                    println("Failed to fetch user posts: ${userPostsResponse.message()}")
+                }
+            } ?: run {
+                println("No followed users found.")
+            }
+        } else {
+            println("Failed to fetch followed user ids: ${followedUserIdsResponse.message()}")
+        }*/
+
     }
 
     suspend fun isPostLiked( postId: Int) :Boolean{

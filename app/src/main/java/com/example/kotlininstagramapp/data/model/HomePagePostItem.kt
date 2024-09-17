@@ -6,7 +6,7 @@ class HomePagePostItem(
     val userFullName: String,
     val userProfileImage: String,
     val content: String,
-    val creationDate: String,
+    val creationDate: Double,
     var likeCount: Double,
     val postDescription: String,
     var userName: String
@@ -18,7 +18,7 @@ class HomePagePostItem(
             val userFullName = map["userFullName"] as String
             val userProfileImage = map["userProfileImage"] as String
             val content = map["content"] as String
-            val creationDate = map["creationDate"] as String
+            val creationDate = map["creationDate"] as Double
             val likeCount = map["likeCount"] as Double
             val postDescription = map["postDescription"] as String
             val userName =map["userName"] as String

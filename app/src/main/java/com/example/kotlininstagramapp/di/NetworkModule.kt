@@ -1,5 +1,6 @@
 package com.example.kotlininstagramapp.di
 
+import com.example.kotlininstagramapp.data.api.PostApi
 import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import dagger.Module
@@ -34,7 +35,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideDatabaseHelper():DatabaseHelper{
-        return DatabaseHelper()
+    fun providePostApi(retrofit: Retrofit): PostApi {
+        return retrofit.create(PostApi::class.java)
     }
 }
