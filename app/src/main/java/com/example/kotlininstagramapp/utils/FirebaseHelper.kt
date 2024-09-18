@@ -649,8 +649,8 @@ class FirebaseHelper {
 
     suspend fun uploadStory(context: Context, gelenDosya: File, onUploadedSuccesfully: () -> Unit,) {
         val storyId = UUID.randomUUID().toString()
-        val imageRef = storageReference.reference.child("stories/${UserSingleton.user!!.userId}/images/${storyId}")
-        val user = UserSingleton.user!!
+        val imageRef = storageReference.reference.child("stories/${UserSingleton.userModel?.userId}/images/${storyId}")
+        val user = UserSingleton.userModel!!
 
         val compressedImageFile = Compressor.compress(context, gelenDosya) { quality(80) }
         val compressedImageUri = Uri.fromFile(compressedImageFile)
@@ -673,7 +673,7 @@ class FirebaseHelper {
                 if (userDocument.exists()) {
                     userStoriesRef.update("stories", FieldValue.arrayUnion(singleStory))
                 } else {
-                    val newStory = Story(user.userId, user.userName, user.userDetails.profilePicture, mutableListOf(singleStory))
+                    val newStory = Story(user.userId, user.userName, user.profilePicture, mutableListOf(singleStory))
                     userStoriesRef.set(newStory)
                 }
 

@@ -6,4 +6,8 @@
     <string name="title_search">Search\n</string>
     <string name="title_chat">Share</string>
     <string name="title_notifications">Notifications</string>
+    <string name="kullanici_adi">Kullanıcı Adı</string>
+    <string name="enter_name">Adınızı girin</string>
+    <string name="full_name">Tam Ad</string>
+    <string name="change_photo">Fotoğrafı Değiştir</string>
 </resources>

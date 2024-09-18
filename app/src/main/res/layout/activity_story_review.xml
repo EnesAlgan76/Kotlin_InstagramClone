@@ -72,7 +72,7 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginRight="32dp"
-                    app:srcCompat="@drawable/icon_profile" />
+                    app:srcCompat="@drawable/profile" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

@@ -39,7 +39,7 @@
                 android:layout_height="100dp"
                 android:layout_marginTop="48dp"
                 android:layout_marginBottom="36dp"
-                app:srcCompat="@drawable/instagram" />
+                app:srcCompat="@drawable/baybay_logo" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"

@@ -102,7 +102,7 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
     private fun setUserInfos(user: UserModel) {
 
         binding.userExploreTvUserName.setText(user.userName)
-        Glide.with(this).load(user.profilePicture).error(R.drawable.icon_profile).placeholder(R.drawable.icon_profile).into(binding.userExploreIvProfile)
+        Glide.with(this).load(user.profilePicture).error(R.drawable.profile).placeholder(R.drawable.icon_profile).into(binding.userExploreIvProfile)
         binding.userExploreTvName.setText(user.fullName)
         binding.userExploreTvBiograpy.setText(user.biography)
         binding.userExploreTvFollow.setText(user.followingCount.toString())

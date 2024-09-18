@@ -67,7 +67,7 @@
                     android:layout_height="75dp"
                     android:layout_marginStart="24dp"
                     android:layout_marginTop="36dp"
-                    android:src="@drawable/icon_profile"
+                    android:src="@drawable/profile"
                     app:civ_border_color="#000"
                     app:civ_border_overlay="true"
                     app:civ_border_width="2dp"

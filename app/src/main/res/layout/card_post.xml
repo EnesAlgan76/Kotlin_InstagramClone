@@ -19,7 +19,7 @@
             android:layout_height="50dp"
             android:scaleType="centerCrop"
             android:padding="8dp"
-            android:src="@drawable/icon_profile"
+            android:src="@drawable/profile"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -88,18 +88,19 @@
 
 
 
-    <LinearLayout
+
+<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <com.example.ns.ui.NSLikeButton
+        <com.example.ns.ui.NSDynamicImageButton
             android:id="@+id/post_ivlike"
             android:layout_margin="8dp"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            app:unlikedImage="@drawable/heart"
-            app:likedImage="@drawable/heart_red"
+            app:firstImage="@drawable/like"
+            app:secondImage="@drawable/like_filled"
             android:layout_weight="0" />
 
         <ImageView
@@ -110,24 +111,18 @@
             app:srcCompat="@drawable/comment"
             android:layout_weight="0" />
 
-        <ImageView
-            android:id="@+id/post_ivsend"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_margin="8dp"
-            app:srcCompat="@drawable/send"
-            android:layout_weight="0" />
         <androidx.legacy.widget.Space
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"/>
 
-        <ImageView
+        <com.example.ns.ui.NSDynamicImageButton
             android:id="@+id/post_ivsave"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_margin="8dp"
-            app:srcCompat="@drawable/save"
+            app:firstImage ="@drawable/save"
+            app:secondImage ="@drawable/save_filled"
             android:layout_weight="0" />
     </LinearLayout>
 

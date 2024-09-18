@@ -16,8 +16,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.Models.Conversation
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.data.api.RetrofitInstance
+import com.example.kotlininstagramapp.data.api.UserApi
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ConversationsFragment : Fragment() {
     private lateinit var recyclerViewConversations: RecyclerView
@@ -29,6 +35,7 @@ class ConversationsFragment : Fragment() {
     private lateinit var searchBox: EditText
     private var conversations: ArrayList<Conversation> = ArrayList()
     private lateinit var firestore: FirebaseFirestore
+    val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_messages, container, false)
@@ -117,7 +124,7 @@ class ConversationsFragment : Fragment() {
 //        },
     }
 
-    private fun fetchUsers(searchText: String) {
+    private fun fetchUsers2(searchText: String) {
         println("---------- Querying Users ------")
         firestore.collection("users")
             .whereGreaterThanOrEqualTo("userName", searchText)
@@ -144,6 +151,22 @@ class ConversationsFragment : Fragment() {
                     conversationsSearchResultsAdapter.setUsers(users)
                 }
             }
+    }
+
+    private fun fetchUsers(searchText: String) {
+        println("---------- Fetching Users ------")
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = userService.searchUsersByUsername(searchText).execute()
+            if (response.isSuccessful) {
+                val userList = response.body()?.data as List<Map<String, String>>
+                withContext(Dispatchers.Main) {
+                    conversationsSearchResultsAdapter.setUsers(userList)
+                }
+
+            } else {
+                Log.e("---------------------", "Response failed")
+            }
+        }
     }
 
 }

@@ -94,6 +94,10 @@
         android:id="@+id/notificationsFragment"
         android:name="com.example.kotlininstagramapp.Home.NotificationsFragment"
         android:label="NotificationsFragment" />
+    <fragment
+        android:id="@+id/conversationsFragment"
+        android:name="com.example.kotlininstagramapp.Home.ConversationsFragment"
+        android:label="ConversationsFragment" />
 
 
 </navigation>

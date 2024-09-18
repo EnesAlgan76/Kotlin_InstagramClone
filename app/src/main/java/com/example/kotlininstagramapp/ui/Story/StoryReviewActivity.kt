@@ -28,7 +28,7 @@ class StoryReviewActivity : AppCompatActivity() {
             Glide.with(this).load(gelenDosya).into(binding.ivStoryReview)
         }
 
-        Glide.with(this).load(UserSingleton.user!!.userDetails.profilePicture).into(binding.ivProfileStoryPreview)
+        Glide.with(this).load(UserSingleton.userModel?.profilePicture).into(binding.ivProfileStoryPreview)
 
 
         binding.ivSendStory.setOnClickListener {

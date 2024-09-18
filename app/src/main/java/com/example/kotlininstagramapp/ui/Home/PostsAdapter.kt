@@ -5,14 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.VideoView
 import androidx.fragment.app.FragmentManager
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackParameters
@@ -24,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserExplorePage
 import com.example.kotlininstagramapp.Models.Story
-import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.model.HomePagePostItem
@@ -32,16 +28,13 @@ import com.example.kotlininstagramapp.ui.Story.StoryAdapter
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.TextHighlighter
-import com.example.ns.ui.NSLikeButton
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.ns.ui.NSDynamicImageButton
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import java.util.concurrent.TimeUnit
@@ -54,7 +47,7 @@ class PostsAdapter(
     private val recyclerView: RecyclerView
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val defaultImage = R.drawable.icon_profile
+    private val defaultImage = R.drawable.profile
     private val handler = Handler(Looper.getMainLooper())
     private val VIEW_TYPE_HORIZONTAL_LIST = 1
     private val VIEW_TYPE_VERTICAL_ITEM = 2
@@ -267,7 +260,7 @@ class PostsAdapter(
         val post_tvusername: TextView = itemView.findViewById(R.id.post_tvusername)
         val post_tvdescription: TextView = itemView.findViewById(R.id.post_tvdescription)
         val showComment: TextView = itemView.findViewById(R.id.tv_showcomments)
-        val post_ivlike: NSLikeButton = itemView.findViewById(R.id.post_ivlike)
+        val post_ivlike: NSDynamicImageButton = itemView.findViewById(R.id.post_ivlike)
         val post_tv_likecount: TextView = itemView.findViewById(R.id.post_tv_likecount)
         val speedTextView: TextView = itemView.findViewById(R.id.tv_speed)
         val iv_playPauseButton: ImageView = itemView.findViewById(R.id.iv_playPauseButton)

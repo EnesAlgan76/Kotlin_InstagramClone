@@ -36,7 +36,7 @@
                 app:layout_constraintStart_toEndOf="@+id/imageView_back"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.5"
-                app:srcCompat="@drawable/icon_profile" />
+                app:srcCompat="@drawable/profile" />
 
             <TextView
                 android:id="@+id/textView_userFullName"

@@ -23,6 +23,7 @@ import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.UserDetails
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.EImageLoader
 import id.zelory.compressor.Compressor
@@ -49,12 +50,14 @@ class ProfileEditFragment : Fragment() {
     private var eventuserFullName: String=""
     private lateinit var galleryLauncher: ActivityResultLauncher<Intent>
     private lateinit var firebaseHelper: FirebaseHelper
+    private lateinit var databaseHelper: DatabaseHelper
     private lateinit var profilePicture: ImageView
     private var selectedImageUri: Uri?=null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_edit_profile, container, false)
         firebaseHelper = FirebaseHelper()
+        databaseHelper = DatabaseHelper()
         initViews(view)
         setupGalleryLauncher()
         return view
@@ -86,20 +89,24 @@ class ProfileEditFragment : Fragment() {
              progressDialog.show(childFragmentManager, "progress_dialog")
 
              CoroutineScope(Dispatchers.Main).launch {
+                 var compressedImageUri:Uri? = null
+                 if (selectedImageUri!=null){
+                     val originalFile = File(getPathFromUri(requireContext(), selectedImageUri!!))
 
-                 val originalFile = File(getPathFromUri(requireContext(), selectedImageUri!!))
+                     val compressedImageFile = Compressor.compress(requireContext(), originalFile)
+                     compressedImageUri = Uri.fromFile(compressedImageFile)
+                 }
 
-                 val compressedImageFile = Compressor.compress(requireContext(), originalFile)
 
-                 val compressedImageUri = Uri.fromFile(compressedImageFile)
-
-                 firebaseHelper.updateUserProfile(
+                 databaseHelper.updateUserProfile(
                      eventuserName,
                      if (fullName.text.toString() != eventuserFullName) fullName.text.toString() else null,
                      if (userNameEditText.text.toString() != eventuserName) userNameEditText.text.toString() else null,
                      if (biography.text.toString() != eventBiografi) biography.text.toString() else null,
                      compressedImageUri,
-                 )
+                 ){
+                     message ->
+                 }
 
                  progressDialog.dismiss()
              }

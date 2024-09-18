@@ -11,7 +11,7 @@
         android:layout_margin="0.5dp"
         android:padding="1dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/icon_profile" />
+        android:src="@drawable/profile" />
 
     <TextView
         android:id="@+id/video_duration_text"

@@ -43,7 +43,7 @@ class EImageLoader {
         fun setImage(imgUrl: String, imageView: ImageView, mProgressBar: ProgressBar?) {
             Glide.with(imageView.context)
                 .load(imgUrl)
-                .apply(RequestOptions.errorOf(R.drawable.icon_profile))
+                .apply(RequestOptions.errorOf(R.drawable.profile))
                 .listener(object : RequestListener<Drawable> {
 
                     override fun onLoadFailed(

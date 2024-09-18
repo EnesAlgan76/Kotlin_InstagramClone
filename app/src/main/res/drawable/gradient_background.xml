@@ -4,9 +4,6 @@
     <item>
         <shape
             android:shape="rectangle">
-            <corners
-                android:radius="15dp">
-            </corners>
             <gradient
                 android:startColor="@color/nscolorPrimary"
                 android:centerColor="@color/nscolorPrimary"

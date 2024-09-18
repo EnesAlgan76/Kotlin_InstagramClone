@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.data.api.RetrofitInstance
 import com.example.kotlininstagramapp.data.api.UserApi
@@ -125,14 +126,18 @@ class LoginFragment : Fragment() {
 
         }
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            val secondaryColor = ContextCompat.getColor(requireContext(), R.color.nscolorSecondary)
+            val whiteColor = ContextCompat.getColor(requireContext(), R.color.white)
+
             if(binding.etLoginmail.length()<6 || binding.etLoginpassword.length() <6){
-                binding.btnLogingiris.setBackgroundColor(Color.parseColor("#FFFFFF"))
-                binding.btnLogingiris.setTextColor(Color.parseColor("#3a97f1"))
+                binding.btnLogingiris.setBackgroundColor(whiteColor)
+                binding.btnLogingiris.setTextColor(secondaryColor)
                 buttonActive = false
 
             }else{
-                binding.btnLogingiris.setBackgroundColor(Color.parseColor("#3a97f1"))
-                binding.btnLogingiris.setTextColor(Color.WHITE)
+                binding.btnLogingiris.setBackgroundColor(secondaryColor)
+                binding.btnLogingiris.setTextColor(whiteColor)
                 buttonActive = true
             }
         }

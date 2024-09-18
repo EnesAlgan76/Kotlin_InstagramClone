@@ -2,13 +2,13 @@ package com.example.kotlininstagramapp.data.model
 
 data class UserModel(
     val userId: String,
-    val userName: String,
+    var userName: String,
     val password: String,
     val phoneNumber: String,
     val email: String,
-    val fullName: String,
-    val profilePicture: String,
-    val biography: String,
+    var fullName: String,
+    var profilePicture: String,
+    var biography: String,
     val fcmToken: String,
     val followerCount: Int,
     val followingCount: Int,

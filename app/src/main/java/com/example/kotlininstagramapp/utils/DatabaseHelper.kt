@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import okhttp3.internal.Util
 import retrofit2.await
 import java.util.UUID
 
@@ -47,6 +48,48 @@ class DatabaseHelper {
             return UserModel.fromMap(userData)
         } ?: return null
     }
+
+    suspend fun updateUserProfile (
+        userName: String,
+        newFullName: String?,
+        newUserName: String?,
+        newBiography: String?,
+        newSelectedImageUri: Uri?,
+        onMessage: (message :String) -> Unit,
+    ) {
+        try {
+            val response = userService.updateUserProfile(
+                userName = userName,
+                newFullName = newFullName,
+                newUserName = newUserName,
+                newBiography = newBiography,
+                newSelectedImageUri = newSelectedImageUri?.toString()
+            ).await()
+
+            if (response.status) {
+                onMessage.invoke("Profile updated: ${response.message}")
+                if (newUserName != null) {
+                    UserSingleton.userModel?.userName = newUserName
+                }
+                if (newFullName != null) {
+                    UserSingleton.userModel?.fullName = newFullName
+                }
+                if (newBiography != null) {
+                    UserSingleton.userModel?.biography = newBiography
+                }
+                if(newSelectedImageUri != null){
+                    UserSingleton.userModel?.profilePicture = newSelectedImageUri.toString()
+                }
+
+            } else {
+                println("Error: ${response.message}")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            println("Exception: ${e.message}")
+        }
+    }
+
 
     suspend fun uploadPost(
         compressedMediaUri: Uri,

@@ -1,23 +1,44 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
-    <!-- TabBar -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="00dp"
+        android:background="@drawable/gradient_background"
+        app:layout_constraintBottom_toBottomOf="@+id/view"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="16dp" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_changePhoto"
+        app:layout_constraintEnd_toEndOf="@+id/iv_profile"
+        app:layout_constraintStart_toStartOf="@+id/iv_profile"
+        app:layout_constraintTop_toBottomOf="@+id/tabBar" />
+
+
     <LinearLayout
         android:id="@+id/tabBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical|end"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/iv_closeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/icon_cancel" />
+            android:src="@drawable/icon_close" />
 
         <TextView
             android:id="@+id/titleTextView"
@@ -35,12 +56,41 @@
             android:src="@drawable/icon_check" />
     </LinearLayout>
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_profile"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/profile"
+        app:civ_border_color="#000"
+        app:civ_border_overlay="true"
+        app:civ_border_width="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tabBar" />
+
+
+    <TextView
+        android:id="@+id/tv_changePhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        android:text="@string/change_photo"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_profile" />
+
     <!-- Ana ekran -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/tabBar"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@+id/tv_changePhoto">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -48,91 +98,83 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Profil resmi -->
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/iv_profile"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/icon_profile"
-                app:civ_border_color="#000"
-                app:civ_border_overlay="true"
-                app:civ_border_width="2dp" />
 
-            <!-- Fotoğrafı değiştir -->
-            <TextView
-                android:id="@+id/tv_changePhoto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Fotoğrafı Değiştir"
-                android:textSize="16sp"
-                android:layout_gravity="center_horizontal"
-                android:paddingTop="8dp" />
-
-            <!-- Ad -->
             <TextView
                 android:id="@+id/nameLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="16dp"
-                android:text="Tam Ad"
+                android:text="@string/full_name"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
-            <!-- Ad TextField -->
-            <EditText
+
+            <com.example.ns.ui.NSEditText
                 android:id="@+id/fullNameTextField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Adınızı girin" />
+                android:hint="@string/enter_name"
+                app:cornerRadius="12dp"
+                app:edgeColor="@color/black"
+                app:edgeWidth="1dp" />
 
 
-            <!-- TextField 1 -->
             <TextView
                 android:id="@+id/textView13"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Kullanıcı Adı"
+                android:paddingTop="18dp"
+                android:text="@string/kullanici_adi"
                 android:textColor="@color/black"
-                android:textSize="16sp"
-                android:paddingTop="18dp" />
-            <EditText
+                android:textSize="16sp" />
+
+            <com.example.ns.ui.NSEditText
                 android:id="@+id/et_userName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Kullanıcı Adı" />
+                android:hint="@string/kullanici_adi"
+                app:cornerRadius="12dp"
+                app:edgeColor="@color/black"
+                app:edgeWidth="1dp" />
 
-            <!-- TextField 2 -->
+
             <TextView
                 android:id="@+id/textView14"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingTop="18dp"
                 android:text="Biyografi"
                 android:textColor="@color/black"
-                android:textSize="16sp"
-                android:paddingTop="18dp" />
-            <EditText
+                android:textSize="16sp" />
+
+            <com.example.ns.ui.NSEditText
                 android:id="@+id/et_biografi"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Biyografi" />
-
+                android:hint="Biyografi"
+                app:cornerRadius="12dp"
+                app:edgeColor="@color/black"
+                app:edgeWidth="1dp" />
 
 
             <TextView
                 android:id="@+id/textView15"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingTop="18dp"
                 android:text="İnternet Sitesi"
                 android:textColor="@color/black"
-                android:textSize="16sp"
-                android:paddingTop="18dp" />
-            <EditText
+                android:textSize="16sp" />
+
+            <com.example.ns.ui.NSEditText
                 android:id="@+id/et_site"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="İnternet Sitesi" />
+                android:hint="İnternet Sitesi"
+                app:cornerRadius="12dp"
+                app:edgeColor="@color/black"
+                app:edgeWidth="1dp" />
 
 
         </LinearLayout>
     </ScrollView>
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

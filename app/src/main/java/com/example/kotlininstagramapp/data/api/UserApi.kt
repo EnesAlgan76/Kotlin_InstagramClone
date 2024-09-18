@@ -1,6 +1,7 @@
 package com.example.kotlininstagramapp.data.api
 import com.example.kotlininstagramapp.data.model.UserModel
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -59,5 +60,13 @@ interface UserApi {
      @PUT("users/incrementFollowCount")
      fun incrementFollowCount(@Query("userId") userId: String) : Call<BaseResponse>
 
+     @PUT("users/updateProfile")
+     fun updateUserProfile(
+          @Query("userName") userName: String,
+          @Query("newFullName") newFullName: String?,
+          @Query("newUserName") newUserName: String?,
+          @Query("newBiography") newBiography: String?,
+          @Query("newSelectedImageUri") newSelectedImageUri: String?
+     ): Call<BaseResponse>
 
 }

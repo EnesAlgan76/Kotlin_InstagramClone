@@ -58,12 +58,17 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         setupRecyclerView()
         setupBottomNavigation()
-      //  setupClickListeners()
+        setupChatButton()
         updateUiOnNotificationStatusChange()
 
         return binding.root
     }
 
+    private fun setupChatButton() {
+        binding.ivChat.setOnClickListener {
+            findNavController().navigate(R.id.conversationsFragment)
+        }
+    }
 
 
     companion object{var isBottomNavInitialized =false}
