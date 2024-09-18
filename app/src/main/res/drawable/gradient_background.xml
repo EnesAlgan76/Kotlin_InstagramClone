@@ -8,9 +8,9 @@
                 android:radius="15dp">
             </corners>
             <gradient
-                android:startColor="#FFEB3B"
-                android:centerColor="#E91E63"
-                android:endColor="#E91E63"
+                android:startColor="@color/nscolorPrimary"
+                android:centerColor="@color/nscolorPrimary"
+                android:endColor="@color/nscolorSecondary"
                 >
             </gradient>
         </shape>

@@ -9,10 +9,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.VideoView
 import androidx.fragment.app.FragmentManager
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -21,8 +27,8 @@ import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.Models.UserPostItem
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.ui.Story.StoryAdapter
 import com.example.kotlininstagramapp.data.model.HomePagePostItem
+import com.example.kotlininstagramapp.ui.Story.StoryAdapter
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.TextHighlighter
@@ -40,52 +46,64 @@ import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import java.util.concurrent.TimeUnit
 
-class PostsAdapter(private var posts: ArrayList<HomePagePostItem>, private val mContext: Context, private val fragmentManager: FragmentManager, private val recyclerView: RecyclerView) :RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+
+class PostsAdapter(
+    private var posts: ArrayList<HomePagePostItem>,
+    private val mContext: Context,
+    private val fragmentManager: FragmentManager,
+    private val recyclerView: RecyclerView
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
     private val defaultImage = R.drawable.icon_profile
     private val handler = Handler(Looper.getMainLooper())
-    private var likeId:Int? = null
-
     private val VIEW_TYPE_HORIZONTAL_LIST = 1
     private val VIEW_TYPE_VERTICAL_ITEM = 2
 
-    var playingVideoList: MutableList<PostViewHolder> = mutableListOf()
-
     init {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            private val debounceTime = 200L
+            private var lastScrollTime = 0L
+
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val firstVisibleItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition()
-                if (firstVisibleItemPosition !=-1){
-                    if(posts[firstVisibleItemPosition].content.contains("videos")){
-                        handler.removeCallbacksAndMessages(null)
-                        handler.post {
-                            val holderTop = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition-1) as? PostViewHolder
-                            holderTop?.post_vv_postvideo?.pause()
-
-                            val holderCenter = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition) as? PostViewHolder
-                            holderCenter?.post_vv_postvideo?.start()
-
-                            val holderBottom = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition+1) as? PostViewHolder
-                            holderBottom?.post_vv_postvideo?.pause()
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastScrollTime > debounceTime) {
+                    lastScrollTime = currentTime
+                    val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
+                    layoutManager?.let {
+                        val firstVisibleItemPosition = it.findFirstCompletelyVisibleItemPosition()
+                        if (firstVisibleItemPosition != -1) {
+                            handler.removeCallbacksAndMessages(null)
+                            handler.post {
+                                handleVideoPlayback(firstVisibleItemPosition)
+                            }
                         }
-                    }else{
-                        handler.post{
-                            val holderBottom = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition+1) as? PostViewHolder
-                            holderBottom?.post_vv_postvideo?.pause()
-
-                            val holderTop = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition-1) as? PostViewHolder
-                            holderTop?.post_vv_postvideo?.pause()
-
-                        }
-
                     }
-
                 }
-
             }
         })
+    }
+
+    private fun handleVideoPlayback(position: Int) {
+        if (posts[position].content.contains("videos")) {
+            (recyclerView.findViewHolderForAdapterPosition(position - 1) as? PostViewHolder)
+                ?.post_vv_postvideo?.player?.pause()
+
+            if(!(recyclerView.findViewHolderForAdapterPosition(position) as? PostViewHolder)?.isVideoPausedByHand!!){
+                (recyclerView.findViewHolderForAdapterPosition(position) as? PostViewHolder)
+                    ?.post_vv_postvideo?.player?.play()
+            }
+
+
+            (recyclerView.findViewHolderForAdapterPosition(position + 1) as? PostViewHolder)
+                ?.post_vv_postvideo?.player?.pause()
+        } else {
+            (recyclerView.findViewHolderForAdapterPosition(position + 1) as? PostViewHolder)
+                ?.post_vv_postvideo?.player?.pause()
+
+            (recyclerView.findViewHolderForAdapterPosition(position - 1) as? PostViewHolder)
+                ?.post_vv_postvideo?.player?.pause()
+        }
     }
 
     fun addPosts(newPosts: List<HomePagePostItem>) {
@@ -98,92 +116,114 @@ class PostsAdapter(private var posts: ArrayList<HomePagePostItem>, private val m
         return if (position == 0) VIEW_TYPE_HORIZONTAL_LIST else VIEW_TYPE_VERTICAL_ITEM
     }
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-
         return if (viewType == VIEW_TYPE_HORIZONTAL_LIST) {
-            val horizontalListView =
-                inflater.inflate(R.layout.item_storieslist, parent, false)
-            StoriesViewHolder(horizontalListView)
+            val view = inflater.inflate(R.layout.item_storieslist, parent, false)
+            StoriesViewHolder(view)
         } else {
-            val verticalItemView =
-                inflater.inflate(R.layout.card_post, parent, false)
-            PostViewHolder(verticalItemView)
+            val view = inflater.inflate(R.layout.card_post, parent, false)
+            PostViewHolder(view)
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val viewType = getItemViewType(position)
-
-        if (viewType == VIEW_TYPE_HORIZONTAL_LIST) {
-            val horizontalViewHolder = holder as StoriesViewHolder
-            horizontalViewHolder.bind()
-        } else {
-            val verticalViewHolder = holder as PostViewHolder
-            val userPostItem = posts[position]
-            with(verticalViewHolder) {
-                fullNameTextView.text = userPostItem.userFullName
-                post_tvusername.text = userPostItem.userName
-                post_tvdescription.text = userPostItem.postDescription
-                TextHighlighter.highlightWordsTextView(post_tvdescription)
-                post_tv_dateago.text = getTimeAgo(userPostItem.creationDate.toLong())
-                post_tv_likecount.text = "${userPostItem.likeCount} beğenme"
-
-                showComment.setOnClickListener {
-                    val bottomSheetFragment = CommentBottomSheetFragment(userPostItem.postId, userPostItem.userId, userPostItem.content)
-
-                    bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
-                }
-
-                fullNameTextView.setOnClickListener {
-                    val intent = Intent(mContext, UserExplorePage::class.java).apply {
-                        putExtra("USER_ID", userPostItem.userId)
-                    }
-                    mContext.startActivity(intent)
-                }
-
-                setupLikeButton(holder, userPostItem)
-               // setLikeClickListener(holder, userPostItem, position)
-                verticalViewHolder.setLikeButtonListener(userPostItem)
-
+        when (getItemViewType(position)) {
+            VIEW_TYPE_HORIZONTAL_LIST -> {
+                (holder as StoriesViewHolder).bind()
             }
+            VIEW_TYPE_VERTICAL_ITEM -> {
+                val userPostItem = posts[position]
+                val viewHolder = holder as PostViewHolder
+                with(viewHolder) {
+                    fullNameTextView.text = userPostItem.userFullName
+                    post_tvusername.text = userPostItem.userName
+                    post_tvdescription.text = userPostItem.postDescription
+                    TextHighlighter.highlightWordsTextView(post_tvdescription)
+                    post_tv_dateago.text = getTimeAgo(userPostItem.creationDate.toLong())
+                    post_tv_likecount.text = "${userPostItem.likeCount.toInt()} beğenme"
 
-            Glide.with(mContext).load(userPostItem.userProfileImage).placeholder(defaultImage).error(defaultImage).into(holder.post_profileimage)
+                    showComment.setOnClickListener {
+                        val bottomSheetFragment = CommentBottomSheetFragment(
+                            userPostItem.postId,
+                            userPostItem.userId,
+                            userPostItem.content
+                        )
+                        bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
+                    }
 
-            loadMedias(holder, userPostItem)
+                    fullNameTextView.setOnClickListener {
+                        val intent = Intent(mContext, UserExplorePage::class.java).apply {
+                            putExtra("USER_ID", userPostItem.userId)
+                        }
+                        mContext.startActivity(intent)
+                    }
+
+                    setupLikeButton(this, userPostItem)
+
+                    Glide.with(mContext)
+                        .load(userPostItem.userProfileImage)
+                        .placeholder(defaultImage)
+                        .error(defaultImage)
+                        .into(post_profileimage)
+
+                    loadMedias(this, userPostItem)
+                }
+            }
         }
-
-
-
     }
-
 
     override fun getItemCount(): Int = posts.size
 
     private fun loadMedias(holder: PostViewHolder, userPostItem: HomePagePostItem) {
-        if(userPostItem.content.contains("videos")){
-            Glide.with(mContext)
-                .load(userPostItem.content)
-                .into(holder.post_iv_postimage)
+        val contentType = if (userPostItem.content.contains("videos")) "video" else "image"
 
+        if (contentType == "video") {
             holder.post_vv_postvideo.visibility = View.VISIBLE
-            val videoView = holder.post_vv_postvideo
-            videoView.setVideoURI(Uri.parse(userPostItem.content))
+            holder.post_iv_postimage.visibility = View.GONE
 
-            videoView.setOnPreparedListener { mediaPlayer ->
-                holder.post_iv_postimage.visibility = View.GONE
-                Log.e("video Hazır",holder.post_tvdescription.text.toString())
+            val player = ExoPlayer.Builder(mContext).build()
+            holder.post_vv_postvideo.player = player
+            val uri = Uri.parse(userPostItem.content)
+            player.setMediaItem(MediaItem.fromUri(uri))
+            player.prepare()
+            player.playWhenReady = true
+
+            holder.speedTextView.setOnClickListener {
+                val currentSpeed = holder.speedTextView.text.toString()
+                val newSpeed = when (currentSpeed) {
+                    "1x" -> 1.5f
+                    "1.5x" -> 2f
+                    else -> 1f
+                }
+                holder.speedTextView.text = "${newSpeed}x"
+                player.playbackParameters = PlaybackParameters(newSpeed)
             }
 
-        }else{
+            player.addListener(object : Player.Listener {
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    super.onIsPlayingChanged(isPlaying)
+                    if (isPlaying) {
+                        holder.iv_playPauseButton.setImageResource(R.drawable.pause)
+                    } else {
+                        holder.iv_playPauseButton.setImageResource(R.drawable.play)
+                    }
+                }
+            })
+
+            holder.iv_playPauseButton.setOnClickListener {
+                if (player.isPlaying) {
+                    player.pause()
+                    holder.isVideoPausedByHand =true
+                } else {
+                    player.play()
+                }
+            }
+        } else {
             holder.post_vv_postvideo.visibility = View.GONE
             holder.post_iv_postimage.visibility = View.VISIBLE
-            Glide.with(mContext)
-                .load(userPostItem.content)
-                .into(holder.post_iv_postimage)
+            Glide.with(mContext).load(userPostItem.content).into(holder.post_iv_postimage)
         }
-
     }
 
     private fun setupLikeButton(holder: PostViewHolder, userPostItem: HomePagePostItem) {
@@ -193,108 +233,63 @@ class PostsAdapter(private var posts: ArrayList<HomePagePostItem>, private val m
                 DatabaseHelper().isPostLiked(userPostItem.postId.toInt())
             }
             holder.post_ivlike.setLiked(isLiked)
-            holder.post_ivlike.onLikeStateChange { newLikeState->
-                debounceJob?.cancel()
-                debounceJob= CoroutineScope(Dispatchers.IO).launch{
-                   delay(3000)
-                   if (newLikeState){
-                       DatabaseHelper().likePost(userPostItem.postId.toInt())
-                       DatabaseHelper().addNotification(userPostItem.userId,"post_like",userPostItem.content)
-                   }else{
-                       DatabaseHelper().unlikePost(userPostItem.postId.toInt())
-                   }
+            holder.post_ivlike.onLikeStateChange { newLikeState ->
+                val text = holder.post_tv_likecount.text
+                when(newLikeState){
+                    true -> holder.post_tv_likecount.text = (text.split(" ")[0].toInt()+1).toString()+" beğenme"
+                    false -> holder.post_tv_likecount.text = (text.split(" ")[0].toInt()-1).toString()+" beğenme"
                 }
-            }
-        }
-    }
-
-    private fun setLikeButtonListener() {
-
-    }
-
-    private fun setLikeClickListener(holder: PostViewHolder, userPostItem: UserPostItem, position: Int) {
-        var lastClickTime: Long = 0
-        holder.post_ivlike.setOnClickListener {
-            val currentTime = System.currentTimeMillis()
-            if (currentTime - lastClickTime > 1000) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    val auth: FirebaseAuth = FirebaseAuth.getInstance()
-                    val userDocumentRef = FirebaseFirestore.getInstance().collection("users")
-                        .document(auth.currentUser!!.uid)
-                    val likedPostDocRef = userDocumentRef.collection("liked_posts")
-                        .document(userPostItem.postId)
-                    val document = likedPostDocRef.get().await()
-                    val tempPost = posts[position]
-                    if (document.exists()) {   // zaten beğenilmişse kaldır
-                        withContext(Dispatchers.Main) {
-                            userPostItem.likeCount = (userPostItem.likeCount.toInt() - 1).toString()
-                            posts[position] = tempPost
-                            notifyItemChanged(position)
-                        }
-                        likedPostDocRef.delete().await()
-                        FirebaseHelper().updateLikeCount(userPostItem.postId, userPostItem.userId, false)
-                        FirebaseHelper().deleteLikeNotification(userPostItem.userId, userPostItem.userPostUrl)
-                    } else {   // ilk defa begenilecek
-                        withContext(Dispatchers.Main) {
-                            tempPost.likeCount = (tempPost.likeCount + 1)
-                            posts[position] = tempPost
-                            notifyItemChanged(position)
-                        }
-                        val data = mapOf("post_id" to userPostItem.postId)
-                        likedPostDocRef.set(data).await()
-                        FirebaseHelper().updateLikeCount(userPostItem.postId, userPostItem.userId, true)
-                        FirebaseHelper().sendLikeNotification(userPostItem.userId, userPostItem.userPostUrl)
+                debounceJob?.cancel()
+                debounceJob = CoroutineScope(Dispatchers.IO).launch {
+                    delay(3000)
+                    if (newLikeState) {
+                        DatabaseHelper().likePost(userPostItem.postId.toInt())
+                        DatabaseHelper().addNotification(
+                            userPostItem.userId,
+                            "post_like",
+                            userPostItem.content
+                        )
+                    } else {
+                        DatabaseHelper().unlikePost(userPostItem.postId.toInt())
                     }
                 }
-            } else {
-                println("----- >> Çift Tıklandı")
             }
-            lastClickTime = currentTime
         }
     }
 
     inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
+        var isVideoPausedByHand = false
         val fullNameTextView: TextView = itemView.findViewById(R.id.post_tv_fullname)
         val post_tv_dateago: TextView = itemView.findViewById(R.id.post_tv_dateago)
         val post_profileimage: CircleImageView = itemView.findViewById(R.id.post_profileimage)
         val post_iv_postimage: ImageView = itemView.findViewById(R.id.post_iv_postimage)
-        val post_vv_postvideo: VideoView = itemView.findViewById(R.id.post_vv_postvideo)
+        val post_vv_postvideo: PlayerView = itemView.findViewById(R.id.post_vv_postvideo)
         val post_tvusername: TextView = itemView.findViewById(R.id.post_tvusername)
         val post_tvdescription: TextView = itemView.findViewById(R.id.post_tvdescription)
         val showComment: TextView = itemView.findViewById(R.id.tv_showcomments)
         val post_ivlike: NSLikeButton = itemView.findViewById(R.id.post_ivlike)
         val post_tv_likecount: TextView = itemView.findViewById(R.id.post_tv_likecount)
-
-        fun setLikeButtonListener(userPostItem: HomePagePostItem) {
-            post_ivlike.onLikeStateChange { likeState ->
-
-            }
-        }
-
+        val speedTextView: TextView = itemView.findViewById(R.id.tv_speed)
+        val iv_playPauseButton: ImageView = itemView.findViewById(R.id.iv_playPauseButton)
     }
 
     inner class StoriesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val horizontalRecyclerView: RecyclerView = itemView.findViewById(R.id.rv_homeFragmentStories)
-        private val horizontalAdapter = StoryAdapter(context = mContext, listOf())
+        private val horizontalAdapter = StoryAdapter(mContext, listOf())
 
         init {
             horizontalRecyclerView.adapter = horizontalAdapter
-            val layoutManager = LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
-            horizontalRecyclerView.layoutManager = layoutManager
+            horizontalRecyclerView.layoutManager = LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
         }
 
         fun bind() {
             CoroutineScope(Dispatchers.IO).launch {
-                var stories: List<Story> = FirebaseHelper().getFollowedUsersStories()
-                withContext(Dispatchers.Main){
+                val stories: List<Story> = FirebaseHelper().getFollowedUsersStories()
+                withContext(Dispatchers.Main) {
                     horizontalAdapter.setData(stories)
                     EventBus.getDefault().postSticky(EventBusDataEvents.SendStories(stories))
                 }
-
             }
-            //var stories : ArrayList<Story> = FirebaseHelper().getStoriesFollowedUsers()
-
         }
     }
 
@@ -319,5 +314,4 @@ class PostsAdapter(private var posts: ArrayList<HomePagePostItem>, private val m
             else -> "$days days ago"
         }
     }
-
 }

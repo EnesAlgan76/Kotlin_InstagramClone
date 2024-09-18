@@ -1,0 +1,21 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Background color of the SeekBar -->
+    <item>
+        <shape>
+            <solid android:color="#DDDDDD" /> <!-- Light gray background -->
+        </shape>
+    </item>
+
+    <!-- Gradient for progress of the SeekBar -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <gradient
+                    android:startColor="#FF6D00"
+                android:endColor="#FFD600"
+                android:angle="270" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>

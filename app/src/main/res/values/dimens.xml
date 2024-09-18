@@ -4,4 +4,5 @@
     <dimen name="indicator_size">8dp</dimen>
     <dimen name="indicator_margin">4dp</dimen>
     <dimen name="line_width">4dp</dimen>
+    <dimen name="post_media_height">300dp</dimen>
 </resources>

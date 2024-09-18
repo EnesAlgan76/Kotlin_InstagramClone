@@ -59,11 +59,14 @@
         android:layout_width="match_parent"
         android:layout_height="300dp">
 
-        <VideoView
+        <androidx.media3.ui.PlayerView
             android:id="@+id/post_vv_postvideo"
             android:layout_width="wrap_content"
-            android:layout_height="300dp"
+            android:layout_height="match_parent"
+            app:show_timeout="2000"
             android:layout_gravity="center_vertical"
+            app:controller_layout_id="@layout/exo_player_control_view2"
+            app:show_rewind_button="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -71,7 +74,7 @@
         <ImageView
             android:id="@+id/post_iv_postimage"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="match_parent"
             android:minWidth="400dp"
             android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
