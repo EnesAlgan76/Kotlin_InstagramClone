@@ -187,6 +187,18 @@ class HomeFragment : Fragment() {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }*/
 
+    override fun onPause() {
+        super.onPause()
+        // Pause all video players when the fragment is paused
+        postAdapter.pauseAllVideos()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Stop or release all video players when the fragment is stopped
+        postAdapter.stopAllVideos()
+    }
+
 
 }
 

@@ -314,4 +314,19 @@ class PostsAdapter(
             else -> "$days days ago"
         }
     }
+
+    fun pauseAllVideos() {
+        for (i in 0 until itemCount) {
+            val holder = recyclerView.findViewHolderForAdapterPosition(i) as? PostViewHolder
+            holder?.post_vv_postvideo?.player?.pause()
+        }
+    }
+
+    // Method to stop or release all video players
+    fun stopAllVideos() {
+        for (i in 0 until itemCount) {
+            val holder = recyclerView.findViewHolderForAdapterPosition(i) as? PostViewHolder
+            holder?.post_vv_postvideo?.player?.release()
+        }
+    }
 }
