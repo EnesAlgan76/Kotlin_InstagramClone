@@ -44,7 +44,8 @@ class PostsAdapter(
     private var posts: ArrayList<HomePagePostItem>,
     private val mContext: Context,
     private val fragmentManager: FragmentManager,
-    private val recyclerView: RecyclerView
+    private val recyclerView: RecyclerView,
+    private val databaseHelper: DatabaseHelper
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val defaultImage = R.drawable.profile
@@ -223,7 +224,7 @@ class PostsAdapter(
         var debounceJob: Job? = null
         CoroutineScope(Dispatchers.Main).launch {
             val isLiked = withContext(Dispatchers.IO) {
-                DatabaseHelper().isPostLiked(userPostItem.postId.toInt())
+                databaseHelper.isPostLiked(userPostItem.postId.toInt())
             }
             holder.post_ivlike.setLiked(isLiked)
             holder.post_ivlike.onLikeStateChange { newLikeState ->
@@ -236,14 +237,14 @@ class PostsAdapter(
                 debounceJob = CoroutineScope(Dispatchers.IO).launch {
                     delay(3000)
                     if (newLikeState) {
-                        DatabaseHelper().likePost(userPostItem.postId.toInt())
-                        DatabaseHelper().addNotification(
+                        databaseHelper.likePost(userPostItem.postId.toInt())
+                        databaseHelper.addNotification(
                             userPostItem.userId,
                             "post_like",
                             userPostItem.content
                         )
                     } else {
-                        DatabaseHelper().unlikePost(userPostItem.postId.toInt())
+                        databaseHelper.unlikePost(userPostItem.postId.toInt())
                     }
                 }
             }

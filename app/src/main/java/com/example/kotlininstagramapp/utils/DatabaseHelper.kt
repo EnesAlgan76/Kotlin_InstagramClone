@@ -10,7 +10,6 @@ import com.example.kotlininstagramapp.data.api.FollowApi
 import com.example.kotlininstagramapp.data.api.LikesApi
 import com.example.kotlininstagramapp.data.api.NotificationApi
 import com.example.kotlininstagramapp.data.api.PostApi
-import com.example.kotlininstagramapp.data.api.RetrofitInstance
 import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.data.model.HomePagePostItem
 import com.example.kotlininstagramapp.data.model.NotificationModel
@@ -26,15 +25,25 @@ import kotlinx.coroutines.withContext
 import okhttp3.internal.Util
 import retrofit2.await
 import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class DatabaseHelper {
+@Singleton
+class DatabaseHelper @Inject constructor(
+    val userService: UserApi,
+    val postService: PostApi,
+    val followService: FollowApi,
+    val notificationService: NotificationApi,
+    val likesService: LikesApi,
+    val firebaseHelper: FirebaseHelper
+) {
 
-    val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
+    /*val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
     val postService = RetrofitInstance.retrofit.create(PostApi::class.java)
     val followService = RetrofitInstance.retrofit.create(FollowApi::class.java)
     val notificationService = RetrofitInstance.retrofit.create(NotificationApi::class.java)
     val likesService = RetrofitInstance.retrofit.create(LikesApi::class.java)
-    val firebaseHelper =FirebaseHelper()
+    val firebaseHelper =FirebaseHelper()*/
 
     suspend fun getUserById(userId: String): UserModel? {
         var userData: Map<String, Any>? = null
@@ -54,7 +63,7 @@ class DatabaseHelper {
         newFullName: String?,
         newUserName: String?,
         newBiography: String?,
-        newSelectedImageUri: Uri?,
+        newSelectedImageUrl: String?,
         onMessage: (message :String) -> Unit,
     ) {
         try {
@@ -63,7 +72,7 @@ class DatabaseHelper {
                 newFullName = newFullName,
                 newUserName = newUserName,
                 newBiography = newBiography,
-                newSelectedImageUri = newSelectedImageUri?.toString()
+                newSelectedImageUri = newSelectedImageUrl
             ).await()
 
             if (response.status) {
@@ -77,16 +86,16 @@ class DatabaseHelper {
                 if (newBiography != null) {
                     UserSingleton.userModel?.biography = newBiography
                 }
-                if(newSelectedImageUri != null){
-                    UserSingleton.userModel?.profilePicture = newSelectedImageUri.toString()
+                if(newSelectedImageUrl != null){
+                    UserSingleton.userModel?.profilePicture = newSelectedImageUrl
                 }
 
             } else {
-                println("Error: ${response.message}")
+                onMessage("Error: ${response.message}")
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            println("Exception: ${e.message}")
+            onMessage("Error: ${e.message}")
         }
     }
 
@@ -360,6 +369,10 @@ class DatabaseHelper {
         }catch (e:Throwable){
             Log.e("unlikePost","error : ${e.message}")
         }
+    }
+
+    suspend fun updateProfileImage(compressedImageUri: Uri?, path: String):String? {
+        return firebaseHelper.updateProfileImage(compressedImageUri,path)
     }
 
 }

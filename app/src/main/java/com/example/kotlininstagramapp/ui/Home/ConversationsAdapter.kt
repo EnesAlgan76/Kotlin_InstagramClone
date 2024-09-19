@@ -15,9 +15,15 @@ import com.example.kotlininstagramapp.Models.Conversation
 import com.example.kotlininstagramapp.Models.User
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.data.model.UserModel
+import com.example.kotlininstagramapp.utils.DatabaseHelper
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-class ConversationsAdapter(private var conversationList: ArrayList<Conversation>) :
+class ConversationsAdapter(
+    private var conversationList: ArrayList<Conversation>,
+    private val databaseHelper: DatabaseHelper
+) :
     RecyclerView.Adapter<ConversationsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -42,10 +48,10 @@ class ConversationsAdapter(private var conversationList: ArrayList<Conversation>
 
         fun bind(conversation: Conversation) {
             CoroutineScope(Dispatchers.IO).launch {
-                val user: User? = FirebaseHelper().getUserById(conversation.user_id)
+                val user: UserModel? = databaseHelper.getUserById(conversation.user_id)
                 if (user!=null){
                     withContext(Dispatchers.Main){
-                        userFullName.text = user.userFullName
+                        userFullName.text = user.fullName
                         lastMessage.text =conversation.last_message
 
                         if (!conversation.isRead){
@@ -58,15 +64,15 @@ class ConversationsAdapter(private var conversationList: ArrayList<Conversation>
                             bluePoint.visibility = View.INVISIBLE
                         }
 
-                        Glide.with(itemView.context).load(user.userDetails.profilePicture).into(userProfileImage)
+                        Glide.with(itemView.context).load(user.profilePicture).error(R.drawable.profile).into(userProfileImage)
 
                         itemView.setOnClickListener {
                             FirebaseHelper().updateConversationReadState(isRead=true,conversationId= conversation.conversation_id)
                             val intent = Intent(itemView.context, ChatActivity::class.java)
                             intent.putExtra("USER_ID",conversation.user_id)
                             intent.putExtra("CONVERSATION_ID",conversation.conversation_id)
-                            intent.putExtra("FULL_NAME",user.userFullName)
-                            intent.putExtra("PROFILE_IMAGE",user.userDetails.profilePicture)
+                            intent.putExtra("FULL_NAME",user.fullName)
+                            intent.putExtra("PROFILE_IMAGE",user.profilePicture)
                             intent.putExtra("USER_NAME",user.userName)
                             itemView.context.startActivity(intent)
                         }

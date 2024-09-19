@@ -25,7 +25,7 @@ class Post {
         fun fromMap(map: Map<String, Any>): Post {
             val userId = map["userId"] as String
             val postId = map["postId"] as Double
-            val date = map["creationDate"] as Long
+            val date = (map["creationDate"] as Double).toLong()
             val explanation = map["explanation"] as String
             val url = map["content"] as String
 

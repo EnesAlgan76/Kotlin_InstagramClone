@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kotlininstagramapp.data.api.RetrofitInstance
 import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.data.model.UserModel
 import com.example.kotlininstagramapp.data.repository.UserRepository

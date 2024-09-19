@@ -9,15 +9,20 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kotlininstagramapp.databinding.FragmentNotificationsBinding
 import com.example.kotlininstagramapp.utils.DatabaseHelper
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NotificationsFragment : Fragment() {
     private var _binding: FragmentNotificationsBinding? = null
     private val binding get() = _binding!!
     private lateinit var mContext: Context
+    @Inject
+    lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,9 +42,9 @@ class NotificationsFragment : Fragment() {
         CoroutineScope(Dispatchers.Main).launch {
             val notificationList = withContext(Dispatchers.IO) {
                 // FirebaseHelper().getNotifications()
-                DatabaseHelper().getNotifications()
+                databaseHelper.getNotifications()
             }
-            val adapter = NotificationAdapter(mContext, notificationList)
+            val adapter = NotificationAdapter(mContext, notificationList, databaseHelper)
             binding.notificationList.adapter = adapter
         }
     }

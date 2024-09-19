@@ -26,7 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class NotificationAdapter(var mContext : Context, private val notificationList: List<NotificationModel>) :
+class NotificationAdapter(var mContext : Context, private val notificationList: List<NotificationModel>,private val databaseHelper: DatabaseHelper) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -109,7 +109,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
                     deleteCard.visibility = View.INVISIBLE
                     withContext(Dispatchers.IO){
                        // FirebaseHelper().acceptFollowRequest(currentItem.userId, currentItem.id)
-                        DatabaseHelper().acceptFollowRequest(currentItem.fromUserId, currentItem.id)
+                        databaseHelper.acceptFollowRequest(currentItem.fromUserId, currentItem.id)
                       //  FirebaseHelper().deleteFollowRequestNotification(currentItem.id)
                     }
 
@@ -121,7 +121,7 @@ class NotificationAdapter(var mContext : Context, private val notificationList: 
                // FirebaseHelper().deleteFollowRequestNotification(currentItem.id)
                 CoroutineScope(Dispatchers.IO).launch{
                     try {
-                        DatabaseHelper().deleteNotification(currentItem.id.toInt())
+                        databaseHelper.deleteNotification(currentItem.id.toInt())
                     } catch (e: Exception) {
                         Log.e("SPRING deleteNotification ERROR: ",e.toString())
                     }

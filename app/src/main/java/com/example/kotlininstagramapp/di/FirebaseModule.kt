@@ -1,5 +1,6 @@
 package com.example.kotlininstagramapp.di
 
+import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
@@ -17,4 +18,6 @@ object FirebaseModule {
     fun provideFirebaseAuth(): FirebaseAuth {
         return FirebaseAuth.getInstance()
     }
+
+
 }

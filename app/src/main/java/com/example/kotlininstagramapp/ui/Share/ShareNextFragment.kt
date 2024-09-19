@@ -29,6 +29,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import dagger.hilt.android.AndroidEntryPoint
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
 import kotlinx.coroutines.CoroutineScope
@@ -39,23 +40,20 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import java.io.File
 import java.util.*
+import javax.inject.Inject
 
+
+@AndroidEntryPoint
 class ShareNextFragment : Fragment() {
     var gelenDosya: File? =null
     lateinit var image:ImageView
     lateinit var ivBack:ImageView
     lateinit var tvShare :TextView
     lateinit var explanation :TextView
-    var mAuth = FirebaseAuth.getInstance()
-    var firestore = FirebaseFirestore.getInstance()
-    //lateinit var storageReference: StorageReference
-    val postId = UUID.randomUUID()
-    var  storageReference = FirebaseStorage.getInstance().reference
-    val imageRef = storageReference.child("posts/${mAuth.currentUser?.uid}/images/${postId}")
-    val videoRef = storageReference.child("posts/${mAuth.currentUser?.uid}/videos/${postId}")
     val shareProgressDialog = ShareProgressDialog()
-
     private val uris = mutableListOf<Uri>()
+    @Inject
+    lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_share_next, container, false)
@@ -95,7 +93,7 @@ class ShareNextFragment : Fragment() {
                     else{
                         val compressedImageFile = Compressor.compress(requireContext(), gelenDosya!!) { quality(80) }
                         val compressedImageUri = Uri.fromFile(compressedImageFile)
-                        DatabaseHelper().uploadPost(
+                        databaseHelper.uploadPost(
                             compressedImageUri,
                             true,
                             explanation.text.toString(),
@@ -170,7 +168,7 @@ class ShareNextFragment : Fragment() {
                         println("BAŞARILI ---------- > ${path}")
                         CoroutineScope(Dispatchers.IO).launch {
 
-                            DatabaseHelper().uploadPost(
+                            databaseHelper.uploadPost(
                                 Uri.fromFile(File(path)),
                                 false,
                                 explanation.text.toString(),

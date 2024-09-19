@@ -1,5 +1,6 @@
 package com.example.kotlininstagramapp.Home
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -37,6 +39,9 @@ class HomeFragment : Fragment() {
     private var isLoading = false
     private val postViewModel: PostViewModel by viewModels()
     private lateinit var postAdapter: PostsAdapter
+
+    @Inject
+    lateinit var databaseHelper: DatabaseHelper
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
@@ -63,6 +68,8 @@ class HomeFragment : Fragment() {
 
         return binding.root
     }
+    
+
 
     private fun setupChatButton() {
         binding.ivChat.setOnClickListener {
@@ -70,13 +77,19 @@ class HomeFragment : Fragment() {
         }
     }
 
+    override fun onDestroy() {
+        isBottomNavInitialized = false
+        super.onDestroy()
+    }
+
 
     companion object{var isBottomNavInitialized =false}
+
     private fun setupBottomNavigation() {
+        val bottomNavigationView = requireActivity().findViewById<NSBottomNavView>(R.id.bottomNavigationView)
+        bottomNavigationView.visibility = View.VISIBLE
         if(!isBottomNavInitialized){
             isBottomNavInitialized = true
-            val bottomNavigationView = requireActivity().findViewById<NSBottomNavView>(R.id.bottomNavigationView)
-            bottomNavigationView.visibility = View.VISIBLE
             BottomNavHandler.setupBottomNavBar(bottomNavigationView, findNavController())
         }
 
@@ -99,7 +112,7 @@ class HomeFragment : Fragment() {
 
     private fun setupRecyclerView() {
         binding.rvHomeFragmentPosts.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL,false)
-        postAdapter= PostsAdapter(allPosts2,requireContext(), requireActivity().supportFragmentManager,binding.rvHomeFragmentPosts)
+        postAdapter= PostsAdapter(allPosts2,requireContext(), requireActivity().supportFragmentManager,binding.rvHomeFragmentPosts,databaseHelper)
         binding.rvHomeFragmentPosts.adapter=postAdapter
 
         loadMorePosts()

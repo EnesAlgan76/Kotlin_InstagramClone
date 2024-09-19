@@ -16,15 +16,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.Models.Conversation
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.data.api.RetrofitInstance
 import com.example.kotlininstagramapp.data.api.UserApi
+import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ConversationsFragment : Fragment() {
     private lateinit var recyclerViewConversations: RecyclerView
     private lateinit var recyclerViewUsers: RecyclerView
@@ -35,7 +38,11 @@ class ConversationsFragment : Fragment() {
     private lateinit var searchBox: EditText
     private var conversations: ArrayList<Conversation> = ArrayList()
     private lateinit var firestore: FirebaseFirestore
-    val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
+    @Inject
+    lateinit var userService: UserApi
+
+    @Inject
+    lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_messages, container, false)
@@ -50,7 +57,7 @@ class ConversationsFragment : Fragment() {
 
         recyclerViewConversations = view.findViewById(R.id.recycler_view_conversations)
         recyclerViewConversations.layoutManager = LinearLayoutManager(requireContext())
-        conversationsAdapter = ConversationsAdapter(conversations)
+        conversationsAdapter = ConversationsAdapter(conversations, databaseHelper)
         recyclerViewConversations.adapter = conversationsAdapter
 
         recyclerViewUsers = view.findViewById(R.id.recycler_view_users)

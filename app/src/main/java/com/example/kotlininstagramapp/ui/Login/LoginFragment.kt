@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.example.kotlininstagramapp.Generic.UserSingleton
-import com.example.kotlininstagramapp.data.api.RetrofitInstance
 import com.example.kotlininstagramapp.data.api.UserApi
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.FirebaseFirestore
@@ -26,6 +25,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.FragmentLoginBinding
 import com.example.kotlininstagramapp.ui.dialogs.NSCircleProgress
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -34,7 +34,8 @@ class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
     private var buttonActive: Boolean = false
     private val firestore = FirebaseFirestore.getInstance()
-    private val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
+    @Inject
+    lateinit var userService: UserApi
     private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(

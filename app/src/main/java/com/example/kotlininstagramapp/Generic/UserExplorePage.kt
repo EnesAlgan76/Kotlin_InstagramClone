@@ -12,17 +12,21 @@ import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.model.UserModel
 import com.example.kotlininstagramapp.databinding.ActivityUserDetailPageBinding
 import com.example.kotlininstagramapp.utils.DatabaseHelper
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostItemClicked {
     lateinit var followStateButton : Button
     private var userId: String? = null
     lateinit var binding : ActivityUserDetailPageBinding
     lateinit var userPostItems: List<Post>
+    @Inject
+    lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,13 +36,13 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
         CoroutineScope(Dispatchers.Main).launch{
             val user = withContext(Dispatchers.IO){
                // FirebaseHelper().getUserById(userId!!)!!
-                DatabaseHelper().getUserById(userId!!)!!
+                databaseHelper.getUserById(userId!!)!!
             }
             setUserInfos(user)
 
             val isFollowing =  withContext(Dispatchers.IO){
                 //FirebaseHelper().isUserFollowing(userId?:"")
-                DatabaseHelper().isUserFollowing(userId!!)
+                databaseHelper.isUserFollowing(userId!!)
             }
             handleFollowStateUI(isFollowing)
 
@@ -57,10 +61,10 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
                 CoroutineScope(Dispatchers.Main).launch {
                     withContext(Dispatchers.IO){
                         //FirebaseHelper().sendFollowRequest(userId!!)
-                        DatabaseHelper().sendFollowRequest(userId!!)
+                        databaseHelper.sendFollowRequest(userId!!)
                     }
                    // val isFollowed = FirebaseHelper().isUserFollowing(userId?:"") // gizli hesap değilse anında takip edilir. gizli ise isek gönderildi yazısı göster
-                    val isFollowed = DatabaseHelper().isUserFollowing(userId!!)
+                    val isFollowed = databaseHelper.isUserFollowing(userId!!)
 
                     handleFollowStateUI(isFollowed)
 
@@ -93,7 +97,7 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
     private fun showPosts(user: UserModel) {
         CoroutineScope(Dispatchers.Main).launch {
             withContext(Dispatchers.IO){
-                userPostItems = DatabaseHelper().fetchUserPosts(user.userId)
+                userPostItems = databaseHelper.fetchUserPosts(user.userId)
             }
             //setUserInfos(user)
             setRecycleView(userPostItems)
@@ -102,7 +106,7 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
     private fun setUserInfos(user: UserModel) {
 
         binding.userExploreTvUserName.setText(user.userName)
-        Glide.with(this).load(user.profilePicture).error(R.drawable.profile).placeholder(R.drawable.icon_profile).into(binding.userExploreIvProfile)
+        Glide.with(this).load(user.profilePicture).error(R.drawable.profile).placeholder(R.drawable.profile).into(binding.userExploreIvProfile)
         binding.userExploreTvName.setText(user.fullName)
         binding.userExploreTvBiograpy.setText(user.biography)
         binding.userExploreTvFollow.setText(user.followingCount.toString())

@@ -13,24 +13,28 @@ import com.example.kotlininstagramapp.Generic.UserSingleton.userModel
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.api.PostApi
-import com.example.kotlininstagramapp.data.api.RetrofitInstance
+import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.databinding.FragmentProfileBinding
 import com.example.kotlininstagramapp.utils.BottomNavHandler
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.example.kotlininstagramapp.utils.EImageLoader
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val userId = firebaseAuth.currentUser!!.uid
-    private val postService = RetrofitInstance.retrofit.create(PostApi::class.java)
+    @Inject
+    lateinit var postService: PostApi
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

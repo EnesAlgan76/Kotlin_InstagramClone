@@ -16,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.data.api.RetrofitInstance
 import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.databinding.FragmentSearchBinding
 import com.example.kotlininstagramapp.utils.BottomNavHandler
@@ -28,12 +27,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
+@AndroidEntryPoint
 class SearchFragment : Fragment() {
     lateinit var firestore: FirebaseFirestore
     lateinit var searchResultAdapter: SearchResultsAdapter
     lateinit var binding: FragmentSearchBinding
-    val userService = RetrofitInstance.retrofit.create(UserApi::class.java)
+    @Inject
+    lateinit var userService: UserApi
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = FragmentSearchBinding.inflate(inflater, container, false)

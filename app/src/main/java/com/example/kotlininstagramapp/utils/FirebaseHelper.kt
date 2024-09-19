@@ -20,7 +20,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.util.UUID
+import javax.inject.Singleton
 
+@Singleton
 class FirebaseHelper {
     private val storageReference = FirebaseStorage.getInstance()
     private val db = FirebaseFirestore.getInstance()
@@ -125,7 +127,7 @@ class FirebaseHelper {
         }
     }
 
-    private suspend fun updateProfileImage(selectedImageUri: Uri?, userName: String?) {
+    suspend fun updateProfileImage2(selectedImageUri: Uri?, userName: String?) {
         if (selectedImageUri != null) {
             val imageRef = storageReference.getReference("profileImages/$userName")
 
@@ -138,6 +140,20 @@ class FirebaseHelper {
                 // Handle error
             }
         }
+    }
+
+    suspend fun updateProfileImage(selectedImageUri: Uri?, userName: String?) : String? {
+        if (selectedImageUri != null) {
+            val imageRef = storageReference.getReference("profileImages/$userName")
+
+            try {
+                val uploadTask = imageRef.putFile(selectedImageUri).await()
+                return uploadTask.storage.downloadUrl.await().toString()
+            } catch (e: Exception) {
+                return null
+            }
+        }
+        return null
     }
 
     suspend fun publishComment(text: String, postId: String, adapter: CommentsAdapter) {
@@ -534,30 +550,23 @@ class FirebaseHelper {
             val newConversation = mapOf<String, Any>(
                 "last_message" to message,
                 "last_view" to FieldValue.serverTimestamp(),
-              //  "profile_image" to profileImage,
-              //  "user_full_name" to userFullName,
                 "user_id" to userId,
                 "is_read" to true,
-               // "user_name" to userName
             )
             currentUserDocumentRef.collection("conversations").document(newConversationDocument.id).set(newConversation).await()
 
-            val currentUserObject = getUserById(currentUser!!.uid)
 
             val newConversationForOtherUser = mapOf<String, Any>(
                 "last_message" to message,
                 "last_view" to FieldValue.serverTimestamp(),
-               // "profile_image" to currentUserObject!!.userDetails.profilePicture,
-             //   "user_full_name" to currentUserObject.userFullName,
-                "user_id" to currentUserObject!!.userId,
+                "user_id" to UserSingleton.userModel!!.userId,
                 "is_read" to false,
-              //  "user_name" to currentUserObject.userName
             )
 
             val otherUserDocumentRef = db.collection("users").document(userId)
             otherUserDocumentRef.collection("conversations").document(newConversationDocument.id).set(newConversationForOtherUser).await()
 
-            newConversationDocument.id // Return the newly created conversation ID
+            newConversationDocument.id
         } else {
             Log.e("//","Conversation already exists, only send the message")
             val conversationId = currentUserConversations.documents[0].id
