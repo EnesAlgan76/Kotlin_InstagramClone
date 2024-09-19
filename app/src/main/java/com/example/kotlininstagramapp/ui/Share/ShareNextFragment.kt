@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
 import com.abedelazizshe.lightcompressorlibrary.CompressionListener
 import com.abedelazizshe.lightcompressorlibrary.VideoCompressor
@@ -61,6 +62,10 @@ class ShareNextFragment : Fragment() {
         tvShare = view.findViewById(R.id.tv_paylas)
         explanation = view.findViewById(R.id.et_explanation)
         ivBack = view.findViewById(R.id.iv_back)
+
+        val uriString = arguments?.getString("uri")
+        val uri: Uri? = uriString?.let { Uri.parse(it) }
+        gelenDosya = uri?.toFile()
 
         gelenDosya?.let {
             if(gelenDosya!!.extension=="mp4"){
@@ -202,96 +207,6 @@ class ShareNextFragment : Fragment() {
                 },
             )
         }
-    }
-
-
-    /*private suspend fun uploadImageToStorage2(compressedMediaUri: Uri, image: Boolean) {
-        try {
-            var mediaRef :StorageReference
-            if (image){
-                mediaRef = imageRef
-            }else{
-                mediaRef = videoRef
-            }
-
-            val uploadTask = mediaRef.putFile(compressedMediaUri)
-
-
-            uploadTask.addOnProgressListener { taskSnapshot ->
-                val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
-
-                Log.e("","Progress ____>>> "+progress)
-                shareProgressDialog.tvProgress.text = "Yükleniyor : %${progress}"
-            }
-
-            uploadTask.addOnSuccessListener {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val url = mediaRef.downloadUrl.await().toString()
-                        val post = Post(
-                            UserSingleton.userModel!!.userId,
-                            0.1,
-                            System.currentTimeMillis().toString(),
-                            explanation.text.toString(),
-                            url)
-                        DatabaseHelper().uploadPost(post, ){
-
-                        }
-                        uploadPostToFirestore2(post)
-                    }
-            }
-
-
-        } catch (e: Exception) {
-            shareProgressDialog.dismiss()
-            e.printStackTrace()
-        }
-    }*/
-
-    /*
-    private suspend fun uploadPostToFirestore2(post: Post) {
-        try {
-            val userDocRef = firestore.collection("userPosts").document(post.userId)
-            val user = firestore.collection("users").document(post.userId)
-
-            val postMap = hashMapOf(
-                "date" to post.date,
-                "explanation" to post.explanation,
-                "url" to post.url,
-                "likeCount" to "0"
-            )
-
-            userDocRef.set(hashMapOf("userId" to post.userId)).await()
-          //  userDocRef.collection("posts").document(post.postId).set(postMap).await()
-            user.update("userDetails.post", FieldValue.increment(1)).addOnSuccessListener {
-                println("Post count updated")
-            }
-            shareProgressDialog.dismiss()
-            requireActivity().finish()
-
-        } catch (e: Exception) {
-            // Handle any exceptions
-            e.printStackTrace()
-        }
-    }*/
-
-
-
-
-
-    override fun onAttach(context: Context) {
-        EventBus.getDefault().register(this)
-        super.onAttach(context)
-    }
-
-
-    override fun onDetach() {
-        EventBus.getDefault().unregister(this)
-        super.onDetach()
-    }
-
-    @Subscribe(sticky = true)
-    fun onMessageEvent(event: EventBusDataEvents.SendMediaFile) {
-        gelenDosya = event.mediaFile
     }
 
     private fun getVideoThumbnail(file: File): Bitmap? {

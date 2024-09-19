@@ -98,10 +98,6 @@ class ShareCameraFragment : Fragment() {
 
     private fun goShareNextFragment(file: File?) {
 
-        EventBus.getDefault().postSticky(file?.let {
-            EventBusDataEvents.SendMediaFile(it)
-        })
-
         findNavController().navigate(R.id.shareNextFragment)
 
 

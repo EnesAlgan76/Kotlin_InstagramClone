@@ -115,6 +115,15 @@
         android:id="@+id/cameraFragment"
         android:name="com.example.kotlininstagramapp.Home.CameraFragment"
         android:label="CameraFragment" />
+    <fragment
+        android:id="@+id/shareLastFragment"
+        android:name="com.example.kotlininstagramapp.ui.Share.ShareLastFragment"
+        android:label="fragment_share_last"
+        tools:layout="@layout/fragment_share_last">
+        <argument
+            android:name="uri"
+            app:argType="string" />
+    </fragment>
 
 
 </navigation>

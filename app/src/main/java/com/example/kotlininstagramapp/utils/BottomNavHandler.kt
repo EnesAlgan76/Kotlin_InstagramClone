@@ -11,12 +11,17 @@ import com.example.kotlininstagramapp.R
 import com.example.ns.ui.NSBottomNavView
 import com.example.ns.ui.MenuItem
 import android.animation.ObjectAnimator
+import android.content.Intent
+import android.provider.MediaStore
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import androidx.core.animation.addListener
+import androidx.core.app.ActivityCompat.startActivityForResult
+import com.example.kotlininstagramapp.MainActivity.Companion.PICK_IMAGE_REQUEST_CODE
 
 class BottomNavHandler {
     companion object {
+
         fun setupBottomNavBar(
             activity: FragmentActivity,
             bottomNavView: NSBottomNavView,
@@ -112,8 +117,10 @@ class BottomNavHandler {
 
             iv_gallery.setOnClickListener {
                 hideMenu(cvmanu)
-                navController.navigate(R.id.shareGalleryFragment)
-
+                val pickIntent = Intent(Intent.ACTION_PICK)
+                pickIntent.type = "image/* video/*"
+                activity.startActivityForResult(pickIntent, PICK_IMAGE_REQUEST_CODE)
+                //navController.navigate(R.id.shareGalleryFragment)
             }
         }
 
@@ -126,6 +133,6 @@ class BottomNavHandler {
                 cvmanu.visibility = View.GONE // Make it gone after animation ends
             })
         }
-        
+
     }
 }

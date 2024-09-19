@@ -44,13 +44,13 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/")
+            .baseUrl("http://192.168.1.37:8080/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
     //http://10.0.2.2:8080/
-    //http://192.168.1.36:8080/
+    //http://192.168.1.37:8080/
 
     @Provides
     @Singleton
