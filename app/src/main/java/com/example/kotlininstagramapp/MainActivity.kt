@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.example.kotlininstagramapp.databinding.ActivityMainBinding
 import com.example.kotlininstagramapp.utils.BottomNavHandler
 import com.simform.custombottomnavigation.SSCustomBottomNavigation
 import dagger.hilt.android.AndroidEntryPoint

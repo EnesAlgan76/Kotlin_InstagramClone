@@ -1,6 +1,5 @@
 package com.example.kotlininstagramapp.Home
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,16 +16,10 @@ import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.model.HomePagePostItem
 import com.example.kotlininstagramapp.databinding.FragmentHomeBinding
 import com.example.kotlininstagramapp.ui.Home.PostViewModel
-import com.example.kotlininstagramapp.ui.Login.LoginViewModel
 import com.example.kotlininstagramapp.utils.BottomNavHandler
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.example.ns.ui.NSBottomNavView
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -90,7 +83,7 @@ class HomeFragment : Fragment() {
         bottomNavigationView.visibility = View.VISIBLE
         if(!isBottomNavInitialized){
             isBottomNavInitialized = true
-            BottomNavHandler.setupBottomNavBar(bottomNavigationView, findNavController())
+            BottomNavHandler.setupBottomNavBar(requireActivity(),bottomNavigationView, findNavController())
         }
 
 

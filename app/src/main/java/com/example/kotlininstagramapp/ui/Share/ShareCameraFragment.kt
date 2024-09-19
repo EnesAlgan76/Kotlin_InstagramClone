@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.navigation.fragment.findNavController
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.google.firebase.storage.FirebaseStorage
@@ -50,6 +51,8 @@ class ShareCameraFragment : Fragment() {
         cameraView.mapGesture(Gesture.PINCH,GestureAction.ZOOM)
         cameraView.mapGesture(Gesture.TAP,GestureAction.AUTO_FOCUS)
         cameraView.mode= Mode.PICTURE
+
+        cameraView.open()
 
         captureButton.setOnClickListener(object :View.OnClickListener{
             override fun onClick(p0: View?) {
@@ -94,22 +97,14 @@ class ShareCameraFragment : Fragment() {
     }
 
     private fun goShareNextFragment(file: File?) {
-        val flShareNextFrame = requireActivity().findViewById<FrameLayout>(R.id.fl_shareNextFrame)
-        val mainLayout = requireActivity().findViewById<ConstraintLayout>(R.id.mainLayout)
-
-        mainLayout.visibility = View.GONE
-        flShareNextFrame.visibility = View.VISIBLE
 
         EventBus.getDefault().postSticky(file?.let {
             EventBusDataEvents.SendMediaFile(it)
         })
 
-        val shareNextFragment = ShareNextFragment()
+        findNavController().navigate(R.id.shareNextFragment)
 
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.fl_shareNextFrame, shareNextFragment)
-            .addToBackStack("ShareNextFragment")
-            .commit()
+
     }
 
 

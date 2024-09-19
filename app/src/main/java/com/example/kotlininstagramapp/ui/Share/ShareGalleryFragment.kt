@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.net.toUri
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -54,23 +55,12 @@ class ShareGalleryFragment : Fragment() {
 
 
     private fun handleIleriButton() {
-        val flShareNextFrame = requireActivity().findViewById<FrameLayout>(R.id.fl_shareNextFrame)
-        val mainLayout = requireActivity().findViewById<ConstraintLayout>(R.id.mainLayout)
-
         buttonIleri.setOnClickListener {
             println("**********TIKLANDI**************")
             bigVideo.stopPlayback()
-            mainLayout.visibility = View.GONE
-            flShareNextFrame.visibility = View.VISIBLE
-
             EventBus.getDefault().postSticky(EventBusDataEvents.SendMediaFile(selectedMedia!!))
 
-            val shareNextFragment = ShareNextFragment()
-
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.fl_shareNextFrame, shareNextFragment)
-                .addToBackStack("ShareNextFragment")
-                .commit()
+            findNavController().navigate(R.id.shareNextFragment)
         }
     }
 

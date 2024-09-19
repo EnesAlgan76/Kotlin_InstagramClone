@@ -86,10 +86,7 @@
             android:id="@+id/action_profileFragment_to_settingFragment"
             app:destination="@id/settingFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/shareFragment"
-        android:name="com.example.kotlininstagramapp.ui.Share.ShareFragment"
-        android:label="ShareFragment" />
+
     <fragment
         android:id="@+id/notificationsFragment"
         android:name="com.example.kotlininstagramapp.Home.NotificationsFragment"
@@ -98,6 +95,26 @@
         android:id="@+id/conversationsFragment"
         android:name="com.example.kotlininstagramapp.Home.ConversationsFragment"
         android:label="ConversationsFragment" />
+    <fragment
+        android:id="@+id/videoFragment"
+        android:name="com.example.kotlininstagramapp.ui.Share.ShareVideoFragment"
+        android:label="CameraFragment" />
+    <fragment
+        android:id="@+id/shareCameraFragment"
+        android:name="com.example.kotlininstagramapp.ui.Share.ShareCameraFragment"
+        android:label="ShareCameraFragment" />
+    <fragment
+        android:id="@+id/shareGalleryFragment"
+        android:name="com.example.kotlininstagramapp.ui.Share.ShareGalleryFragment"
+        android:label="ShareGalleryFragment" />
+    <fragment
+        android:id="@+id/shareNextFragment"
+        android:name="com.example.kotlininstagramapp.ui.Share.ShareNextFragment"
+        android:label="ShareNextFragment" />
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.example.kotlininstagramapp.Home.CameraFragment"
+        android:label="CameraFragment" />
 
 
 </navigation>

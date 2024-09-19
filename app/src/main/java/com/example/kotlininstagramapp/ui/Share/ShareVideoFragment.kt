@@ -12,6 +12,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.navigation.fragment.findNavController
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.iammert.library.cameravideobuttonlib.CameraVideoButton
@@ -42,6 +43,7 @@ class ShareVideoFragment : Fragment() {
 
         cameraView.setLifecycleOwner(viewLifecycleOwner)
         cameraView.mode = Mode.VIDEO
+        cameraView.open()
 
         var fileName:String = System.currentTimeMillis().toString()+".mp4"
         val fileToUpload = File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DCIM), fileName)
@@ -101,22 +103,11 @@ class ShareVideoFragment : Fragment() {
     }
 
     private fun goShareNextFragmet(file: File?) {
-        val flShareNextFrame = requireActivity().findViewById<FrameLayout>(R.id.fl_shareNextFrame)
-        val mainLayout = requireActivity().findViewById<ConstraintLayout>(R.id.mainLayout)
-
-        mainLayout.visibility = View.GONE
-        flShareNextFrame.visibility = View.VISIBLE
 
         EventBus.getDefault().postSticky(file?.let {
             EventBusDataEvents.SendMediaFile(it)
         })
-
-        val shareNextFragment = ShareNextFragment()
-
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.fl_shareNextFrame, shareNextFragment)
-            .addToBackStack("ShareNextFragment")
-            .commit()
+        findNavController().navigate(R.id.shareNextFragment)
     }
 
 

@@ -7,6 +7,7 @@
     tools:context=".ui.Share.ShareCameraFragment">
     <com.otaliastudios.cameraview.CameraView
         android:id="@+id/cameraViewShareCamera"
+        android:keepScreenOn="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

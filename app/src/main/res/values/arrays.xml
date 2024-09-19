@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="colors">
+        <item>#8BC34A</item>
+        <item>#E91E63</item>
+        <item>#303030</item>
+        <!-- Add more colors if needed -->
+    </array>
+
+    <array name="icons">
+        <item>@drawable/camera_icon</item>
+        <item>@drawable/video</item>
+        <item>@drawable/add</item>
+        <!-- Add more icons if needed -->
+    </array>
+</resources>
