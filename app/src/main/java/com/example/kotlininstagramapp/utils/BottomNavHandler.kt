@@ -87,13 +87,7 @@ class BottomNavHandler {
             val iv_video = activity.findViewById<ImageView>(R.id.iv_video)
             val iv_gallery = activity.findViewById<ImageView>(R.id.iv_gallery)
             if (cvmanu.isVisible) {
-                ObjectAnimator.ofFloat(cvmanu, "alpha", 1f, 0f).apply {
-                    duration = 300 // duration of animation in milliseconds
-                    interpolator = AccelerateDecelerateInterpolator()
-                    start()
-                }.addListener(onEnd = {
-                    cvmanu.visibility = View.GONE // Make it gone after animation ends
-                })
+                hideMenu(cvmanu)
             } else {
                 cvmanu.visibility = View.VISIBLE
                 cvmanu.alpha = 0f
@@ -105,19 +99,33 @@ class BottomNavHandler {
             }
 
             iv_camera.setOnClickListener {
+                hideMenu(cvmanu)
                 navController.navigate(R.id.shareCameraFragment)
-                cvmanu.visibility = View.GONE
+
             }
 
             iv_video.setOnClickListener {
+                hideMenu(cvmanu)
                  navController.navigate(R.id.videoFragment)
-                cvmanu.visibility = View.GONE
+
             }
 
             iv_gallery.setOnClickListener {
+                hideMenu(cvmanu)
                 navController.navigate(R.id.shareGalleryFragment)
-                cvmanu.visibility = View.GONE
+
             }
         }
+
+        private fun hideMenu(cvmanu: CardView) {
+            ObjectAnimator.ofFloat(cvmanu, "alpha", 1f, 0f).apply {
+                duration = 300 // duration of animation in milliseconds
+                interpolator = AccelerateDecelerateInterpolator()
+                start()
+            }.addListener(onEnd = {
+                cvmanu.visibility = View.GONE // Make it gone after animation ends
+            })
+        }
+        
     }
 }
