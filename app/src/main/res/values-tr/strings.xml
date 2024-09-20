@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">KotlinInstagramApp</string>
+    <string name="hello_blank_fragment">Merhaba boş fragment</string>
+    <string name="title_home">Ana Sayfa</string>
+    <string name="title_search">Ara</string>
+    <string name="title_chat">Paylaş</string>
+    <string name="title_notifications">Bildirimler</string>
+    <string name="kullanici_adi">Kullanıcı Adı</string>
+    <string name="enter_name">Adınızı girin</string>
+    <string name="full_name">Tam Ad</string>
+    <string name="change_photo">Fotoğrafı Değiştir</string>
+    <string name="unsupported_file_type">Seçilen dosya türü desteklenmiyor.</string>
+    <string name="image_selection_error">Resim seçme hatası. Lütfen tekrar deneyin.</string>
+    <string name="crop_result_error">Resmi kırpma hatası. Lütfen tekrar deneyin.</string>
+    <string name="crop_error_message">Kırpma sırasında bir hata oluştu.</string>
+    <string name="error">Hata</string>
+
+    <!--  Setting Fragment -->
+    <string name="settings_title">Ayarlar</string>
+    <string name="account_settings">Hesap Ayarları</string>
+    <string name="edit_profile">Profili Düzenle</string>
+    <string name="liked_posts">Beğeniler</string>
+    <string name="change_password">Şifreyi Değiştir</string>
+    <string name="saved_posts">Kaydedilenler</string>
+    <string name="hidden_account">Gizli Hesap</string>
+    <string name="delete_search_history">Arama Geçmişini Sil</string>
+    <string name="log_out">Çıkış Yap</string>
+
+    <!--    Login  -->
+    <string name="email_label">E-POSTA</string>
+    <string name="phone_label">TELEFON</string>
+    <string name="phone_hint">Telefon</string>
+    <string name="next_button">İleri</string>
+    <string name="already_have_account">Zaten bir hesabınız var mı?</string>
+    <string name="login_label">Giriş Yap</string>
+
+    <!--    Card Post-->
+    <string name="full_name_placeholder">Tam Ad</string>
+    <string name="like_count_placeholder">beğeni</string>
+    <string name="username_placeholder">Kullanıcı Adı</string>
+    <string name="description_placeholder">Açıklama</string>
+    <string name="view_comments">Yorumları Gör</string>
+    <string name="date_placeholder">Tarih</string>
+
+    <string name="trim_video">Video Düzenle</string>
+
+
+
+</resources>

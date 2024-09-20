@@ -5,7 +5,7 @@
     android:id="@+id/cslyt"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.Profile.SettingActivity">
+    tools:context=".ui.Profile.SettingFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/profileSettingsRoot"
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="36dp"
-            android:text="Ayarlar"
+            android:text="@string/settings_title"
             android:textColor="#000000"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="38dp"
-            android:text="Hesap Ayarları"
+            android:text="@string/account_settings"
             android:textColor="#000000"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -54,10 +54,9 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="22dp"
             android:layout_marginEnd="16dp"
-            android:text="Edit Profile"
+            android:text="@string/edit_profile"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView8" />
@@ -69,10 +68,9 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="22dp"
             android:layout_marginEnd="16dp"
-            android:text="Likes"
+            android:text="@string/liked_posts"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/tv_editprofile"
             app:layout_constraintTop_toBottomOf="@+id/tv_editprofile" />
@@ -84,10 +82,9 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="22dp"
             android:layout_marginEnd="16dp"
-            android:text="Şifreni Değiştir"
+            android:text="@string/change_password"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/tv_likedPosts"
             app:layout_constraintTop_toBottomOf="@+id/tv_likedPosts" />
@@ -99,10 +96,9 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="22dp"
             android:layout_marginEnd="16dp"
-            android:text="Kaydedilenler"
+            android:text="@string/saved_posts"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/tv_changePassword"
             app:layout_constraintTop_toBottomOf="@+id/tv_changePassword" />
@@ -113,10 +109,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="22dp"
-            android:text="Gizli Hesap"
+            android:text="@string/hidden_account"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="normal"
             app:layout_constraintEnd_toStartOf="@+id/switch1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_savedPosts" />
@@ -127,7 +122,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="51dp"
-            android:text="Arama Geçmişini Sil"
+            android:text="@string/delete_search_history"
             android:textColor="#03A9F4"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -139,13 +134,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Çıkış Yap"
+            android:text="@string/log_out"
             android:textColor="#03A9F4"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/tv_deleteSearchData"
             app:layout_constraintTop_toBottomOf="@+id/tv_deleteSearchData" />
-
 
         <Switch
             android:id="@+id/switch1"
@@ -157,7 +151,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tv_hiddenAccount" />
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
@@ -165,9 +158,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </FrameLayout>
-
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

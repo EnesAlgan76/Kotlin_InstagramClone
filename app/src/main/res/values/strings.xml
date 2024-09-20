@@ -1,13 +1,45 @@
 <resources>
     <string name="app_name">KotlinInstagramApp</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_home">Home</string>
-    <string name="title_search">Search\n</string>
+    <string name="title_search">Search</string>
     <string name="title_chat">Share</string>
     <string name="title_notifications">Notifications</string>
-    <string name="kullanici_adi">Kullanıcı Adı</string>
-    <string name="enter_name">Adınızı girin</string>
-    <string name="full_name">Tam Ad</string>
-    <string name="change_photo">Fotoğrafı Değiştir</string>
+    <string name="kullanici_adi">Username</string>
+    <string name="enter_name">Enter your name</string>
+    <string name="full_name">Full Name</string>
+    <string name="change_photo">Change Photo</string>
+    <string name="unsupported_file_type">Unsupported file type selected.</string>
+    <string name="image_selection_error">Error selecting image. Please try again.</string>
+    <string name="crop_result_error">Error cropping image. Please try again.</string>
+    <string name="crop_error_message">An error occurred during cropping.</string>
+    <string name="error">Error</string>
+
+    <!--  Setting Fragment -->
+    <string name="settings_title">Settings</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="liked_posts">Likes</string>
+    <string name="change_password">Change Password</string>
+    <string name="saved_posts">Saved Posts</string>
+    <string name="hidden_account">Hidden Account</string>
+    <string name="delete_search_history">Delete Search History</string>
+    <string name="log_out">Log Out</string>
+
+    <!--    Login -->
+    <string name="email_label">EMAIL</string>
+    <string name="phone_label">PHONE</string>
+    <string name="phone_hint">Phone</string>
+    <string name="next_button">Next</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="login_label">Login</string>
+
+    <!--    Card Post-->
+    <string name="full_name_placeholder">Full Name</string>
+    <string name="like_count_placeholder">likes</string>
+    <string name="username_placeholder">Username</string>
+    <string name="description_placeholder">Description</string>
+    <string name="view_comments">View Comments</string>
+    <string name="date_placeholder">Date Ago</string>
+    <string name="trim_video">Trim Video</string>
 </resources>

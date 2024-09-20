@@ -1,6 +1,5 @@
 package com.example.kotlininstagramapp.ui.Share
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.Uri
@@ -13,6 +12,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import com.abedelazizshe.lightcompressorlibrary.CompressionListener
 import com.abedelazizshe.lightcompressorlibrary.VideoCompressor
 import com.abedelazizshe.lightcompressorlibrary.VideoQuality
@@ -21,26 +22,15 @@ import com.abedelazizshe.lightcompressorlibrary.config.SaveLocation
 import com.abedelazizshe.lightcompressorlibrary.config.SharedStorageConfiguration
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserSingleton
-import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.DatabaseHelper
-import com.example.kotlininstagramapp.utils.EventBusDataEvents
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import dagger.hilt.android.AndroidEntryPoint
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 
@@ -65,11 +55,20 @@ class ShareNextFragment : Fragment() {
 
         val uriString = arguments?.getString("uri")
         val uri: Uri? = uriString?.let { Uri.parse(it) }
-        gelenDosya = uri?.toFile()
+
+        val gelenDosya = if (uri != null) {
+            if (uri.scheme == "file") {
+                uri.toFile()
+            } else {
+                File(uri.path)
+            }
+        }else{
+            null
+        }
+
 
         gelenDosya?.let {
-            if(gelenDosya!!.extension=="mp4"){
-               // Picasso.get().load(getVideoThumbnail(it)).into(image)
+            if(gelenDosya.extension=="mp4"){
                 Glide.with(view.context).load(getVideoThumbnail(it)).into(image)
                 uris.add(Uri.fromFile(gelenDosya))
             }else{
@@ -108,7 +107,7 @@ class ShareNextFragment : Fragment() {
                             },
                             onSuccess = {
                                 shareProgressDialog.dismiss()
-                                requireActivity().finish()
+                                navigateHomeFragment()
                                 UserSingleton.userModel!!.postCount +=1
                                 Log.e("SUCCESS",it)
                             },
@@ -132,6 +131,15 @@ class ShareNextFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun navigateHomeFragment() {
+        val navOptions = NavOptions.Builder()
+            .setEnterAnim(R.anim.enter_from_left)
+            .setExitAnim(0)
+            .build()
+
+        findNavController().navigate(R.id.homeFragment, null, navOptions)
     }
 
     private fun processVideo() {
@@ -184,7 +192,8 @@ class ShareNextFragment : Fragment() {
                                 },
                                 onSuccess = {
                                     shareProgressDialog.dismiss()
-                                    requireActivity().finish()
+                                    navigateHomeFragment()
+
                                     UserSingleton.userModel!!.postCount +=1
                                     Log.e("SUCCESS",it)
                                 },
