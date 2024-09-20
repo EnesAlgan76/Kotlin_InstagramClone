@@ -1,10 +1,13 @@
 package com.example.kotlininstagramapp.di
 
+import android.app.Application
+import android.content.Context
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.data.api.FollowApi
 import com.example.kotlininstagramapp.data.api.LikesApi
 import com.example.kotlininstagramapp.data.api.NotificationApi
 import com.example.kotlininstagramapp.data.api.PostApi
+import com.example.kotlininstagramapp.data.api.StoryApi
 import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import dagger.Module
@@ -21,12 +24,17 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideApplicationContext(app: Application): Context = app.applicationContext
+
+    @Provides
+    @Singleton
     fun provideDatabaseHelper(
         userService: UserApi,
         postService: PostApi,
         followService: FollowApi,
         notificationService: NotificationApi,
         likesService: LikesApi,
+        storyService: StoryApi,
         firebaseHelper: FirebaseHelper
     ): DatabaseHelper {
         return DatabaseHelper(
@@ -35,6 +43,7 @@ object NetworkModule {
             followService,
             notificationService,
             likesService,
+            storyService,
             firebaseHelper
         )
     }
@@ -91,5 +100,11 @@ object NetworkModule {
     @Singleton
     fun provideLikesService(retrofit: Retrofit): LikesApi {
         return retrofit.create(LikesApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideStoryApi(retrofit: Retrofit): StoryApi {
+        return retrofit.create(StoryApi::class.java)
     }
 }

@@ -2,15 +2,21 @@ package com.example.kotlininstagramapp.ui.Story
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.FragmentActivity
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserSingleton
+import com.example.kotlininstagramapp.Home.HomeFragment
 import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.model.UserModel
@@ -19,7 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class StoryAdapter(private val context: Context, private var data: List<Story>) :
+class StoryAdapter(private val context: HomeFragment, private var data: List<Story>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val VIEW_TYPE_CURRENT_USER = 0
@@ -30,11 +36,11 @@ class StoryAdapter(private val context: Context, private var data: List<Story>) 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_CURRENT_USER -> {
-                val currentUserView = LayoutInflater.from(context).inflate(R.layout.item_story_current_user, parent, false)
+                val currentUserView = LayoutInflater.from(context.context).inflate(R.layout.item_story_current_user, parent, false)
                 CurrentUserViewHolder(currentUserView)
             }
             VIEW_TYPE_FOLLOWED_USER -> {
-                val followedUserView = LayoutInflater.from(context).inflate(R.layout.item_story, parent, false)
+                val followedUserView = LayoutInflater.from(context.context).inflate(R.layout.item_story, parent, false)
                 FollowedUserViewHolder(followedUserView)
             }
             else -> throw IllegalArgumentException("Invalid view type")
@@ -50,7 +56,7 @@ class StoryAdapter(private val context: Context, private var data: List<Story>) 
             is FollowedUserViewHolder -> {
                 // Adjust position for the current user item
                 val story = data[position - 1]
-                val imageUrl = story.userProfilePicture
+                val imageUrl = story.profilePicture
                 holder.bind(position,story)
             }
         }
@@ -79,11 +85,16 @@ class StoryAdapter(private val context: Context, private var data: List<Story>) 
         val tv_storyCurrentUser: TextView = itemView.findViewById(R.id.tv_storyCurrentUser)
         fun handleClick(position: Int) {
             iv_storyCurrentUser.setOnClickListener {
-                val intent = Intent(context, StoryActivity::class.java)
-                intent.putExtra("isCurrentUser",true)
-                intent.putExtra("position",position)
-                context.startActivity(intent)
-                Toast.makeText(context, "Current User Clicked. position : ${position}", Toast.LENGTH_SHORT).show()
+
+                val bundle = Bundle().apply {
+                    putBoolean("isCurrentUser", true)
+                    putInt("position", position)  }
+
+
+                val navController = context.findNavController()
+                navController.navigate(R.id.storyFragment, bundle)
+
+                //Toast.makeText(context, "Current User Clicked. position : ${position}", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -112,15 +123,17 @@ class StoryAdapter(private val context: Context, private var data: List<Story>) 
 
         fun bind(position: Int, story: Story) {
             iv_storyFollowedUser.setOnClickListener {
-                val intent = Intent(context, StoryActivity::class.java)
-                intent.putExtra("isCurrentUser",false)
-                intent.putExtra("position",position)
-                context.startActivity(intent)
-                Toast.makeText(context, "Tıklandı. position ${position}", Toast.LENGTH_SHORT).show()
+                val bundle = Bundle().apply {
+                    putBoolean("isCurrentUser", false)
+                    putInt("position", position)  }
+
+
+                val navController = context.findNavController()
+                navController.navigate(R.id.storyFragment, bundle)
             }
 
-            Glide.with(context).load(story.userProfilePicture).into(iv_storyFollowedUser)
-            tv_storyFollowedUser.setText(story.userName)
+            Glide.with(context).load(story.profilePicture).into(iv_storyFollowedUser)
+            tv_storyFollowedUser.setText(story.username)
         }
     }
 }

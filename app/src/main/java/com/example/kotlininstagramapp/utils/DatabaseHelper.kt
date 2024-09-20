@@ -1,15 +1,18 @@
 package com.example.kotlininstagramapp.utils
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Models.Post
+import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.data.api.BaseResponse
 import com.example.kotlininstagramapp.data.api.FollowApi
 import com.example.kotlininstagramapp.data.api.LikesApi
 import com.example.kotlininstagramapp.data.api.NotificationApi
 import com.example.kotlininstagramapp.data.api.PostApi
+import com.example.kotlininstagramapp.data.api.StoryApi
 import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.data.model.HomePagePostItem
 import com.example.kotlininstagramapp.data.model.NotificationModel
@@ -24,6 +27,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import okhttp3.internal.Util
 import retrofit2.await
+import java.io.File
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,6 +39,7 @@ class DatabaseHelper @Inject constructor(
     val followService: FollowApi,
     val notificationService: NotificationApi,
     val likesService: LikesApi,
+    val storyApi: StoryApi,
     val firebaseHelper: FirebaseHelper
 ) {
 
@@ -373,6 +378,30 @@ class DatabaseHelper @Inject constructor(
 
     suspend fun updateProfileImage(compressedImageUri: Uri?, path: String):String? {
         return firebaseHelper.updateProfileImage(compressedImageUri,path)
+    }
+
+    suspend fun addStory(gelenDosya: File, status: (String) -> Unit, progress: (Int) ->Unit) {
+        val url = firebaseHelper.addStoryToStorage(gelenDosya) {
+            progress.invoke(it)
+        }
+        val userId = UserSingleton.userModel?.userId
+        val response: BaseResponse =
+            storyApi.addStory(userId!!, url, System.currentTimeMillis()).await()
+        status.invoke(response.message)
+    }
+
+    suspend fun getFollowedUsersStories(): List<Story> {
+        val response :BaseResponse = storyApi.getUserStories(UserSingleton.userModel!!.userId).await()
+        if (response.status){
+            val storyList = response.data as? List<Map<String, Any>> ?: return listOf()
+
+            return storyList.map { Story.fromMap(it) }
+
+        }else{
+            Log.e("getFollowedUsersStories", response.message)
+            return listOf()
+        }
+
     }
 
 }

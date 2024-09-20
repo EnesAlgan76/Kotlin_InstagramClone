@@ -17,8 +17,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.kotlininstagramapp.R
-import com.example.kotlininstagramapp.ui.Story.StoryReviewActivity
 import com.example.kotlininstagramapp.utils.EventBusDataEvents
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraView
@@ -75,10 +75,11 @@ class CameraFragment : Fragment() {
                     result.toFile(file, object : FileCallback {
                         override fun onFileReady(file: File?) {
                             file?.let {
+                                val bundle = Bundle().apply {
+                                    putString("FILE_PATH", file.absolutePath)
+                                }
 
-                                val intent = Intent(activity, StoryReviewActivity::class.java)
-                                intent.putExtra("FILE_PATH", file.absolutePath)
-                                startActivity(intent)
+                                findNavController().navigate(R.id.storyReviewFragment, bundle)
 
                             } ?: run {
                                 Log.e("*********", "File is null")

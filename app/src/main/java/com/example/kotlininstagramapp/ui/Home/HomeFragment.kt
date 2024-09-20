@@ -105,7 +105,7 @@ class HomeFragment : Fragment() {
 
     private fun setupRecyclerView() {
         binding.rvHomeFragmentPosts.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL,false)
-        postAdapter= PostsAdapter(allPosts2,requireContext(), requireActivity().supportFragmentManager,binding.rvHomeFragmentPosts,databaseHelper)
+        postAdapter= PostsAdapter(allPosts2,this, requireActivity().supportFragmentManager,binding.rvHomeFragmentPosts,databaseHelper)
         binding.rvHomeFragmentPosts.adapter=postAdapter
 
         loadMorePosts()

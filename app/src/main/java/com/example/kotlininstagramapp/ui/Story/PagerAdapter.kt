@@ -37,13 +37,13 @@ class PagerAdapter(private var pages: List<Story>, private val context: Context)
 
         val page = pages[position]
 
-        println("şimdiki story : ${page.userName}, ${page.stories[0].url}")
+        println("şimdiki story : ${page.username}, ${page.stories[0].storyImage}")
 
 
 
-        Glide.with(context).load(page.stories[0].url).into(imageView)
-        Glide.with(context).load(page.userProfilePicture).into(profileImage)
-        username.text = page.userName
+        Glide.with(context).load(page.stories[0].storyImage).into(imageView)
+        Glide.with(context).load(page.profilePicture).into(profileImage)
+        username.text = page.username
 
         var currentImageIndex = 0
 
@@ -61,7 +61,7 @@ class PagerAdapter(private var pages: List<Story>, private val context: Context)
                         // Left side tap show previous image 5 3 2
                         currentImageIndex = (currentImageIndex - 1 + page.stories.size) % page.stories.size
                     }
-                    Glide.with(context).load(page.stories[currentImageIndex].url).into(imageView)
+                    Glide.with(context).load(page.stories[currentImageIndex].storyImage).into(imageView)
                     updateIndicatorColor(indicatorLayout, currentImageIndex, page.stories.size)
                 }
             }

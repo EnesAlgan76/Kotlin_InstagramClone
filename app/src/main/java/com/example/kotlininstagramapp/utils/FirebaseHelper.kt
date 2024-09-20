@@ -20,10 +20,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.util.UUID
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FirebaseHelper {
+class FirebaseHelper @Inject constructor() {
     private val storageReference = FirebaseStorage.getInstance()
     private val db = FirebaseFirestore.getInstance()
     val commentCollection =db.collection("comments")
@@ -420,7 +421,7 @@ class FirebaseHelper {
         return snapshot.exists()
     }
 
-    suspend fun getFollowedUsersStories(): List<Story> {
+   /* suspend fun getFollowedUsersStories(): List<Story> {
         val followedUsers = currentUserDocumentRef.collection("follows").get().await()
 
         val followedUserIds = followedUsers.documents.map { it.id }
@@ -459,7 +460,7 @@ class FirebaseHelper {
 
 
         return stories
-    }
+    }*/
 
 
     fun getConversations(
@@ -656,7 +657,7 @@ class FirebaseHelper {
         }
     }
 
-    suspend fun uploadStory(context: Context, gelenDosya: File, onUploadedSuccesfully: () -> Unit,) {
+    /*suspend fun uploadStory(context: Context, gelenDosya: File, onUploadedSuccesfully: () -> Unit,) {
         val storyId = UUID.randomUUID().toString()
         val imageRef = storageReference.reference.child("stories/${UserSingleton.userModel?.userId}/images/${storyId}")
         val user = UserSingleton.userModel!!
@@ -696,6 +697,31 @@ class FirebaseHelper {
         }
 
 
+    }*/
+
+    suspend fun addStoryToStorage(gelenDosya: File, resultProgress: (Int) -> Unit): String {
+        val storyId = UUID.randomUUID().toString()
+        val imageRef = storageReference.reference.child("stories/${UserSingleton.userModel?.userId}/images/$storyId")
+
+        val compressedImageUri = Uri.fromFile(gelenDosya)
+
+
+        val uploadTask = imageRef.putFile(compressedImageUri)
+
+
+        uploadTask.addOnProgressListener { taskSnapshot ->
+            val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount).toInt()
+            resultProgress.invoke(progress)
+        }
+
+        val url = uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                throw task.exception ?: Exception("Upload task failed")
+            }
+            imageRef.downloadUrl
+        }.await().toString()
+
+        return url
     }
 
 

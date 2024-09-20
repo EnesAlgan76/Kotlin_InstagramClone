@@ -1,6 +1,5 @@
 package com.example.kotlininstagramapp.Home
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Handler
@@ -21,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserExplorePage
 import com.example.kotlininstagramapp.Models.Story
-import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.model.HomePagePostItem
 import com.example.kotlininstagramapp.ui.Story.StoryAdapter
@@ -42,7 +40,7 @@ import java.util.concurrent.TimeUnit
 
 class PostsAdapter(
     private var posts: ArrayList<HomePagePostItem>,
-    private val mContext: Context,
+    private val fragment: HomeFragment,
     private val fragmentManager: FragmentManager,
     private val recyclerView: RecyclerView,
     private val databaseHelper: DatabaseHelper
@@ -147,15 +145,15 @@ class PostsAdapter(
                     }
 
                     fullNameTextView.setOnClickListener {
-                        val intent = Intent(mContext, UserExplorePage::class.java).apply {
+                        val intent = Intent(fragment.context, UserExplorePage::class.java).apply {
                             putExtra("USER_ID", userPostItem.userId)
                         }
-                        mContext.startActivity(intent)
+                        fragment.startActivity(intent)
                     }
 
                     setupLikeButton(this, userPostItem)
 
-                    Glide.with(mContext)
+                    Glide.with(fragment)
                         .load(userPostItem.userProfileImage)
                         .placeholder(defaultImage)
                         .error(defaultImage)
@@ -176,7 +174,7 @@ class PostsAdapter(
             holder.post_vv_postvideo.visibility = View.VISIBLE
             holder.post_iv_postimage.visibility = View.GONE
 
-            val player = ExoPlayer.Builder(mContext).build()
+            val player = ExoPlayer.Builder(fragment.requireContext()).build()
             holder.post_vv_postvideo.player = player
             val uri = Uri.parse(userPostItem.content)
             player.setMediaItem(MediaItem.fromUri(uri))
@@ -216,7 +214,7 @@ class PostsAdapter(
         } else {
             holder.post_vv_postvideo.visibility = View.GONE
             holder.post_iv_postimage.visibility = View.VISIBLE
-            Glide.with(mContext).load(userPostItem.content).into(holder.post_iv_postimage)
+            Glide.with(fragment).load(userPostItem.content).into(holder.post_iv_postimage)
         }
     }
 
@@ -269,7 +267,7 @@ class PostsAdapter(
 
     inner class StoriesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val horizontalRecyclerView: RecyclerView = itemView.findViewById(R.id.rv_homeFragmentStories)
-        private val horizontalAdapter = StoryAdapter(mContext, listOf())
+        private val horizontalAdapter = StoryAdapter(fragment, listOf())
 
         init {
             horizontalRecyclerView.adapter = horizontalAdapter
@@ -278,7 +276,8 @@ class PostsAdapter(
 
         fun bind() {
             CoroutineScope(Dispatchers.IO).launch {
-                val stories: List<Story> = FirebaseHelper().getFollowedUsersStories()
+               // val stories2: List<Story> = FirebaseHelper().getFollowedUsersStories()
+                val stories: List<Story> = databaseHelper.getFollowedUsersStories()
                 withContext(Dispatchers.Main) {
                     horizontalAdapter.setData(stories)
                     EventBus.getDefault().postSticky(EventBusDataEvents.SendStories(stories))
