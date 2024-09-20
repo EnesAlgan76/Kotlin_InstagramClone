@@ -3,17 +3,17 @@ package com.example.kotlininstagramapp.Models
 import java.sql.Timestamp
 
 class Story(
-    var userId: String,
-    var userName: String,
-    var userProfilePicture: String,
-    val stories: MutableList<SingleStory> = mutableListOf()
+    val username: String,
+    val fullName: String,
+    val profilePicture: String,
+    val stories: List<SingleStory>
 )
 
 
 class SingleStory (
-    var storyId: String,
-    var url: String,
-    val timestamp: com.google.firebase.Timestamp,
+    val storyId: Int,
+    val storyImage: String,
+    val creationDate: Long
 )
 
 
