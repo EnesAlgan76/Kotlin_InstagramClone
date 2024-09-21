@@ -57,12 +57,12 @@ class ConversationsFragment : Fragment() {
 
         recyclerViewConversations = view.findViewById(R.id.recycler_view_conversations)
         recyclerViewConversations.layoutManager = LinearLayoutManager(requireContext())
-        conversationsAdapter = ConversationsAdapter(conversations, databaseHelper)
+        conversationsAdapter = ConversationsAdapter(this,conversations, databaseHelper)
         recyclerViewConversations.adapter = conversationsAdapter
 
         recyclerViewUsers = view.findViewById(R.id.recycler_view_users)
         recyclerViewUsers.layoutManager = LinearLayoutManager(requireContext())
-        conversationsSearchResultsAdapter = ConversationsSearchResultsAdapter(requireContext())
+        conversationsSearchResultsAdapter = ConversationsSearchResultsAdapter(this)
         recyclerViewUsers.adapter = conversationsSearchResultsAdapter
 
         searchBox = view.findViewById(R.id.searchBox)

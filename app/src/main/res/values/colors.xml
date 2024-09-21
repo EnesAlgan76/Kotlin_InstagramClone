@@ -14,7 +14,19 @@
     <color name="purple">#9C27B0</color>
     <color name="nscolorPrimary">#0079E5</color>
     <color name="nscolorSecondary">#02E8BF</color>
+    <color name="nsGray">#e8f3f1</color>
     <color name="transparent">#00FFFFFF</color>
+
+    <color name="buttonPrimaryBackground">#0079E5</color>
+    <color name="buttonPrimaryText">#FFFFFF</color>
+
+    <color name="buttonSecondaryBackground">#02E8BF</color>
+    <color name="buttonSecondaryText">#000000</color>
+
+    <color name="editTextFocusedBorder">#0079E5</color>
+    <color name="editTextFocusedBackground">#F0F8FF</color>
+    <color name="editTextDefaultBorder">#CCCCCC</color>
+    <color name="editTextDefaultBackground">#FFFFFF</color>
 
     <color name="blackwith_opacity">#A6000000</color>
     <color name="selected_line_color">#FFFFFFFF</color>

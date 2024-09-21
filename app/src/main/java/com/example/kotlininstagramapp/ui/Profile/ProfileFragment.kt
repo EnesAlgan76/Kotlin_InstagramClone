@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.OnSinglePostItemClicked
 import com.example.kotlininstagramapp.Generic.UserSingleton.userModel
 import com.example.kotlininstagramapp.Models.Post
@@ -66,6 +67,7 @@ class ProfileFragment : Fragment(), OnSinglePostItemClicked {
         } catch (e: java.lang.Error) {
             Log.e("------------", "Resim Bulunamadı")
         }
+        Glide.with(requireContext()).load(userModel?.profilePicture).error(R.drawable.profile).into(binding.ivProfileBig)
 
         EventBus.getDefault().postSticky(
             EventBusDataEvents.KullaniciBilgileriGonder(

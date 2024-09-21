@@ -2,11 +2,13 @@ package com.example.kotlininstagramapp.Home
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserExplorePage
@@ -20,10 +22,10 @@ import kotlinx.coroutines.tasks.await
 import org.greenrobot.eventbus.EventBus
 
 
-class ConversationsSearchResultsAdapter(context: Context) : RecyclerView.Adapter<ConversationsSearchResultsAdapter.UserViewHolder>() {
+class ConversationsSearchResultsAdapter(var fragment: ConversationsFragment) : RecyclerView.Adapter<ConversationsSearchResultsAdapter.UserViewHolder>() {
 
     private var userList: List<Map<String, String>> = listOf()
-    val mContext =context
+    val mContext =fragment.requireContext()
 
 
 
@@ -74,14 +76,16 @@ class ConversationsSearchResultsAdapter(context: Context) : RecyclerView.Adapter
                         val conversation_id: String = FirebaseHelper().getConversationId(userId= userId!!)
 
                         withContext(Dispatchers.Main){
-                            val intent = Intent(itemView.context, ChatActivity::class.java)
-                            intent.putExtra("USER_ID",userId)
-                            intent.putExtra("FULL_NAME",user["userFullName"])
-                            intent.putExtra("PROFILE_IMAGE",user["userProfileImage"])
-                            intent.putExtra("USER_NAME",user["userName"])
-                            intent.putExtra("USER_NAME",user["userName"])
-                            intent.putExtra("CONVERSATION_ID",conversation_id)
-                            itemView.context.startActivity(intent)
+                            val bundle = Bundle().apply {
+                                putString("USER_ID",userId)
+                                putString("FULL_NAME",user["userFullName"])
+                                putString("PROFILE_IMAGE",user["userProfileImage"])
+                                putString("USER_NAME",user["userName"])
+                                putString("USER_NAME",user["userName"])
+                                putString("CONVERSATION_ID",conversation_id)
+                            }
+
+                            fragment.findNavController().navigate(R.id.chatFragment, bundle)
                         }
 
 

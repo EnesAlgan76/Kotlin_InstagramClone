@@ -152,6 +152,10 @@
         android:name="com.example.kotlininstagramapp.Home.SinglePostFragment"
         android:label="SinglePostFragment"
         tools:layout="@layout/fragment_single_post" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.kotlininstagramapp.Home.ChatFragment"
+        android:label="ChatFragment" />
 
 
 </navigation>

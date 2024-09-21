@@ -5,22 +5,26 @@
     android:layout_height="match_parent">
 
     <View
+        android:id="@+id/view5"
+        android:layout_width="match_parent"
+        android:layout_height="0dp
+"
+        android:background="@drawable/gradient_background"
+        app:layout_constraintBottom_toBottomOf="@+id/view4"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <View
+        android:id="@+id/view4"
         android:layout_width="match_parent"
         android:layout_height="00dp"
-        android:background="@drawable/gradient_background"
-        app:layout_constraintBottom_toBottomOf="@+id/view"
+        android:background="@drawable/gradient_transparent_white"
+        app:layout_constraintBottom_toBottomOf="@+id/scrollView2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
         tools:layout_editor_absoluteX="16dp" />
 
-    <View
-        android:id="@+id/view"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        app:layout_constraintBottom_toTopOf="@+id/tv_changePhoto"
-        app:layout_constraintEnd_toEndOf="@+id/iv_profile"
-        app:layout_constraintStart_toStartOf="@+id/iv_profile"
-        app:layout_constraintTop_toBottomOf="@+id/tabBar" />
+
 
 
     <LinearLayout
@@ -58,8 +62,8 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/iv_profile"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_gravity="center_horizontal"
         android:src="@drawable/profile"
         app:civ_border_color="#000"
@@ -86,9 +90,11 @@
 
     <!-- Ana ekran -->
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tabBar"
+        android:background="@color/transparent"
         android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@+id/tv_changePhoto">
 
@@ -104,6 +110,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="16dp"
+                android:layout_marginBottom="4dp"
                 android:text="@string/full_name"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
@@ -112,9 +119,10 @@
                 android:id="@+id/fullNameTextField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:hint="@string/enter_name"
                 app:cornerRadius="12dp"
-                app:edgeColor="@color/black"
+                app:edgeColor="@color/editTextDefaultBorder"
                 app:edgeWidth="1dp" />
 
 
@@ -122,6 +130,7 @@
                 android:id="@+id/textView13"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:paddingTop="18dp"
                 android:text="@string/kullanici_adi"
                 android:textColor="@color/black"
@@ -132,8 +141,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/kullanici_adi"
+                android:paddingLeft="8dp"
                 app:cornerRadius="12dp"
-                app:edgeColor="@color/black"
+                app:edgeColor="@color/editTextDefaultBorder"
                 app:edgeWidth="1dp" />
 
 
@@ -142,7 +152,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="18dp"
-                android:text="Biyografi"
+                android:text="@string/biography"
+                android:layout_marginBottom="4dp"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -150,18 +161,19 @@
                 android:id="@+id/et_biografi"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Biyografi"
+                android:hint="@string/biography"
+                android:paddingLeft="8dp"
                 app:cornerRadius="12dp"
-                app:edgeColor="@color/black"
+                app:edgeColor="@color/editTextDefaultBorder"
                 app:edgeWidth="1dp" />
-
 
             <TextView
                 android:id="@+id/textView15"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="18dp"
-                android:text="İnternet Sitesi"
+                android:text="@string/website"
+                android:layout_marginBottom="4dp"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -169,10 +181,12 @@
                 android:id="@+id/et_site"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="İnternet Sitesi"
+                android:hint="@string/empty"
+                android:paddingLeft="8dp"
                 app:cornerRadius="12dp"
-                app:edgeColor="@color/black"
+                app:edgeColor="@color/editTextDefaultBorder"
                 app:edgeWidth="1dp" />
+
 
 
         </LinearLayout>

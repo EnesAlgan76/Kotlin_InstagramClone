@@ -2,6 +2,7 @@ package com.example.kotlininstagramapp.Home
 
 import android.content.Intent
 import android.graphics.Color
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Conversation
@@ -21,6 +23,7 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class ConversationsAdapter(
+    private val fragment: ConversationsFragment,
     private var conversationList: ArrayList<Conversation>,
     private val databaseHelper: DatabaseHelper
 ) :
@@ -68,13 +71,17 @@ class ConversationsAdapter(
 
                         itemView.setOnClickListener {
                             FirebaseHelper().updateConversationReadState(isRead=true,conversationId= conversation.conversation_id)
-                            val intent = Intent(itemView.context, ChatActivity::class.java)
-                            intent.putExtra("USER_ID",conversation.user_id)
-                            intent.putExtra("CONVERSATION_ID",conversation.conversation_id)
-                            intent.putExtra("FULL_NAME",user.fullName)
-                            intent.putExtra("PROFILE_IMAGE",user.profilePicture)
-                            intent.putExtra("USER_NAME",user.userName)
-                            itemView.context.startActivity(intent)
+
+                            val bundle = Bundle().apply {
+                                putString("USER_ID", conversation.user_id)
+                                putString("CONVERSATION_ID", conversation.conversation_id)
+                                putString("FULL_NAME", user.fullName)
+                                putString("PROFILE_IMAGE", user.profilePicture)
+                                putString("USER_NAME", user.userName)
+                            }
+
+                            fragment.findNavController().navigate(R.id.chatFragment, bundle)
+
                         }
                     }
 

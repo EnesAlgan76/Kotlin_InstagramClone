@@ -102,6 +102,10 @@ class UserExplorePage : Fragment(), FollowStateUIHandler, OnSinglePostItemClicke
             .error(R.drawable.profile)
             .placeholder(R.drawable.profile)
             .into(binding.userExploreIvProfile)
+        Glide.with(this).load(user.profilePicture)
+            .error(R.drawable.profile)
+            .placeholder(R.drawable.profile)
+            .into(binding.userExploreIvProfileBig)
         binding.userExploreTvName.text = user.fullName
         binding.userExploreTvBiograpy.text = user.biography
         binding.userExploreTvFollow.text = user.followingCount.toString()

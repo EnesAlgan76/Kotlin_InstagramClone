@@ -14,6 +14,7 @@
     <string name="crop_result_error">Resmi kırpma hatası. Lütfen tekrar deneyin.</string>
     <string name="crop_error_message">Kırpma sırasında bir hata oluştu.</string>
     <string name="error">Hata</string>
+    <string name="empty">boş</string>
 
     <!--  Setting Fragment -->
     <string name="settings_title">Ayarlar</string>
@@ -25,6 +26,8 @@
     <string name="hidden_account">Gizli Hesap</string>
     <string name="delete_search_history">Arama Geçmişini Sil</string>
     <string name="log_out">Çıkış Yap</string>
+    <string name="biography">Biyografi</string>
+    <string name="website">İnternet Sitesi</string>
 
     <!--    Login  -->
     <string name="email_label">E-POSTA</string>
