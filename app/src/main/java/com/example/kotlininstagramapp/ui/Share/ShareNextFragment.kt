@@ -1,9 +1,12 @@
 package com.example.kotlininstagramapp.ui.Share
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,10 +23,14 @@ import com.abedelazizshe.lightcompressorlibrary.VideoQuality
 import com.abedelazizshe.lightcompressorlibrary.config.Configuration
 import com.abedelazizshe.lightcompressorlibrary.config.SaveLocation
 import com.abedelazizshe.lightcompressorlibrary.config.SharedStorageConfiguration
+import com.abedelazizshe.lightcompressorlibrary.config.StorageConfiguration
+import com.abedelazizshe.lightcompressorlibrary.config.VideoResizer
+import com.abedelazizshe.lightcompressorlibrary.utils.saveVideoInExternal
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.utils.DatabaseHelper
+import com.example.kotlininstagramapp.utils.FullyCustomizedStorageConfiguration
 import dagger.hilt.android.AndroidEntryPoint
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
@@ -31,6 +38,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
 import javax.inject.Inject
 
 
@@ -143,23 +152,20 @@ class ShareNextFragment : Fragment() {
     }
 
     private fun processVideo() {
-
         CoroutineScope(Dispatchers.IO).launch {
             VideoCompressor.start(
-                context = requireContext(),
-                uris,
+                context = requireContext(), // => This is required
+                uris = uris, // => Source can be provided as content uris
                 isStreamable = false,
-                sharedStorageConfiguration = SharedStorageConfiguration(
-                    saveAt = SaveLocation.movies,
-                    subFolderName = "nstavideos"
-                ),
-//                appSpecificStorageConfiguration = AppSpecificStorageConfiguration(
-//
-//                ),
+                storageConfiguration = FullyCustomizedStorageConfiguration(),
+
                 configureWith = Configuration(
+                    videoNames = listOf("compressed-video.mp4"),
                     quality = VideoQuality.LOW,
-                    videoNames = uris.map { uri -> uri.pathSegments.last() },
-                    isMinBitrateCheckEnabled = false,
+                    isMinBitrateCheckEnabled = true,
+                  //  videoBitrateInMbps = 5,
+                    disableAudio = false,
+                    //resizer = VideoResizer.matchSize(360.0, 480.0) /*VideoResizer, ignore, or null*/
                 ),
                 listener = object : CompressionListener {
                     override fun onProgress(index: Int, percent: Float) {
@@ -170,17 +176,13 @@ class ShareNextFragment : Fragment() {
                                 shareProgressDialog.tvProgress.text = "Sıkıştırılıyor: %$roundedPercent"
                             }
                         }
-                    }
-
-                    override fun onStart(index: Int) {
-                        println("------------------ >>>>>>>>>>>>>>>> "+uris.first())
 
                     }
+
+                    override fun onStart(index: Int) {}
 
                     override fun onSuccess(index: Int, size: Long, path: String?) {
-                        println("BAŞARILI ---------- > ${path}")
                         CoroutineScope(Dispatchers.IO).launch {
-
                             databaseHelper.uploadPost(
                                 Uri.fromFile(File(path)),
                                 false,
@@ -202,7 +204,6 @@ class ShareNextFragment : Fragment() {
                                     Log.e("FAİL",it)
                                 }
                             )
-                           // uploadImageToStorage2(Uri.fromFile(File(path)), image =false)
                         }
                     }
 
@@ -213,8 +214,12 @@ class ShareNextFragment : Fragment() {
                     override fun onCancelled(index: Int) {
                         Log.wtf("TAG", "compression has been cancelled")
                     }
-                },
+
+
+                }
             )
+
+
         }
     }
 
@@ -227,3 +232,5 @@ class ShareNextFragment : Fragment() {
 
 
 }
+
+

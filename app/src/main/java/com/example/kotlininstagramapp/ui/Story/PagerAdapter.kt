@@ -8,13 +8,15 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager.widget.PagerAdapter
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.ui.Story.StoryFragment
 import com.squareup.picasso.Picasso
 
-class PagerAdapter(private var pages: List<Story>, private val context: Context) : PagerAdapter() {
+class PagerAdapter(private var pages: List<Story>, private val fragment: StoryFragment) : PagerAdapter() {
 
     override fun getCount(): Int {
         return pages.size
@@ -27,7 +29,7 @@ class PagerAdapter(private var pages: List<Story>, private val context: Context)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val view = LayoutInflater.from(context).inflate(R.layout.item_pager, container, false)
+        val view = LayoutInflater.from(fragment.requireContext()).inflate(R.layout.item_pager, container, false)
 
         val imageView: ImageView = view.findViewById(R.id.imageViewPager)
         val closeButton: ImageView = view.findViewById(R.id.iv_closeButtonStory)
@@ -41,14 +43,14 @@ class PagerAdapter(private var pages: List<Story>, private val context: Context)
 
 
 
-        Glide.with(context).load(page.stories[0].storyImage).into(imageView)
-        Glide.with(context).load(page.profilePicture).into(profileImage)
+        Glide.with(fragment.requireContext()).load(page.stories[0].storyImage).into(imageView)
+        Glide.with(fragment.requireContext()).load(page.profilePicture).into(profileImage)
         username.text = page.username
 
         var currentImageIndex = 0
 
         closeButton.setOnClickListener {
-            (context as? Activity)?.finish()
+            fragment.findNavController().popBackStack(R.id.homeFragment,false)
         }
 
         imageView.setOnTouchListener { _, event ->
@@ -59,7 +61,7 @@ class PagerAdapter(private var pages: List<Story>, private val context: Context)
                     } else {
                         currentImageIndex = (currentImageIndex - 1 + page.stories.size) % page.stories.size
                     }
-                    Glide.with(context).load(page.stories[currentImageIndex].storyImage).into(imageView)
+                    Glide.with(fragment.requireContext()).load(page.stories[currentImageIndex].storyImage).into(imageView)
                     updateIndicatorColor(indicatorLayout, currentImageIndex, page.stories.size)
                 }
             }
@@ -81,8 +83,8 @@ class PagerAdapter(private var pages: List<Story>, private val context: Context)
         indicatorLayout.removeAllViews()
         for (i in 0 until count) {
 
-            val line = View(context)
-            val size = context.resources.getDimensionPixelSize(R.dimen.line_width)
+            val line = View(fragment.requireContext())
+            val size = fragment.requireContext().resources.getDimensionPixelSize(R.dimen.line_width)
             val layoutParams = LinearLayout.LayoutParams(size, ViewGroup.LayoutParams.MATCH_PARENT)
             layoutParams.weight = 1f
             layoutParams.height =8

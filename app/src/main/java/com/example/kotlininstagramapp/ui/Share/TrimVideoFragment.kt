@@ -52,10 +52,6 @@ class TrimVideoFragment : Fragment(), OnVideoEditedEvent {
         return binding.root
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        binding.videoTrimmer.onCancelClicked()
-    }
 
 
     override fun getResult(uri: Uri) {
@@ -63,6 +59,7 @@ class TrimVideoFragment : Fragment(), OnVideoEditedEvent {
             putString("uri", uri.toString())
         }
         nsdialog.hideProgress()
+        binding.videoTrimmer.onCancelClicked()
         findNavController().navigate(R.id.shareNextFragment, bundle)
     }
 

@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -84,8 +85,9 @@ class ProfileEditFragment : Fragment() {
 
 
         changeProfilePhoto.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            galleryLauncher.launch(intent)
+            val pickIntent = Intent(Intent.ACTION_PICK)
+            pickIntent.type = "image/*"
+            galleryLauncher.launch(pickIntent)
         }
 
          saveButton.setOnClickListener {
@@ -93,19 +95,26 @@ class ProfileEditFragment : Fragment() {
              progressDialog.show(childFragmentManager, "progress_dialog")
 
              CoroutineScope(Dispatchers.Main).launch {
-                 var compressedImageUri:Uri? = null
-                 val url:String?
-                 if (selectedImageUri!=null){
-                     val originalFile = File(getPathFromUri(requireContext(), selectedImageUri!!))
+                 var compressedImageUri: Uri? = null
+                 val url: String?
 
-                     val compressedImageFile = Compressor.compress(requireContext(), originalFile)
+                 if (selectedImageUri != null) {
+                     val tempFile = createTempFileFromUri(selectedImageUri!!)
+
+                     // Compress the image using the temporary file
+                     val compressedImageFile = Compressor.compress(requireContext(), tempFile) {
+                         resolution(1280, 720)
+                         quality(80)
+                         format(Bitmap.CompressFormat.JPEG)  // Ensure the format is JPEG
+                         size(204_800)
+                     }
                      compressedImageUri = Uri.fromFile(compressedImageFile)
                  }
 
-                 if (userNameEditText.text.toString() != eventuserName) {
-                     url = databaseHelper.updateProfileImage(compressedImageUri, userNameEditText.text.toString())
+                 url = if (userNameEditText.text.toString() != eventuserName) {
+                     databaseHelper.updateProfileImage(compressedImageUri, userNameEditText.text.toString())
                  } else {
-                     url = databaseHelper.updateProfileImage(compressedImageUri, eventuserName)
+                     databaseHelper.updateProfileImage(compressedImageUri, eventuserName)
                  }
 
                  databaseHelper.updateUserProfile(
@@ -113,14 +122,15 @@ class ProfileEditFragment : Fragment() {
                      if (fullName.text.toString() != eventuserFullName) fullName.text.toString() else null,
                      if (userNameEditText.text.toString() != eventuserName) userNameEditText.text.toString() else null,
                      if (biography.text.toString() != eventBiografi) biography.text.toString() else null,
-                     url,
-                 ){
-                     message -> Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                     url
+                 ) { message ->
+                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                  }
 
                  progressDialog.dismiss()
              }
          }
+
 
          fullName.setText(eventuserFullName)
         userNameEditText.setText(eventuserName)
@@ -129,16 +139,18 @@ class ProfileEditFragment : Fragment() {
         EImageLoader.setImage(eventProfilePicture, profilePicture, null)
     }
 
-    fun getPathFromUri(context: Context, uri: Uri): String {
-        val cursor = context.contentResolver.query(uri, null, null, null, null)
-        cursor?.let {
-            val index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            cursor.moveToFirst()
-            val path = cursor.getString(index)
-            cursor.close()
-            return path
+    private suspend fun createTempFileFromUri(uri: Uri): File = withContext(Dispatchers.IO) {
+        val tempFile = File.createTempFile("temp_image", ".jpg", requireContext().cacheDir)
+        try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            val outputStream = tempFile.outputStream()
+            inputStream?.copyTo(outputStream)
+            inputStream?.close()
+            outputStream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
-        return uri.path ?: ""
+        tempFile
     }
 
 

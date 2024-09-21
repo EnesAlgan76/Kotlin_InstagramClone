@@ -42,7 +42,7 @@ class StoryFragment : Fragment() {
                 .commit()
         } else {
             val pages: List<Story> = listOf() // Initialize empty stories
-            pagerAdapter = PagerAdapter(pages, requireContext())
+            pagerAdapter = PagerAdapter(pages, this)
             viewPager.adapter = pagerAdapter
         }
     }
