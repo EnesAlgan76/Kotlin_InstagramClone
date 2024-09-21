@@ -31,9 +31,7 @@ class StoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Get arguments from the Bundle
         val isCurrentUser = arguments?.getBoolean("isCurrentUser", false) ?: false
-        val position = arguments?.getInt("position", -1) ?: -1
 
         viewPager = view.findViewById(R.id.viewPagerStory)
         frameLayout = view.findViewById(R.id.fl_storyActivity)
@@ -62,12 +60,12 @@ class StoryFragment : Fragment() {
     @Subscribe(sticky = true)
     fun onMessageEvent(event: EventBusDataEvents.SendStories) {
         val isCurrentUser = arguments?.getBoolean("isCurrentUser", false) ?: false
-        val position = arguments?.getInt("position", -1) ?: -1
+        val position = arguments?.getInt("position", 0) ?: 0
 
         if (!isCurrentUser) {
             val stories = event.stories
             pagerAdapter.setData(stories)
-            viewPager.setCurrentItem(position - 1)
+            viewPager.setCurrentItem(position)
         }
     }
 }

@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserExplorePage
+import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.model.HomePagePostItem
@@ -267,7 +268,7 @@ class PostsAdapter(
 
     inner class StoriesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val horizontalRecyclerView: RecyclerView = itemView.findViewById(R.id.rv_homeFragmentStories)
-        private val horizontalAdapter = StoryAdapter(fragment, listOf())
+        private val horizontalAdapter = StoryAdapter(fragment, mutableListOf())
 
         init {
             horizontalRecyclerView.adapter = horizontalAdapter
@@ -276,8 +277,23 @@ class PostsAdapter(
 
         fun bind() {
             CoroutineScope(Dispatchers.IO).launch {
-               // val stories2: List<Story> = FirebaseHelper().getFollowedUsersStories()
-                val stories: List<Story> = databaseHelper.getFollowedUsersStories()
+                val stories: MutableList<Story> = databaseHelper.getFollowedUsersStories()
+                val currentUserUsername = UserSingleton.userModel!!.userName
+
+                val currentUserStory: Story? = stories.firstOrNull { story -> story.username == currentUserUsername }
+
+                if (currentUserStory != null) {
+                    stories.remove(currentUserStory)
+                    stories.add(0, currentUserStory)
+                } else {
+                    stories.add(0, Story(
+                        username = currentUserUsername,
+                        fullName = UserSingleton.userModel!!.fullName,
+                        profilePicture = UserSingleton.userModel!!.profilePicture,
+                        stories = listOf()
+                    ))
+                }
+
                 withContext(Dispatchers.Main) {
                     horizontalAdapter.setData(stories)
                     EventBus.getDefault().postSticky(EventBusDataEvents.SendStories(stories))

@@ -55,10 +55,8 @@ class PagerAdapter(private var pages: List<Story>, private val context: Context)
             when (event.action) {
                 MotionEvent.ACTION_UP -> {
                     if (event.x > imageView.width / 2) {
-                        // -- Right side tap show next image
                         currentImageIndex = (currentImageIndex + 1) % page.stories.size
                     } else {
-                        // Left side tap show previous image 5 3 2
                         currentImageIndex = (currentImageIndex - 1 + page.stories.size) % page.stories.size
                     }
                     Glide.with(context).load(page.stories[currentImageIndex].storyImage).into(imageView)
@@ -78,7 +76,7 @@ class PagerAdapter(private var pages: List<Story>, private val context: Context)
         container.removeView(`object` as View)
     }
 
-    // Set up the indicators
+
     private fun setupIndicators(indicatorLayout: LinearLayout, count: Int, selectedIndex: Int) {
         indicatorLayout.removeAllViews()
         for (i in 0 until count) {

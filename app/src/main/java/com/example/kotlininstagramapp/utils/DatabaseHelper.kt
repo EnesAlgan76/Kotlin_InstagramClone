@@ -390,16 +390,16 @@ class DatabaseHelper @Inject constructor(
         status.invoke(response.message)
     }
 
-    suspend fun getFollowedUsersStories(): List<Story> {
+    suspend fun getFollowedUsersStories(): MutableList<Story> {
         val response :BaseResponse = storyApi.getUserStories(UserSingleton.userModel!!.userId).await()
         if (response.status){
-            val storyList = response.data as? List<Map<String, Any>> ?: return listOf()
+            val storyList = response.data as? List<Map<String, Any>> ?: return mutableListOf()
 
-            return storyList.map { Story.fromMap(it) }
+            return storyList.map { Story.fromMap(it) }.toMutableList()
 
         }else{
             Log.e("getFollowedUsersStories", response.message)
-            return listOf()
+            return mutableListOf()
         }
 
     }

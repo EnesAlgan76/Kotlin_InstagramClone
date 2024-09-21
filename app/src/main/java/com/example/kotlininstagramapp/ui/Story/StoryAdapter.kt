@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.Home.HomeFragment
+import com.example.kotlininstagramapp.Models.SingleStory
 import com.example.kotlininstagramapp.Models.Story
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.model.UserModel
@@ -54,17 +55,15 @@ class StoryAdapter(private val context: HomeFragment, private var data: List<Sto
                 holder.handleClick(position)
             }
             is FollowedUserViewHolder -> {
-                // Adjust position for the current user item
-                val story = data[position - 1]
-                val imageUrl = story.profilePicture
+
+                val story = data[position]
                 holder.bind(position,story)
             }
         }
     }
 
     override fun getItemCount(): Int {
-        // Add 1 to the item count for the current user view
-        return data.size + 1
+        return data.size
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -75,7 +74,7 @@ class StoryAdapter(private val context: HomeFragment, private var data: List<Sto
         }
     }
 
-    fun setData(horizontalItemList: List<Story>) {
+    fun setData(horizontalItemList: MutableList<Story>) {
         data = horizontalItemList
         notifyDataSetChanged()
     }
@@ -83,18 +82,24 @@ class StoryAdapter(private val context: HomeFragment, private var data: List<Sto
     inner class CurrentUserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val iv_storyCurrentUser: ImageView = itemView.findViewById(R.id.iv_storyCurrentUser)
         val tv_storyCurrentUser: TextView = itemView.findViewById(R.id.tv_storyCurrentUser)
+        val iv_addStory: ImageView = itemView.findViewById(R.id.iv_addStory)
         fun handleClick(position: Int) {
             iv_storyCurrentUser.setOnClickListener {
+                val isCurrentUser = data.first().stories.isEmpty()
+                val bundle = Bundle().apply {
+                    putBoolean("isCurrentUser", isCurrentUser)
+                    putInt("position", position)
+                }
+                context.findNavController().navigate(R.id.storyFragment, bundle)
+            }
 
+
+            iv_addStory.setOnClickListener {
                 val bundle = Bundle().apply {
                     putBoolean("isCurrentUser", true)
-                    putInt("position", position)  }
-
-
-                val navController = context.findNavController()
-                navController.navigate(R.id.storyFragment, bundle)
-
-                //Toast.makeText(context, "Current User Clicked. position : ${position}", Toast.LENGTH_SHORT).show()
+                    putInt("position", position)
+                }
+                context.findNavController().navigate(R.id.storyFragment, bundle)
             }
         }
 
@@ -106,9 +111,7 @@ class StoryAdapter(private val context: HomeFragment, private var data: List<Sto
                 if (user!=null){
                     withContext(Dispatchers.Main){
 
-                        Glide.with(context)
-                            .load(user.profilePicture).placeholder(R.drawable.profile)
-                            .into(iv_storyCurrentUser)
+                        Glide.with(context).load(user.profilePicture).placeholder(R.drawable.profile).into(iv_storyCurrentUser)
 
                         tv_storyCurrentUser.setText(user.userName)
                     }

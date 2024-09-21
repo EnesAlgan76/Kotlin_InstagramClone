@@ -18,7 +18,7 @@
         android:id="@+id/iv_storyFollowedUser"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/common_google_signin_btn_icon_dark"
+        android:src="@drawable/profile"
         app:layout_constraintBottom_toBottomOf="@+id/imageView33"
         app:layout_constraintEnd_toEndOf="@+id/imageView33"
         app:layout_constraintStart_toStartOf="@+id/imageView33"
@@ -30,13 +30,22 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="8dp"
-        android:text="ensalgn76"
+        android:text=""
         android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/iv_storyFollowedUser"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/imageView33"
         app:layout_constraintTop_toBottomOf="@+id/imageView33" />
+
+    <ImageView
+        android:id="@+id/iv_addStory"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView33"
+        app:layout_constraintEnd_toEndOf="@+id/imageView33"
+        app:srcCompat="@drawable/icon_add_story"
+        android:visibility="gone"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
