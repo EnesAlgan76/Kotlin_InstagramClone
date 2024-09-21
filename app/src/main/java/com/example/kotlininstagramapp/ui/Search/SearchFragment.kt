@@ -39,7 +39,7 @@ class SearchFragment : Fragment() {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
         firestore = FirebaseFirestore.getInstance()
 
-        searchResultAdapter= SearchResultsAdapter(requireContext())
+        searchResultAdapter= SearchResultsAdapter(this)
         binding.rvSearch.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = searchResultAdapter

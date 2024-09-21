@@ -2,6 +2,7 @@ package com.example.kotlininstagramapp.Home
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -145,11 +147,23 @@ class PostsAdapter(
                         bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
                     }
 
+                    post_ivcomment.setOnClickListener {
+                        val bottomSheetFragment = CommentBottomSheetFragment(
+                            userPostItem.postId,
+                            userPostItem.userId,
+                            userPostItem.content
+                        )
+                        bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
+                    }
+
+
+
                     fullNameTextView.setOnClickListener {
-                        val intent = Intent(fragment.context, UserExplorePage::class.java).apply {
-                            putExtra("USER_ID", userPostItem.userId)
+                        val bundle = Bundle().apply {
+                            putString("USER_ID", userPostItem.userId)
                         }
-                        fragment.startActivity(intent)
+
+                        fragment.findNavController().navigate(R.id.userExplorePage,bundle)
                     }
 
                     setupLikeButton(this, userPostItem)
@@ -264,6 +278,7 @@ class PostsAdapter(
         val post_tv_likecount: TextView = itemView.findViewById(R.id.post_tv_likecount)
         val speedTextView: TextView = itemView.findViewById(R.id.tv_speed)
         val iv_playPauseButton: ImageView = itemView.findViewById(R.id.iv_playPauseButton)
+        val post_ivcomment: ImageView = itemView.findViewById(R.id.post_ivcomment)
     }
 
     inner class StoriesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

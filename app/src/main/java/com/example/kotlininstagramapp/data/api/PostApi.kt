@@ -1,7 +1,6 @@
 package com.example.kotlininstagramapp.data.api
 
 import com.example.kotlininstagramapp.Models.Post
-import com.example.kotlininstagramapp.Models.User
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -17,15 +16,8 @@ interface PostApi {
     @POST("/posts")
     fun createPost(@Body post: Post) : Call<BaseResponse>
 
-    @GET("posts/getUserPostsHomePage/{userId}")
-    fun getUserPostsHomePage(@Path("userId") userId: String): Call<BaseResponse>
-
-    @GET("posts/pagedPosts")
-    fun getPagedPostsByUserId(
-        @Query("userId") userId: String,
-        @Query("page") page: Int,
-        @Query("size") size: Int
-    ): Call<BaseResponse>
+    @GET("posts/postHome/{postId}")
+    fun getPostHomepageById(@Path("postId") postId: Int): Call<BaseResponse>
 
 
     @GET("posts/pagedPostsFollowed")

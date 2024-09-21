@@ -143,6 +143,15 @@
         android:id="@+id/storyFragment"
         android:name="com.example.kotlininstagramapp.ui.Story.StoryFragment"
         android:label="StoryFragment" />
+    <fragment
+        android:id="@+id/userExplorePage"
+        android:name="com.example.kotlininstagramapp.Generic.UserExplorePage"
+        android:label="UserExplorePage" />
+    <fragment
+        android:id="@+id/singlePostFragment"
+        android:name="com.example.kotlininstagramapp.Home.SinglePostFragment"
+        android:label="SinglePostFragment"
+        tools:layout="@layout/fragment_single_post" />
 
 
 </navigation>

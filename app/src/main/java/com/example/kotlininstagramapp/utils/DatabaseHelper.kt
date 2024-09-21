@@ -295,6 +295,11 @@ class DatabaseHelper @Inject constructor(
         }
     }
 
+    suspend fun getSinglePostById(postId: Int):HomePagePostItem {
+        val response:BaseResponse =  postService.getPostHomepageById(postId).await()
+        return HomePagePostItem.fromMap(response.data as Map<String, Any>)
+    }
+
     suspend fun getHomePagePosts(): ArrayList<HomePagePostItem> {
         val userId = UserSingleton.userModel!!.userId
 

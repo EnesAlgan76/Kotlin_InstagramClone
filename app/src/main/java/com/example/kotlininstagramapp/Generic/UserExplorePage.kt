@@ -1,16 +1,18 @@
 package com.example.kotlininstagramapp.Generic
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.ui.Profile.ProfileUserPostsAdapter
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.data.model.UserModel
-import com.example.kotlininstagramapp.databinding.ActivityUserDetailPageBinding
+import com.example.kotlininstagramapp.databinding.FragmentUserExplorePageBinding
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -20,75 +22,66 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostItemClicked {
-    lateinit var followStateButton : Button
+class UserExplorePage : Fragment(), FollowStateUIHandler, OnSinglePostItemClicked {
+    private var _binding: FragmentUserExplorePageBinding? = null
+    private val binding get() = _binding!!
+
     private var userId: String? = null
-    lateinit var binding : ActivityUserDetailPageBinding
-    lateinit var userPostItems: List<Post>
+    private lateinit var userPostItems: List<Post>
+
     @Inject
     lateinit var databaseHelper: DatabaseHelper
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityUserDetailPageBinding.inflate(layoutInflater)
-        userId = intent.getStringExtra("USER_ID")
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentUserExplorePageBinding.inflate(inflater, container, false)
+        userId = arguments?.getString("USER_ID")
 
-        CoroutineScope(Dispatchers.Main).launch{
-            val user = withContext(Dispatchers.IO){
-               // FirebaseHelper().getUserById(userId!!)!!
+        CoroutineScope(Dispatchers.Main).launch {
+            val user = withContext(Dispatchers.IO) {
                 databaseHelper.getUserById(userId!!)!!
             }
             setUserInfos(user)
 
-            val isFollowing =  withContext(Dispatchers.IO){
-                //FirebaseHelper().isUserFollowing(userId?:"")
+            val isFollowing = withContext(Dispatchers.IO) {
                 databaseHelper.isUserFollowing(userId!!)
             }
             handleFollowStateUI(isFollowing)
 
-            if(isFollowing){
+            if (isFollowing) {
                 showPosts(user)
-            }else{
+            } else {
                 showPrivateAccountInfo()
             }
-
         }
 
-
-
-        binding.userExploreBtnFollow.setOnClickListener{
-            if (userId != null) {
+        binding.userExploreBtnFollow.setOnClickListener {
+            userId?.let {
                 CoroutineScope(Dispatchers.Main).launch {
-                    withContext(Dispatchers.IO){
-                        //FirebaseHelper().sendFollowRequest(userId!!)
-                        databaseHelper.sendFollowRequest(userId!!)
+                    withContext(Dispatchers.IO) {
+                        databaseHelper.sendFollowRequest(it)
                     }
-                   // val isFollowed = FirebaseHelper().isUserFollowing(userId?:"") // gizli hesap değilse anında takip edilir. gizli ise isek gönderildi yazısı göster
-                    val isFollowed = databaseHelper.isUserFollowing(userId!!)
-
+                    val isFollowed = databaseHelper.isUserFollowing(it)
                     handleFollowStateUI(isFollowed)
 
-                    if(!isFollowed){
+                    if (!isFollowed) {
                         binding.userExploreBtnFollow.visibility = View.INVISIBLE
                         binding.userExploreLayoutFollowandmessage.visibility = View.INVISIBLE
                         binding.userExploreBtnFollowRequestSended.visibility = View.VISIBLE
                     }
-
-
-
                 }
-
             }
         }
 
-        binding.userExploreBtnFollowOptions.setOnClickListener{
-            val bottomSheetFragment = FollowOptionsBottomSheetFragment(userId!!,this)
-            bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
+        binding.userExploreBtnFollowOptions.setOnClickListener {
+            val bottomSheetFragment = FollowOptionsBottomSheetFragment(userId!!, this)
+            bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
         }
-        setContentView(binding.root)
+
+        return binding.root
     }
-
-
 
     private fun showPrivateAccountInfo() {
         binding.imageViewPrivateInfo.visibility = View.VISIBLE
@@ -96,47 +89,51 @@ class UserExplorePage : AppCompatActivity(),FollowStateUIHandler, OnSinglePostIt
 
     private fun showPosts(user: UserModel) {
         CoroutineScope(Dispatchers.Main).launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 userPostItems = databaseHelper.fetchUserPosts(user.userId)
             }
-            //setUserInfos(user)
             setRecycleView(userPostItems)
         }
     }
-    private fun setUserInfos(user: UserModel) {
 
-        binding.userExploreTvUserName.setText(user.userName)
-        Glide.with(this).load(user.profilePicture).error(R.drawable.profile).placeholder(R.drawable.profile).into(binding.userExploreIvProfile)
-        binding.userExploreTvName.setText(user.fullName)
-        binding.userExploreTvBiograpy.setText(user.biography)
-        binding.userExploreTvFollow.setText(user.followingCount.toString())
-        binding.userExploreTvFollowers.setText(user.followerCount.toString())
-        binding.userExploreTvPosts.setText(user.postCount.toString())
+    private fun setUserInfos(user: UserModel) {
+        binding.userExploreTvUserName.text = user.userName
+        Glide.with(this).load(user.profilePicture)
+            .error(R.drawable.profile)
+            .placeholder(R.drawable.profile)
+            .into(binding.userExploreIvProfile)
+        binding.userExploreTvName.text = user.fullName
+        binding.userExploreTvBiograpy.text = user.biography
+        binding.userExploreTvFollow.text = user.followingCount.toString()
+        binding.userExploreTvFollowers.text = user.followerCount.toString()
+        binding.userExploreTvPosts.text = user.postCount.toString()
     }
 
     private fun setRecycleView(userPostItems: List<Post>) {
-        var adapter = ProfileUserPostsAdapter(context = this, userPostItems)
+        val adapter = ProfileUserPostsAdapter(context = requireContext(), this, userPostItems)
         binding.userExploreRvProfilePageUserPosts.adapter = adapter
-        binding.userExploreRvProfilePageUserPosts.layoutManager = GridLayoutManager(this, 3)
+        binding.userExploreRvProfilePageUserPosts.layoutManager = GridLayoutManager(requireContext(), 3)
     }
 
     override fun handleFollowStateUI(isFollowing: Boolean) {
-        if(isFollowing){
+        if (isFollowing) {
             binding.userExploreLayoutFollowandmessage.visibility = View.VISIBLE
             binding.userExploreBtnFollow.visibility = View.INVISIBLE
-        }else{
+        } else {
             binding.userExploreBtnFollow.visibility = View.VISIBLE
             binding.userExploreLayoutFollowandmessage.visibility = View.INVISIBLE
         }
     }
 
-    override fun onSingleItemClicked(position:Int) {
-        binding.userExploreScrollView2.visibility = View.INVISIBLE
-        binding.userExploreFlActivityProfile.visibility = View.VISIBLE
-      //  supportFragmentManager.beginTransaction().replace(R.id.userExplore_fl_activity_profile, SinglePostListFragment(userPostItems,position)).commit()
-
+    override fun onSingleItemClicked(position: Int) {
+        val bundle = Bundle().apply {
+            putInt("post_id", userPostItems[position].postId.toInt())
+        }
+        findNavController().navigate(R.id.singlePostFragment,bundle)
     }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
-

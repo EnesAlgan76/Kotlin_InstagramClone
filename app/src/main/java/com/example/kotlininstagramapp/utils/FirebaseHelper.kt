@@ -157,20 +157,17 @@ class FirebaseHelper @Inject constructor() {
         return null
     }
 
-    suspend fun publishComment(text: String, postId: String, adapter: CommentsAdapter) {
+    suspend fun publishComment(text: String, postId: Double, adapter: CommentsAdapter) {
         if(currentUser!=null){
-           val userDoc = currentUserDocumentRef.get().await()
-            val userProfilePicture = userDoc.getString("userDetails.profilePicture")?:""
-            val userName= userDoc.getString("userName")?:"Unknown User"
 
             var comment:Comment = Comment(
                 commentId = "",
                 comment = text,
                 like_count = "0",
                 user_id = currentUser!!.uid,
-                user_profile_picture = userProfilePicture,
+                user_profile_picture = UserSingleton.userModel!!.profilePicture,
                 time = System.currentTimeMillis().toString(),
-                user_name = userName,
+                user_name = UserSingleton.userModel!!.userName,
                 post_id = postId
             )
 
@@ -186,7 +183,7 @@ class FirebaseHelper @Inject constructor() {
 
     }
 
-    suspend fun getComments(postId: String): ArrayList<Pair<Comment, Boolean>> {
+    suspend fun getComments(postId: Double): ArrayList<Pair<Comment, Boolean>> {
         val comments = commentCollection.whereEqualTo("post_id", postId).get().await()
         val userDocument = currentUserDocumentRef.get().await()
         val likedComments = userDocument.get("liked_comments") as? List<String> ?: listOf()
@@ -206,7 +203,6 @@ class FirebaseHelper @Inject constructor() {
         var liked :Boolean? =null
         try {
             val documentSnapshot = currentUserDocumentRef.get().await()
-
             val likedComments = documentSnapshot.get("liked_comments") as? List<String> ?: listOf()   // Kullanıcının daha önceden yorumu beğenip
             liked = likedComments.contains(commentId) // beğenmediğini kontrol et
             val newLikeCount = if (liked) currentLikeCount - 1 else currentLikeCount + 1

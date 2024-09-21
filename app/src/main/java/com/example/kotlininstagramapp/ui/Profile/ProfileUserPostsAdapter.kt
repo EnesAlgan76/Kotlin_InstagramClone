@@ -15,7 +15,7 @@ import com.example.kotlininstagramapp.R
 import java.io.File
 
 
-class ProfileUserPostsAdapter(private val context: Context, private val posts: List<Post>) : RecyclerView.Adapter<ProfileUserPostsAdapter.ViewHolder>() {
+class ProfileUserPostsAdapter(private val context: Context, private val onSinglePostItemClicked: OnSinglePostItemClicked,  private val posts: List<Post>) : RecyclerView.Adapter<ProfileUserPostsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.grid_userposts_image_view, parent, false)
@@ -31,7 +31,7 @@ class ProfileUserPostsAdapter(private val context: Context, private val posts: L
         val isVideo = userPost.content.contains("videos")
         holder.bindData(userPost, isVideo)
         holder.itemView.setOnClickListener {
-            (context as OnSinglePostItemClicked).onSingleItemClicked(position)
+            onSinglePostItemClicked.onSingleItemClicked(userPost.postId.toInt())
         }
     }
 

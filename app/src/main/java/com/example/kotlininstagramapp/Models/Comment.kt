@@ -6,5 +6,5 @@ data class Comment(
     var user_profile_picture: String = "",
     var time: String = "",
     var user_name: String = "",
-    var post_id: String = ""
+    var post_id: Double = 0.0
 )

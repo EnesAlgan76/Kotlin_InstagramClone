@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.kotlininstagramapp.Generic.OnSinglePostItemClicked
 import com.example.kotlininstagramapp.Generic.UserSingleton.userModel
 import com.example.kotlininstagramapp.Models.Post
 import com.example.kotlininstagramapp.R
@@ -28,7 +29,7 @@ import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ProfileFragment : Fragment() {
+class ProfileFragment : Fragment(), OnSinglePostItemClicked {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val firebaseAuth = FirebaseAuth.getInstance()
@@ -87,7 +88,7 @@ class ProfileFragment : Fragment() {
                         Post.fromMap(postMap)
                     }
                     withContext(Dispatchers.Main) {
-                        val adapter = ProfileUserPostsAdapter(context = requireContext(), postDTOList)
+                        val adapter = ProfileUserPostsAdapter(context = requireContext(),this@ProfileFragment, postDTOList)
                         binding.rvProfilePageUserPosts.adapter = adapter
                         binding.rvProfilePageUserPosts.layoutManager = GridLayoutManager(requireContext(), 3)
                     }
@@ -132,5 +133,12 @@ class ProfileFragment : Fragment() {
         } else {
             binding.profileActivityroot.visibility = View.GONE
         }
+    }
+
+    override fun onSingleItemClicked(postId: Int) { //explore page için pozisyon gönderir.. profile için post ıd
+        val bundle = Bundle().apply {
+            putInt("post_id", postId)
+        }
+        findNavController().navigate(R.id.singlePostFragment,bundle)
     }
 }

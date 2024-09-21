@@ -54,7 +54,7 @@ class CommentBottomSheetFragment(var postId: Double, var userId: String, var use
         CoroutineScope(Dispatchers.Main).launch{
             shimmer.startShimmer()
             withContext(Dispatchers.IO){
-               // comments = FirebaseHelper().getComments(postId)
+                comments = FirebaseHelper().getComments(postId)
             }
             shimmer.stopShimmer()
             shimmer.visibility =View.GONE
@@ -72,7 +72,7 @@ class CommentBottomSheetFragment(var postId: Double, var userId: String, var use
                     val text = et_comment.text.toString()
                     et_comment.text.clear()
                     withContext(Dispatchers.IO){
-                      //  FirebaseHelper().publishComment(text,postId,commentAdapter)
+                        FirebaseHelper().publishComment(text,postId,commentAdapter)
                         FirebaseHelper().sendCommentNotification(userId, userPostUrl, text )
                         Log.e("------------>","*** Yorum gönderme başarılı  ***")
                     }

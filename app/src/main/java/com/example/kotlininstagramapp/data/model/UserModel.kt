@@ -19,7 +19,7 @@ data class UserModel(
             return UserModel(
                 userId = map["userId"] as String,
                 userName = map["userName"] as String,
-                password = map["password"] as String,
+                password = map["password"] as? String?:"",
                 phoneNumber = map["phoneNumber"] as String,
                 email = map["email"] as String,
                 fullName = map["fullName"] as String,
