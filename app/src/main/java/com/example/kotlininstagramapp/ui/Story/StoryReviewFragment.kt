@@ -52,6 +52,7 @@ import jp.co.cyberagent.android.gpuimage.filter.GPUImageNormalBlendFilter
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageOpacityFilter
 import jp.co.cyberagent.android.gpuimage.filter.GPUImagePixelationFilter
 import jp.co.cyberagent.android.gpuimage.filter.GPUImagePosterizeFilter
+import jp.co.cyberagent.android.gpuimage.filter.GPUImageRGBFilter
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageSaturationFilter
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageScreenBlendFilter
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageSepiaToneFilter
@@ -89,44 +90,17 @@ class StoryReviewFragment : Fragment() {
 
 
     private val filters = listOf(
+        Pair(GPUImageFilter(), "Original"),
         Pair(GPUImageGrayscaleFilter(), "Grayscale"),
         Pair(GPUImageSepiaToneFilter(), "Sepia"),
-        Pair(GPUImageVignetteFilter(), "Vignette"),
         Pair(GPUImageToonFilter(), "Toon"),
         Pair(GPUImageSketchFilter(), "Sketch"),
         Pair(GPUImageContrastFilter(), "Contrast"),
-        Pair(GPUImageBrightnessFilter(), "Brightness"),
-        Pair(GPUImageSaturationFilter(), "Saturation"),
-        Pair(GPUImageGaussianBlurFilter(), "Gaussian Blur"),
-        Pair(GPUImageEmbossFilter(), "Emboss"),
-        Pair(GPUImageHueFilter(), "Hue"),
-        Pair(GPUImagePixelationFilter(), "Pixelation"),
         Pair(GPUImageColorInvertFilter(), "Color Invert"),
-        Pair(GPUImageGammaFilter(), "Gamma"),
-        Pair(GPUImageMonochromeFilter(), "Monochrome"),
-        Pair(GPUImageOpacityFilter(), "Opacity"),
-        Pair(GPUImageCrosshatchFilter(), "Crosshatch"),
-        Pair(GPUImageLookupFilter(), "Lookup"),
-        Pair(GPUImageToneCurveFilter(), "Tone Curve"),
-        Pair(GPUImageSmoothToonFilter(), "Smooth Toon"),
-        Pair(GPUImageSwirlFilter(), "Swirl"),
-        Pair(GPUImageHalftoneFilter(), "Halftone"),
-        Pair(GPUImageNonMaximumSuppressionFilter(), "Non-Max Suppression"),
         Pair(GPUImageDissolveBlendFilter(), "Dissolve Blend"),
-        Pair(GPUImageCGAColorspaceFilter(), "CGA Colorspace"),
-        Pair(GPUImageFilterGroup(), "Filter Group"),
-        Pair(GPUImageHighlightShadowFilter(), "Highlight Shadow"),
-        Pair(GPUImageExclusionBlendFilter(), "Exclusion Blend"),
-        Pair(GPUImageColorMatrixFilter(), "Color Matrix"),
         Pair(GPUImageFalseColorFilter(), "False Color"),
         Pair(GPUImageLuminanceFilter(), "Luminance"),
         Pair(GPUImageHazeFilter(), "Haze"),
-        Pair(GPUImageSourceOverBlendFilter(), "Source Over Blend"),
-        Pair(GPUImageAddBlendFilter(), "Add Blend"),
-        Pair(GPUImageSubtractBlendFilter(), "Subtract Blend"),
-        Pair(GPUImageMultiplyBlendFilter(), "Multiply Blend"),
-        Pair(GPUImageScreenBlendFilter(), "Screen Blend"),
-        Pair(GPUImageFilterGroup(), "Filter Group")
     )
 
 
@@ -138,6 +112,8 @@ class StoryReviewFragment : Fragment() {
         nsdialog = NSCircleProgress(requireContext())
 
         gpuImage = GPUImage(requireContext())
+
+
         val filePath = requireArguments().getString("FILE_PATH")
         if (filePath != null) {
             gelenDosya = File(filePath)
@@ -150,6 +126,12 @@ class StoryReviewFragment : Fragment() {
         binding.ivSendStory.setOnClickListener {
             sendFilteredImage()
         }
+
+        Glide.with(requireContext()).load(UserSingleton.userModel?.profilePicture).into(binding.ivProfileStoryPreview)
+
+        applyFilter(GPUImageFilter())
+
+
 
 
         return binding.root
@@ -178,11 +160,11 @@ class StoryReviewFragment : Fragment() {
                 filteredBitmap.compress(Bitmap.CompressFormat.JPEG, 50, out)
             }
 
-            val compressedImageFile = Compressor.compress(requireContext(), File(gelenDosya.absolutePath)) {
+            val compressedImageFile = Compressor.compress(requireContext(), filteredImageFile) {
                 quality(80)
             }
 
-            /*databaseHelper.addStory(
+            databaseHelper.addStory(
                 compressedImageFile,
                 status = { Log.e("", "Status ____>>> $it") },
                 progress = {
@@ -191,7 +173,7 @@ class StoryReviewFragment : Fragment() {
                         findNavController().navigate(R.id.action_storyReviewFragment_to_homeFragment)
                     }
                 }
-            )*/
+            )
         }
     }
 

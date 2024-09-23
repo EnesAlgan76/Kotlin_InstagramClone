@@ -2,6 +2,7 @@ package com.example.kotlininstagramapp.ui.Login
 
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -51,9 +52,10 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.tvRegiserlogin.setOnClickListener {
-            // Navigate to RegisterActivity or RegisterFragment
             findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
         }
+
+        binding.space
 
         binding.etLoginmail.addTextChangedListener(textWatcher)
         binding.etLoginpassword.addTextChangedListener(textWatcher)
@@ -63,6 +65,20 @@ class LoginFragment : Fragment() {
                 val email = binding.etLoginmail.text.toString()
                 val password = binding.etLoginpassword.text.toString()
                 viewModel.loginUser(email, password)
+            }
+        }
+
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener {
+            val rect = Rect()
+            binding.root.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = binding.root.height
+            val keypadHeight = screenHeight - rect.bottom
+println(" -----------------------------------------------  ")
+            // If the keyboard is open, hide the space, else show it
+            if (keypadHeight > screenHeight * 0.15) { // If keypad height is more than 15% of screen height, keyboard is open
+                binding.space.visibility = View.GONE
+            } else {
+                binding.space.visibility = View.VISIBLE
             }
         }
 

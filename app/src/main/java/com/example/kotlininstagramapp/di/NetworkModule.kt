@@ -2,6 +2,8 @@ package com.example.kotlininstagramapp.di
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
+import com.enesalgan.nswebrtc.NSWebRTCClient
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.data.api.FollowApi
 import com.example.kotlininstagramapp.data.api.LikesApi
@@ -10,6 +12,11 @@ import com.example.kotlininstagramapp.data.api.PostApi
 import com.example.kotlininstagramapp.data.api.StoryApi
 import com.example.kotlininstagramapp.data.api.UserApi
 import com.example.kotlininstagramapp.utils.DatabaseHelper
+import com.example.turkiyefinansappclone.video_call.repository.MainRepository
+import com.example.turkiyefinansappclone.video_call.repository.MainService
+import com.example.turkiyefinansappclone.video_call.service.FirebaseClient
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,6 +54,7 @@ object NetworkModule {
             firebaseHelper
         )
     }
+
 
 
     @Provides
@@ -107,4 +115,54 @@ object NetworkModule {
     fun provideStoryApi(retrofit: Retrofit): StoryApi {
         return retrofit.create(StoryApi::class.java)
     }
+
+
+
+    @Provides
+    fun provideGson():Gson = Gson()
+
+
+    @Provides
+    @Singleton
+    fun provideFirebaseClient(dbRef: FirebaseFirestore, gson: Gson): FirebaseClient {
+        return FirebaseClient(dbRef, gson)
+    }
+
+
+
+    @Provides
+    @Singleton
+    fun provideNSWebRTCClient(context: Context): NSWebRTCClient {
+        return NSWebRTCClient(context)
+    }
+
+
+
+    @Provides
+    @Singleton
+    fun provideMainRepository(
+        firebaseClient: FirebaseClient,
+        webRTCClient: NSWebRTCClient,
+        gson: Gson
+    ): MainRepository {
+        return MainRepository(firebaseClient, webRTCClient, gson)
+    }
+
+
+
+    @Provides
+    @Singleton
+    fun provideMainServiceRepository(mainRepository: MainRepository): MainService {
+        return MainService(mainRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+
+
+
+
+
+
 }

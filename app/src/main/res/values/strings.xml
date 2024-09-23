@@ -47,5 +47,20 @@
     <string name="trim_video">Trim Video</string>
     <string name="post">Post</string>
 
+    <!--Share Last-->
+    <string name="share_post_title">Share Post</string>
+    <string name="back_button_description">Back</string>
+    <string name="share_button_text">Share</string>
+    <string name="caption_hint">Write a caption...</string>
+    <string name="image_preview_description">Image Preview</string>
+
+
+    <string name="in_call_with">In call with %1$s</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="incoming_call_message"> %1$s is %2$s calling you</string>
+    <string name="video_call">Video</string>
+    <string name="audio_call">Audio</string>
+
 
 </resources>

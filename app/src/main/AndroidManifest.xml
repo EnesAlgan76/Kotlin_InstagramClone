@@ -45,15 +45,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.Story.StoryReviewActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Home.HomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.Story.StoryActivity"
-            android:exported="false" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
@@ -68,28 +59,10 @@
         </service>
 
         <activity
-            android:name=".Home.NotificationsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Home.ChatActivity"
-            android:exported="false" />
-        <activity
             android:name=".Generic.UserExplorePage"
             android:exported="false" />
         <activity
-            android:name=".ui.Profile.SettingActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Home.HomeActivity"
-            android:exported="false"></activity>
-        <activity
-            android:name=".ui.Share.ShareActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.Reels.ReelsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.Profile.ProfileActivity"
             android:exported="false" />
     </application>
 

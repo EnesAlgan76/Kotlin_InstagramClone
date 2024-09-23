@@ -10,6 +10,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.MainActivity
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
@@ -19,6 +21,7 @@ import com.example.kotlininstagramapp.ui.Home.PostViewModel
 import com.example.kotlininstagramapp.utils.BottomNavHandler
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.example.ns.ui.NSBottomNavView
+import com.example.turkiyefinansappclone.video_call.repository.MainService
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -35,6 +38,8 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var databaseHelper: DatabaseHelper
+    @Inject
+    lateinit var mainService: MainService
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
@@ -58,6 +63,7 @@ class HomeFragment : Fragment() {
         setupBottomNavigation()
         setupChatButton()
         updateUiOnNotificationStatusChange()
+        mainService.startService(UserSingleton.userModel!!.userId)
 
         return binding.root
     }
@@ -104,6 +110,7 @@ class HomeFragment : Fragment() {
 
 
     private fun setupRecyclerView() {
+
         binding.rvHomeFragmentPosts.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL,false)
         postAdapter= PostsAdapter(allPosts2,this, requireActivity().supportFragmentManager,binding.rvHomeFragmentPosts,databaseHelper)
         binding.rvHomeFragmentPosts.adapter=postAdapter

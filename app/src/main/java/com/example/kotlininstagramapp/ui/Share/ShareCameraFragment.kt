@@ -97,8 +97,10 @@ class ShareCameraFragment : Fragment() {
     }
 
     private fun goShareNextFragment(file: File?) {
-
-        findNavController().navigate(R.id.shareNextFragment)
+        val bundle = Bundle().apply {
+            putString("uri", file!!.path)
+        }
+        findNavController().navigate(R.id.shareNextFragment,bundle)
 
 
     }

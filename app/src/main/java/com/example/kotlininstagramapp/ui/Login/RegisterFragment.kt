@@ -64,7 +64,7 @@ class RegisterFragment : Fragment() {
 
     private fun handleEmailTelClick() {
         binding.tvTel.setOnClickListener {
-            binding.viewTel.setBackgroundColor(Color.BLACK)
+            binding.viewTel.setBackgroundResource(R.drawable.gradient_background)
             binding.viewMail.setBackgroundColor(Color.parseColor("#DFDFDF"))
             binding.etRegisterpage.apply {
                 inputType = InputType.TYPE_CLASS_PHONE
@@ -74,7 +74,7 @@ class RegisterFragment : Fragment() {
 
         binding.tvEposta.setOnClickListener {
             binding.viewTel.setBackgroundColor(Color.parseColor("#DFDFDF"))
-            binding.viewMail.setBackgroundColor(Color.BLACK)
+            binding.viewMail.setBackgroundResource(R.drawable.gradient_background)
             binding.etRegisterpage.apply {
                 inputType = InputType.TYPE_CLASS_TEXT
                 hint = "Email"

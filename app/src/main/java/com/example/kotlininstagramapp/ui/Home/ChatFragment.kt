@@ -12,12 +12,16 @@ import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Profile.FirebaseHelper
 import com.example.kotlininstagramapp.R
 import com.example.kotlininstagramapp.databinding.FragmentChatBinding
+import com.example.turkiyefinansappclone.video_call.repository.MainRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.permissionx.guolindev.PermissionX
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ChatFragment : Fragment() {
 
     private lateinit var binding: FragmentChatBinding
@@ -31,6 +35,9 @@ class ChatFragment : Fragment() {
     private lateinit var profileImage: String
     private lateinit var userName: String
     private lateinit var conversationId: String
+
+    @Inject
+    lateinit var mainRepository: MainRepository
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentChatBinding.inflate(inflater, container, false)
@@ -71,27 +78,32 @@ class ChatFragment : Fragment() {
 
         binding.ivVideocall.setOnClickListener {
             getCameraAndMicPermission {
-               // sendConnectionRequest(true)
+                sendConnectionRequest(true)
             }
         }
 
         binding.ivAudiocall.setOnClickListener {
             getCameraAndMicPermission {
-                //sendConnectionRequest(false)
+                sendConnectionRequest(false)
             }
         }
     }
 
-    /*private fun sendConnectionRequest(isVideoCall: Boolean) {
-        userId.let { username ->
-            mainRepository.sendConnectionRequest(username, true) { success ->
+    private fun sendConnectionRequest(isVideoCall: Boolean) {
+        userId.let { userId ->
+            mainRepository.sendConnectionRequest(userId, true) { success ->
                 if (success) {
-                    val action = ChatFragmentDirections.actionChatFragmentToCallFragment(username, isVideoCall, true)
-                    findNavController().navigate(action)
+                    val bundle = Bundle().apply {
+                        putString("target", userId)
+                        putString("callerName", fullName)
+                        putBoolean("isVideoCall", isVideoCall)
+                        putBoolean("isCaller", true)
+                    }
+                    findNavController().navigate(R.id.callFragment, bundle)
                 }
             }
         }
-    }*/
+    }
 
     fun getCameraAndMicPermission(success:()->Unit){
         PermissionX.init(this)

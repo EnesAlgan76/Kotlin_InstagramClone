@@ -37,9 +37,9 @@ class RegisterNextFragment :Fragment(){
 
 
         binding.btnIleriFrgregister.setOnClickListener {
-            val userName = binding.etFrgregisterKullaniciAdi.text.trim().toString()
-            val password = binding.etFrgregisterSifre.text.trim().toString()
-            val fullName = binding.etFrgregisterAdsoyad.text.trim().toString()
+            val userName = binding.etFrgregisterKullaniciAdi.text?.trim().toString()
+            val password = binding.etFrgregisterSifre.text?.trim().toString()
+            val fullName = binding.etFrgregisterAdsoyad.text?.trim().toString()
 
             if (checkFieldsAreFilled()) {
                 val email = if (hint == "Email") input else ""

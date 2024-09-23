@@ -29,8 +29,12 @@ import com.abedelazizshe.lightcompressorlibrary.utils.saveVideoInExternal
 import com.bumptech.glide.Glide
 import com.example.kotlininstagramapp.Generic.UserSingleton
 import com.example.kotlininstagramapp.R
+import com.example.kotlininstagramapp.databinding.FragmentShareNextBinding
 import com.example.kotlininstagramapp.utils.DatabaseHelper
 import com.example.kotlininstagramapp.utils.FullyCustomizedStorageConfiguration
+import com.example.ns.ui.NSButton
+import com.squareup.picasso.MemoryPolicy
+import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
@@ -45,22 +49,15 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ShareNextFragment : Fragment() {
-    var gelenDosya: File? =null
-    lateinit var image:ImageView
-    lateinit var ivBack:ImageView
-    lateinit var tvShare :TextView
-    lateinit var explanation :TextView
     val shareProgressDialog = ShareProgressDialog()
     private val uris = mutableListOf<Uri>()
     @Inject
     lateinit var databaseHelper: DatabaseHelper
+    lateinit var binding : FragmentShareNextBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater.inflate(R.layout.fragment_share_next, container, false)
-        image = view.findViewById(R.id.iv_share_next)
-        tvShare = view.findViewById(R.id.tv_paylas)
-        explanation = view.findViewById(R.id.et_explanation)
-        ivBack = view.findViewById(R.id.iv_back)
+        binding = FragmentShareNextBinding.bind(view)
 
         val uriString = arguments?.getString("uri")
         val uri: Uri? = uriString?.let { Uri.parse(it) }
@@ -78,15 +75,17 @@ class ShareNextFragment : Fragment() {
 
         gelenDosya?.let {
             if(gelenDosya.extension=="mp4"){
-                Glide.with(view.context).load(getVideoThumbnail(it)).into(image)
+                Glide.with(view.context).load(getVideoThumbnail(it)).into(binding.ivShareImage)
                 uris.add(Uri.fromFile(gelenDosya))
             }else{
-                Glide.with(view.context).load(it).into(image)
+                //Glide.with(requireContext()).load(it).into(binding.ivShareImage)
+
+                Picasso.get().load(it).memoryPolicy(MemoryPolicy.NO_CACHE).into(binding.ivShareImage)
             }
 
         }
 
-        ivBack.setOnClickListener {
+        binding.ivBack.setOnClickListener {
 
         }
 
@@ -94,7 +93,7 @@ class ShareNextFragment : Fragment() {
 
 
 
-        tvShare.setOnClickListener {
+        binding.btnShare.setOnClickListener {
             shareProgressDialog.show(requireActivity().supportFragmentManager, "ShareProgressDialog")
             shareProgressDialog.isCancelable = false
 
@@ -109,7 +108,7 @@ class ShareNextFragment : Fragment() {
                         databaseHelper.uploadPost(
                             compressedImageUri,
                             true,
-                            explanation.text.toString(),
+                            binding.etCaption.text.toString(),
                             onProgress = {
                                 Log.e("","Progress ____>>> "+it)
                                 shareProgressDialog.tvProgress.text = "Yükleniyor : %${it}"
@@ -186,7 +185,7 @@ class ShareNextFragment : Fragment() {
                             databaseHelper.uploadPost(
                                 Uri.fromFile(File(path)),
                                 false,
-                                explanation.text.toString(),
+                                binding.etCaption.text.toString(),
 
                                 onProgress = {
                                     Log.e("","Progress ____>>> "+it)

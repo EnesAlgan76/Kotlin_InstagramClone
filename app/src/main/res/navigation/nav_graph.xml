@@ -110,10 +110,6 @@
         android:name="com.example.kotlininstagramapp.ui.Share.ShareCameraFragment"
         android:label="ShareCameraFragment" />
     <fragment
-        android:id="@+id/shareGalleryFragment"
-        android:name="com.example.kotlininstagramapp.ui.Share.ShareGalleryFragment"
-        android:label="ShareGalleryFragment" />
-    <fragment
         android:id="@+id/shareNextFragment"
         android:name="com.example.kotlininstagramapp.ui.Share.ShareNextFragment"
         android:label="ShareNextFragment" />
@@ -156,6 +152,21 @@
         android:id="@+id/chatFragment"
         android:name="com.example.kotlininstagramapp.Home.ChatFragment"
         android:label="ChatFragment" />
+
+    <fragment
+        android:id="@+id/callFragment"
+        android:name="com.example.kotlininstagramapp.ui.CallFragment"
+        android:layout="@layout/fragment_call">
+        <argument
+            android:name="target"
+            app:argType="string" />
+        <argument
+            android:name="isVideoCall"
+            app:argType="boolean" />
+        <argument
+            android:name="isCaller"
+            app:argType="boolean" />
+    </fragment>
 
 
 </navigation>

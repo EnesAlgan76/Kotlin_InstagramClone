@@ -104,10 +104,10 @@ class ShareVideoFragment : Fragment() {
 
     private fun goShareNextFragmet(file: File?) {
 
-        EventBus.getDefault().postSticky(file?.let {
-            EventBusDataEvents.SendMediaFile(it)
-        })
-        findNavController().navigate(R.id.shareNextFragment)
+        val bundle = Bundle().apply {
+            putString("uri", file!!.path)
+        }
+        findNavController().navigate(R.id.shareNextFragment,bundle)
     }
 
 
